@@ -1,6 +1,4 @@
-# Dependency injection
-
-We have built our own super simple DI. 
+# Mindhive's base Meteor package
 
 ## Install
 
@@ -8,55 +6,34 @@ We have built our own super simple DI.
 2. `meteor add meteorhacks:unblock`
 3. `meteor add aldeed:collection2`
 
-## Motivations and benefits
+## How to use this
+ 
+- See our [example webapp](https://github.com/mindhivenz/todos-basis-webapp)
 
-- Prefer pure functions as they are: 
-	- simpler to understand 
-	- easily tested
-	- make dependencies explicit
-- Avoid ES6 imports as they are difficult to test
-- Especially avoid Meteor package imports as most test runners don't understand Meteor's packaging
-	(they can be accessed through Meteor globals but that's not a great idea either)
-  	
-## Lifecycle
+## Dependency injection 
 
-1. Main file for the app should import all of it's modules using `initModules()` 
+See our [DI package](https://github.com/mindhivenz/di-js).
 
-2. Modules should be a directory's `index.js` with a default export function
+This package also makes Meteor core services available in the appContext:
+ 
+- Meteor
+- Tracker
+- Mongo: to create Mongo collections
+- Users: Meteor's `users` Mongo collection
+- [SimpleSchema](https://github.com/aldeed/meteor-collection2)
+- apiRegistry: see below
 
-	- For example: `export default () => { return { serviceName: new Service(), ... } }`	
-	- Return an object where the keys map service names to the service objects/functions to be 
-		put into the app context
-	- The module function is also passed the current appContext to access other services (destructing works a treat),
-    	for example: `export default ({ Meteor, Mongo }) => { ... }`
-    - Modules further down the list passed to `initModules()` can use services added to the appContext by 
-    	earlier modules
-    - Modules don't have to return anything, you can use them to perform other initialization
-    - Modules are called inside `Meteor.startup` so there is no need to manage that yourself
+## ApiRegistry
 
-3. To use services in the appContext wrap a function with `inject(...)`
+Rather than calling `Meteor.methods` and `Meteor.publish` to create methods and publications
+inject `apiRegistry`. This has a cleaner callback (no use of `this`), calls 
+[unblock](https://github.com/meteorhacks/unblock), and facilitates domain testing (see below).
 
-	- Given a function that needs services form the appContext, for example: 
-		`const fooFunc = ({ Tasks, Accounts }, bar) => {...}`
-	- When we wrap this function: `const foo = inject(fooFunc)`
-	- Then we can call the returned function as `foo(barValue)` and services will be injected 
-	   automagically
-	 
-4. Testing is then easy and explicit
+## Domain tests
 
-## Testing
+An [example domain test](https://github.com/mindhivenz/todos-basis-webapp/blob/master/tests/specs/domain/tasks.spec.js).
 
-In the example below `service` will be the only object in the appContext and available to any
-code under test that uses `inject()`. 
-
-```javascript
-const service = {} 
-it('should call service.foo()', 
-  mockAppContext({ service }, () => {
-	service.foo = sinon.spy()
-	injectedFuncUnderTest()
-	service.foo.should.have.been.calledOnce      	
-  })
-)
-```		 	 
-	 
+- Use `test.mockInitModules` to initialise modules in test
+- From the returned context get the mock `apiRegistry` which can `call` and `subscribe` to methods and publications
+  in the modules being tested
+- Use `test.MiniMongo` to use in memory Mongo instead of on disk
