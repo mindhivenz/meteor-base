@@ -1,0 +1,47 @@
+{
+  "name": "@mindhive/meteor",
+  "version": "0.1.0",
+  "description": "Our standard additions to Meteor",
+  "contributors": [
+    {
+      "name": "Damon Maria",
+      "email": "damon@mindhive.co.nz"
+    }
+  ],
+  "private": false,
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "babel src --ignore *.spec.js --out-dir dist",
+    "test": "mocha --compilers js:babel-core/register --reporter spec \"src/**/*.spec.js\"",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mindhivenz/meteor-base.git"
+  },
+  "keywords": [
+    "meteor"
+  ],
+  "dependencies": {
+    "@mindhive/di": "^0.2.0"
+  },
+  "devDependencies": {
+    "@mindhive/some": "^0.1.1",
+    "babel-cli": "^6.9.0",
+    "babel-eslint": "^6.0.3",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.9.0",
+    "chai": "^3.5.0",
+    "eslint": "^2.8.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.8.0",
+    "mocha": "^2.5.3",
+    "sinon": "^1.17.4",
+    "sinon-chai": "^2.8.0"
+  },
+  "homepage": "https://github.com/mindhivenz/meteor-base",
+  "bugs": {
+    "url": "https://github.com/mindhivenz/meteor-base/issues"
+  },
+  "license": "MIT"
+}

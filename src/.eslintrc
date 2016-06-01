@@ -1,0 +1,27 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb/base"],
+  "env": {
+    "mocha": true,
+    "meteor": true
+  },
+  "rules": {
+    "padded-blocks": 0,
+    "react/prop-types": 0,
+    "semi": [2, "never"],
+    "space-unary-ops": [
+      2, {
+        "overrides": {
+          "!": true
+        }
+      }
+    ],
+    "quote-props": 0,
+    "no-confusing-arrow": 0,
+    "no-unused-expressions": 0,
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
+  },
+  "ecmaFeatures": {
+    "spread": true
+  }
+}
