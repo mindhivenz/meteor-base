@@ -5,6 +5,7 @@
 1. `npm install --save @mindhive/meteor`
 2. `meteor add meteorhacks:unblock`
 3. `meteor add aldeed:collection2`
+4. `meteor add reywood:publish-composite`
 
 ## How to use this
  

@@ -47,7 +47,7 @@ export class ApiRegistry {
     )
   }
 
-  publication(recordSetName, func) {
+  meteorPublication(meteorPublishFunc, recordSetName, func) {
     if (this.Meteor.isServer) {
       const injectedFunc = inject(func)
       // Can't use arrow func as 'this' would be different
@@ -56,7 +56,15 @@ export class ApiRegistry {
         subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
         return injectedFunc(subscription, ...args)
       }
-      this.Meteor.publish(recordSetName, wrapper)
+      meteorPublishFunc(recordSetName, wrapper)
     }
+  }
+
+  publication(recordSetName, func) {
+    this.meteorPublication(this.Meteor.publish, recordSetName, func)
+  }
+
+  publicationComposite(recordSetName, func) {
+    this.meteorPublication(this.Meteor.publishComposite, recordSetName, func)
   }
 }

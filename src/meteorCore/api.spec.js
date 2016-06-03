@@ -135,7 +135,7 @@ describe('ApiRegistry', () => {
       Meteor.publish.should.not.have.been.called
     })
 
-    it('should pass the appContext, call context, and args to the publish function' +
+    it('should pass the appContext, and args to the function' +
       ' and call unblock on the subscription (call context)', () => {
       Meteor.isServer = true
       const thisInPublication = {
@@ -145,6 +145,31 @@ describe('ApiRegistry', () => {
       const publicationFunc = sinon.spy()
       apiRegistry.publication('somePub', publicationFunc)
       Meteor.publish.getCall(0).args[1].call(thisInPublication, ...args)
+      publicationFunc.should.have.been.calledWith(test.appContext, thisInPublication, ...args)
+      thisInPublication.unblock.should.have.been.calledOnce
+    })
+
+  })
+
+  describe('publicationComposite', () => {
+
+    beforeEach(() => {
+      Meteor.publishComposite = sinon.spy()
+    })
+
+    it('should pass recordSetName and pass the appContext, and args to function' +
+      ' and call unblock on the subscription (call context)', () => {
+      Meteor.isServer = true
+      const thisInPublication = {
+        unblock: sinon.spy(),
+      }
+      const args = some.array()
+      const publicationFunc = sinon.spy()
+      const recordSetName = some.unique.string()
+      apiRegistry.publicationComposite(recordSetName, publicationFunc)
+      const meteorCall = Meteor.publishComposite.getCall(0)
+      meteorCall.args[0].should.equal(recordSetName)
+      meteorCall.args[1].call(thisInPublication, ...args)
       publicationFunc.should.have.been.calledWith(test.appContext, thisInPublication, ...args)
       thisInPublication.unblock.should.have.been.calledOnce
     })
