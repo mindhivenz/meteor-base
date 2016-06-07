@@ -23,7 +23,7 @@
     "meteor"
   ],
   "dependencies": {
-    "@mindhive/di": "^0.2.0"
+    "@mindhive/di": "^0.3.0"
   },
   "devDependencies": {
     "@mindhive/some": "^0.1.1",
