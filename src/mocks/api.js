@@ -26,6 +26,10 @@ export class MockApiRegistry {
     this.publicationFuncs.set(recordSetName, func)
   }
 
+  publicationComposite(...args) {
+    this.publication(...args)
+  }
+
   call(methodName, methodInvocation = {}, ...args) {
     const func = this.methodFuncs.get(methodName)
     if (! func) {
@@ -45,9 +49,47 @@ export class MockApiRegistry {
     if (! func) {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
     }
-    return inject(func)(
+    const cursor = inject(func)(
       subscription,
       ...args
-    ).fetch()
+    )
+    if (typeof cursor.fetch !== 'function') {
+      throw new TypeError('Have you called subscribe when you meant subscribeComposite?')
+    }
+    return cursor.fetch()
+  }
+
+  subscribeComposite(recordSetName, subscription = {}, ...args) {
+    const func = this.publicationFuncs.get(recordSetName)
+    if (! func) {
+      throw new ReferenceError(`Unknown publication "${recordSetName}"`)
+    }
+    const tree = inject(func)(
+      subscription,
+      ...args
+    )
+    if (typeof tree.find !== 'function') {
+      throw new TypeError('Have you called subscribeComposite when you meant subscribe?')
+    }
+    const result = {
+      found: tree.find().fetch(),
+      children: [],
+    }
+    if (tree.children) {
+      tree.children.forEach(child => {
+        const childResult = {
+          found: new Map(),
+        }
+        result.children.push(childResult)
+        result.found.forEach(parentResult => {
+          childResult.found.set(parentResult, child.find(parentResult).fetch())
+        })
+        if (child.children) {
+          throw new Error('Mock fetching of children of children not implemented yet')
+        }
+      })
+      
+    }
+    return result
   }
 }
