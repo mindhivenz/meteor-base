@@ -1,4 +1,3 @@
-/* global browser */
 import { appContext } from '@mindhive/di/test'
 
 
@@ -30,10 +29,7 @@ const applyBackDoorMethods = () => {
   })
 }
 
-/*
-Sets up all backdoors
- */
-export const open = () => {
+export default () => {
   if (global.Meteor.isServer) {
     if (process.env.NODE_ENV !== 'test') {
       throw new Error('Only open the backdoor in when NODE_ENV=test')
@@ -42,15 +38,4 @@ export const open = () => {
     globallyApply('resetDatabase', resetDatabase)
     applyBackDoorMethods()
   }
-}
-
-/*
-Sets the userId on a browser connection in a webdriver test to appear as tho you're logged in
- */
-export const login = (userId) => {
-  browser.execute(id => {
-    Meteor.call('backdoor.setUserId', id, function () {  // eslint-disable-line
-      Meteor.connection.setUserId(id)
-    })
-  }, userId)
 }
