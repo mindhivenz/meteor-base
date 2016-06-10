@@ -1,5 +1,5 @@
-import { MiniMongo } from './minimongo'
-import { MockApiRegistry } from './api'
+import { MiniMongo } from './mocks/minimongo'
+import { MockApiRegistry } from './mocks/api'
 
 
 export const mockInitModules = (...contextAndModules) =>

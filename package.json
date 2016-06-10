@@ -9,7 +9,7 @@
     }
   ],
   "private": false,
-  "main": "./dist/index.js",
+  "main": "./index.js",
   "scripts": {
     "build": "babel src --ignore *.spec.js --out-dir dist",
     "test": "mocha --compilers js:babel-core/register --reporter spec \"src/**/*.spec.js\"",
