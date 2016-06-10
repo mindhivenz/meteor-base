@@ -10,3 +10,7 @@ export const login = (userId) => {
     })
   }, userId)
 }
+
+export const keys = {
+  ENTER: '\uE007',
+}
