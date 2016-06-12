@@ -23,18 +23,18 @@
     "meteor"
   ],
   "dependencies": {
-    "@mindhive/di": "^0.3.0"
+    "@mindhive/di": "^0.4.0"
   },
   "devDependencies": {
     "@mindhive/some": "^0.1.1",
-    "babel-cli": "^6.9.0",
-    "babel-eslint": "^6.0.3",
+    "babel-cli": "^6.10.1",
+    "babel-eslint": "^6.0.4",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "chai": "^3.5.0",
-    "eslint": "^2.8.0",
+    "eslint": "^2.12.0",
     "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.8.0",
+    "eslint-plugin-import": "^1.8.1",
     "mocha": "^2.5.3",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0"
