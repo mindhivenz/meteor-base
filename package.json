@@ -1,6 +1,6 @@
 {
   "name": "@mindhive/meteor",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "description": "Our standard additions to Meteor",
   "contributors": [
     {
@@ -23,7 +23,7 @@
     "meteor"
   ],
   "dependencies": {
-    "@mindhive/di": "^0.4.0"
+    "@mindhive/di": "^1.0.0"
   },
   "devDependencies": {
     "@mindhive/some": "^0.1.1",
