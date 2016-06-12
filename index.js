@@ -14,9 +14,10 @@ module.exports = {
  Other Meteor objects and packages that should be injected as dependencies into your code
  go in the meteorCore/index.js module.
  */
-
-if (Package && Package.check) {
-  module.exports.check = Package.check.check
+if (global.Package) {
+  if (global.Package.check) {
+    module.exports.check = global.Package.check.check
+  }
 }
 
 /*
