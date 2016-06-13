@@ -297,6 +297,7 @@ describe('ApiRegistry', () => {
 
     beforeEach(() => {
       Meteor.publishComposite = sinon.spy()
+      thisInCall = {}  // publicationComposite doesn't seem to use prototypes
     })
 
     const callWrappedCompositeSomePub = (...args) =>
@@ -314,6 +315,64 @@ describe('ApiRegistry', () => {
       callWrappedCompositeSomePub(...args)
       publicationFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
       thisInCall.unblock.should.have.been.calledOnce
+    })
+
+    describe('call context (with no prototype)', () => {
+
+      it('should provide viewer', () => {
+        Meteor.isServer = true
+        const viewer = some.object()
+        Users.findOne = sinon.spy(() => viewer)
+        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
+          methodInvocation.viewer().should.equal(viewer)
+        })
+        apiRegistry.publicationComposite('somePub', publicationFunc)
+        const userId = some.string()
+        thisInCall.unblock = sinon.spy()
+        thisInCall.userId = userId
+        callWrappedCompositeSomePub()
+        publicationFunc.should.have.been.called
+        Users.findOne.should.have.been.calledWith(userId)
+      })
+
+      it('should cache viewer', () => {
+        Meteor.isServer = true
+        const viewer = some.object()
+        Users.findOne = sinon.spy(() => viewer)
+        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
+          methodInvocation.viewer()
+          methodInvocation.viewer()
+        })
+        apiRegistry.publicationComposite('somePub', publicationFunc)
+        const userId = some.string()
+        thisInCall.unblock = sinon.spy()
+        thisInCall.userId = userId
+        callWrappedCompositeSomePub()
+        publicationFunc.should.have.been.called
+        Users.findOne.should.have.been.calledOnce
+      })
+
+      it('should ensure roles', () => {
+        Meteor.isServer = true
+        Meteor.Error = Error
+        const viewer = some.object()
+        Users.findOne = sinon.spy(() => viewer)
+        const roles = some.array()
+        const group = some.string()
+        Roles.userIsInRole = sinon.spy(() => false)
+        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
+          methodInvocation.ensureViewerHasRole(roles, group)
+        })
+        apiRegistry.publicationComposite('somePub', publicationFunc)
+        const userId = some.string()
+        thisInCall.unblock = sinon.spy()
+        thisInCall.userId = userId
+        should.throw(() => {
+          callWrappedCompositeSomePub()
+        }, Meteor.Error)
+        Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
+      })
+
     })
 
   })

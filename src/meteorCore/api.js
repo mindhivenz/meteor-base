@@ -78,13 +78,8 @@ export class ApiRegistry {
   enhanceApiContextPrototype(instance) {
     if (! ('viewer' in instance)) {
       const self = this
-      if (instance.prototype === Object.prototype) {
-        throw new Error('Is Object.prototype')
-      }
-      if (typeof instance.prototype === 'undefined') {
-        throw new Error('Prototype undefined')
-      }
-      extend(Object.getPrototypeOf(instance), {
+      const hasPrototype = typeof instance.prototype === 'undefined'
+      extend(hasPrototype ? instance : Object.getPrototypeOf(instance), {
 
         viewer() {
           if (! this.userId) {
