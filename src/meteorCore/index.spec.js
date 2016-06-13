@@ -21,6 +21,8 @@ describe('meteorCoreModule', () => {
       'Users',
       'Mongo',
       'SimpleSchema',
+      'Accounts',
+      'Roles',
       'apiRegistry',
     ])
   })

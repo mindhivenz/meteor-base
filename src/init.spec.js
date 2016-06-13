@@ -1,6 +1,6 @@
 import some from '@mindhive/some'
 import { sinon } from './mocha'
-import { test } from '@mindhive/di'
+import { mockAppContext, appContext } from '@mindhive/di/test'
 
 import { initModules } from './init'
 
@@ -17,36 +17,36 @@ describe('initModules', () => {
   })
 
   it('should not init if Meteor not started',
-    test.mockAppContext(() => {
-      test.appContext.should.be.empty
+    mockAppContext(() => {
+      appContext.should.be.empty
       initModules([])
-      test.appContext.should.be.empty
+      appContext.should.be.empty
     })
   )
 
   it('should init once started and add core module',
-    test.mockAppContext(() => {
-      test.appContext.should.be.empty
+    mockAppContext(() => {
+      appContext.should.be.empty
       initModules([])
       Meteor.startup.yield()
-      test.appContext.should.have.property('Meteor')
+      appContext.should.have.property('Meteor')
     })
   )
 
   it('should add passed modules',
-    test.mockAppContext(() => {
+    mockAppContext(() => {
       initModules([
         () => ({
           someContext: some.object(),
         }),
       ])
       Meteor.startup.yield()
-      test.appContext.should.have.property('someContext')
+      appContext.should.have.property('someContext')
     })
   )
 
   it('should be callable multiple times',
-    test.mockAppContext(() => {
+    mockAppContext(() => {
       Meteor.startup.yields()
       initModules([
         () => ({
@@ -58,8 +58,8 @@ describe('initModules', () => {
           secondContext: some.object(),
         }),
       ])
-      test.appContext.should.have.property('firstContext')
-      test.appContext.should.have.property('secondContext')
+      appContext.should.have.property('firstContext')
+      appContext.should.have.property('secondContext')
     })
   )
 

@@ -23,7 +23,8 @@
     "meteor"
   ],
   "dependencies": {
-    "@mindhive/di": "^1.0.0"
+    "@mindhive/di": "^1.1.0",
+    "lodash.assign": "^4.0.9"
   },
   "devDependencies": {
     "@mindhive/some": "^0.1.1",
