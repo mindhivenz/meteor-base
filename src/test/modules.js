@@ -1,19 +1,9 @@
-import { MiniMongo } from './mocks/minimongo'
-import { MockApiRegistry } from './mocks/api'
+import mockMeteorCoreModule from './mocks/core'
 
 
 export const mockInitModules = (...contextAndModules) =>
   () => {
-    const meteorCoreContext = {
-      Meteor: {
-        isServer: true,
-      },
-      Tracker: {},
-      Mongo: MiniMongo,
-      Users: new MiniMongo.Collection('users'),
-      SimpleSchema: global.SimpleSchema,
-      apiRegistry: new MockApiRegistry(),
-    }
+    const meteorCoreContext = mockMeteorCoreModule()
     const passedContext = typeof contextAndModules[0] !== 'function'
     const [context, ...modules] = passedContext ? contextAndModules : [{}, ...contextAndModules]
     const resultContext = {
