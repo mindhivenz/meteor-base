@@ -1,6 +1,6 @@
 import { sinon } from '../mocha'
 import some from '@mindhive/some'
-import { test } from '@mindhive/di'
+import { appContext } from '@mindhive/di/test'
 
 import { ApiRegistry } from './api'
 
@@ -57,7 +57,7 @@ describe('ApiRegistry', () => {
       const thisInMethod = {}
       const args = some.array()
       Meteor.methods.getCall(0).args[0].someMethod.call(thisInMethod, ...args)
-      someMethodFunc.should.have.been.calledWith(test.appContext, thisInMethod, ...args)
+      someMethodFunc.should.have.been.calledWith(appContext, thisInMethod, ...args)
     })
 
     it('should call unblock() on the call context if not runInSeries', () => {
@@ -145,7 +145,7 @@ describe('ApiRegistry', () => {
       const publicationFunc = sinon.spy()
       apiRegistry.publication('somePub', publicationFunc)
       Meteor.publish.getCall(0).args[1].call(thisInPublication, ...args)
-      publicationFunc.should.have.been.calledWith(test.appContext, thisInPublication, ...args)
+      publicationFunc.should.have.been.calledWith(appContext, thisInPublication, ...args)
       thisInPublication.unblock.should.have.been.calledOnce
     })
 
@@ -170,7 +170,7 @@ describe('ApiRegistry', () => {
       const meteorCall = Meteor.publishComposite.getCall(0)
       meteorCall.args[0].should.equal(recordSetName)
       meteorCall.args[1].call(thisInPublication, ...args)
-      publicationFunc.should.have.been.calledWith(test.appContext, thisInPublication, ...args)
+      publicationFunc.should.have.been.calledWith(appContext, thisInPublication, ...args)
       thisInPublication.unblock.should.have.been.calledOnce
     })
 
