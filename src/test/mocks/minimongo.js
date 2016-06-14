@@ -6,5 +6,10 @@ export const MiniMongo = {
       super(null)   // null causes this to be a MiniMongo
       this.name = name
     }
+
+    _ensureIndex() {
+      // Don't do anything but don't throw as MiniMongo normally would
+      // REVISIT: if this was ever used on the client it should throw still
+    }
   },
 }
