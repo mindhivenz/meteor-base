@@ -1,10 +1,15 @@
 var di = require('@mindhive/di')
+var reactKomposer = require('react-komposer')
 
 var init = require('./dist/init') 
+var compose = require('./dist/compose')
+
 
 module.exports = {
   inject: di.inject,
   initModules: init.initModules,
+  withLiveData: compose.withLiveData,
+  composeAll: reactKomposer.composeAll,
 }
 
 /*
