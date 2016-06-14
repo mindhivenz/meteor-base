@@ -2,6 +2,7 @@ var di = require('@mindhive/di')
 var reactKomposer = require('react-komposer')
 
 var init = require('./dist/init') 
+var api = require('./dist/meteorCore/api')
 var compose = require('./dist/compose')
 
 
@@ -10,6 +11,7 @@ module.exports = {
   initModules: init.initModules,
   withLiveData: compose.withLiveData,
   composeAll: reactKomposer.composeAll,
+  NOT_AUTHORIZED: api.NOT_AUTHORIZED,
 }
 
 /*

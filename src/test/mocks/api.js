@@ -1,4 +1,5 @@
 import { inject } from '@mindhive/di'
+import some from '@mindhive/some'
 
 
 export class MockApiContext {
@@ -6,6 +7,10 @@ export class MockApiContext {
   constructor(options = {}) {
     this.viewerUser = options.viewer
     this.userId = options.userId || (options.viewer && options.viewer._id)
+    this.connection = {
+      id: some.string(),
+      clientAddress: some.ipAddress(),
+    }
   }
 
   viewer() {
