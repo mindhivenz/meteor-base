@@ -1,6 +1,40 @@
 import { inject } from '@mindhive/di'
 
 
+export class MockApiContext {
+
+  constructor(options = {}) {
+    this.viewerUser = options.viewer
+    this.userId = options.userId || (options.viewer && options.viewer._id)
+  }
+
+  viewer() {
+    return this.viewerUser
+  }
+
+  viewerHasRole(roles, group) {
+    return global.Roles.userIsInRole(this.viewer(), roles, group)
+  }
+
+  ensureViewerHasRole(roles, group) {
+    if (! this.viewerHasRole(roles, group)) {
+      throw new global.Meteor.Error('not-authorized', 'You are not authorized')
+    }
+  }
+}
+
+export class MockMethodInvocation extends MockApiContext {
+
+  constructor(options = {}) {
+    super(options)
+    this.isSimulation = false
+  }
+}
+
+export class MockSubscription extends MockApiContext {
+
+}
+
 export class MockApiRegistry {
 
   constructor() {
@@ -30,21 +64,18 @@ export class MockApiRegistry {
     this.publication(...args)
   }
 
-  call(methodName, methodInvocation = {}, ...args) {
+  call(methodName, methodInvocation = new MockMethodInvocation(), ...args) {
     const func = this.methodFuncs.get(methodName)
     if (! func) {
       throw new ReferenceError(`Unknown method name "${methodName}"`)
     }
     return inject(func)(
-      {
-        isSimulation: false,
-        ...methodInvocation,
-      },
+      methodInvocation,
       ...args
     )
   }
 
-  subscribe(recordSetName, subscription = {}, ...args) {
+  subscribe(recordSetName, subscription = new MockSubscription(), ...args) {
     const func = this.publicationFuncs.get(recordSetName)
     if (! func) {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
@@ -59,7 +90,7 @@ export class MockApiRegistry {
     return cursor.fetch()
   }
 
-  subscribeComposite(recordSetName, subscription = {}, ...args) {
+  subscribeComposite(recordSetName, subscription = new MockSubscription(), ...args) {
     const func = this.publicationFuncs.get(recordSetName)
     if (! func) {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
