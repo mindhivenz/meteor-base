@@ -88,7 +88,6 @@ export class MockApiRegistry {
           throw new Error('Mock fetching of children of children not implemented yet')
         }
       })
-      
     }
     return result
   }
