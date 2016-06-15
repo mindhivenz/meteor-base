@@ -3,6 +3,7 @@ import some from '@mindhive/some'
 import { appContext } from '@mindhive/di/test'
 
 import { ApiRegistry } from './api'
+import { NotAuthorizedError } from './error'
 
 
 describe('ApiRegistry', () => {
@@ -184,7 +185,7 @@ describe('ApiRegistry', () => {
         thisInCall.userId = userId
         should.throw(() => {
           callWrappedSomeMethod()
-        }, Meteor.Error)
+        }, NotAuthorizedError)
         Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
       })
 
@@ -285,7 +286,7 @@ describe('ApiRegistry', () => {
         thisInCall.userId = userId
         should.throw(() => {
           callWrappedSomePub()
-        }, Meteor.Error)
+        }, NotAuthorizedError)
         Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
       })
 
@@ -369,7 +370,7 @@ describe('ApiRegistry', () => {
         thisInCall.userId = userId
         should.throw(() => {
           callWrappedCompositeSomePub()
-        }, Meteor.Error)
+        }, NotAuthorizedError)
         Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
       })
 

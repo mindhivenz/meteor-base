@@ -2,9 +2,8 @@ var di = require('@mindhive/di')
 var reactKomposer = require('react-komposer')
 
 var init = require('./dist/init') 
-var api = require('./dist/meteorCore/api')
 var compose = require('./dist/compose')
-var error = require('./dist/test/mocks/error')
+var error = require('./dist/meteorCore/error')
 
 
 module.exports = {
@@ -12,7 +11,9 @@ module.exports = {
   initModules: init.initModules,
   withLiveData: compose.withLiveData,
   composeAll: reactKomposer.composeAll,
-  NOT_AUTHORIZED: api.NOT_AUTHORIZED,
+  NOT_AUTHORIZED: error.NOT_AUTHORIZED,
+  ClientError: error.ClientError,
+  NotAuthorizedError: error.NotAuthorizedError,
 }
 
 /*
@@ -25,16 +26,7 @@ module.exports = {
 if (global.Package) {
   if (global.Package.check) {
     module.exports.check = global.Package.check.check
+    module.exports.Match = global.Package.check.Match
   }
 }
 
-/*
- Expose Meteor.Error under a better name.
- This is the only exception type that a client will receive from a server method.
- Also to avoids importing of Meteor.
- */
-if (global.Meteor) {
-  module.exports.ClientError = global.Meteor.Error
-} else {
-  module.exports.ClientError = error.MockMeteorError
-}

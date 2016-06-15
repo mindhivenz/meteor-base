@@ -1,8 +1,7 @@
 import extend from 'lodash.assign'
 import { inject } from '@mindhive/di'
 
-
-export const NOT_AUTHORIZED = 'not-authorized'
+import { NotAuthorizedError } from './error'
 
 export class ApiRegistry {
 
@@ -99,7 +98,7 @@ export class ApiRegistry {
 
         ensureViewerHasRole(roles, group) {
           if (! this.viewerHasRole(roles, group)) {
-            throw new self.Meteor.Error(NOT_AUTHORIZED, 'You are not authorized')
+            throw new NotAuthorizedError()
           }
         },
 
