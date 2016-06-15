@@ -1,6 +1,8 @@
 import { inject } from '@mindhive/di'
 import some from '@mindhive/some'
 
+import { NotAuthorizedError } from '../../meteorCore/error'
+
 
 export class MockApiContext {
 
@@ -23,7 +25,7 @@ export class MockApiContext {
 
   ensureViewerHasRole(roles, group) {
     if (! this.viewerHasRole(roles, group)) {
-      throw new global.Meteor.Error('not-authorized', 'You are not authorized')
+      throw new NotAuthorizedError('not-authorized', 'You are not authorized')
     }
   }
 }

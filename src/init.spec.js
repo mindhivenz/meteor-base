@@ -9,7 +9,7 @@ describe('initModules', () => {
 
   beforeEach(() => {
     global.Meteor = {}
-    Meteor.startup = sinon.stub()
+    global.Meteor.startup = sinon.stub()
   })
 
   afterEach(() => {

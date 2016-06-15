@@ -14,4 +14,4 @@ export class NotAuthorizedError extends ClientError {
   constructor() {
     super(NOT_AUTHORIZED, 'You are not authorized')
   }
-} 
+}
