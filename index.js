@@ -36,5 +36,5 @@ if (global.Package) {
 if (global.Meteor) {
   module.exports.ClientError = global.Meteor.Error
 } else {
-  module.exports.ClientError = error.MockError
+  module.exports.ClientError = error.MockMeteorError
 }

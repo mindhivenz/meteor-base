@@ -1,11 +1,9 @@
 
-
 /*
-Mimicks the built in Meteor.Error
+Mimicking the built in Meteor.Error
  */
-export class MockError extends Error {
+export class MockMeteorError {
   constructor(error, reason, details) {
-    super()
     this.error = error
     this.reason = reason
     this.details = details
