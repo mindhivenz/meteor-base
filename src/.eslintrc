@@ -19,7 +19,14 @@
     "quote-props": 0,
     "no-confusing-arrow": 0,
     "no-unused-expressions": 0,
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
+    "no-underscore-dangle": [
+      "error", {
+        "allow": [
+          "_id",
+          "_obj"
+        ]
+      }
+    ]
   },
   "ecmaFeatures": {
     "spread": true
