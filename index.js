@@ -4,6 +4,7 @@ var reactKomposer = require('react-komposer')
 var init = require('./dist/init') 
 var api = require('./dist/meteorCore/api')
 var compose = require('./dist/compose')
+var error = require('./dist/test/mocks/error')
 
 
 module.exports = {
@@ -34,4 +35,6 @@ if (global.Package) {
  */
 if (global.Meteor) {
   module.exports.ClientError = global.Meteor.Error
+} else {
+  module.exports.ClientError = error.MockError
 }
