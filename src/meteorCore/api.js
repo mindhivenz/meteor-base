@@ -1,7 +1,7 @@
 import extend from 'lodash.assign'
 import { inject } from '@mindhive/di'
 
-import { NotAuthorizedError } from './error'
+import { notAuthorizedError } from './error'
 
 export class ApiRegistry {
 
@@ -98,7 +98,9 @@ export class ApiRegistry {
 
         ensureViewerHasRole(roles, group) {
           if (! this.viewerHasRole(roles, group)) {
-            throw new NotAuthorizedError()
+            const errorDetails =
+              `Viewer not ${Array.isArray(roles) ? `any of ${roles.join(', ')}` : `a ${roles}`}`
+            throw notAuthorizedError(this, errorDetails)
           }
         },
 

@@ -5,14 +5,17 @@ import { NotAuthorizedError } from '../../meteorCore/error'
 
 
 export class MockApiContext {
-
-  constructor(options = {}) {
-    this.viewerUser = options.viewer
-    this.userId = options.userId || (options.viewer && options.viewer._id)
-    this.connection = {
+  constructor({
+    viewer,
+    userId = viewer && viewer._id,
+    connection = {
       id: some.string(),
       clientAddress: some.ipAddress(),
-    }
+    },
+  }) {
+    this.viewerUser = viewer
+    this.userId = userId
+    this.connection = connection
   }
 
   viewer() {
@@ -25,7 +28,7 @@ export class MockApiContext {
 
   ensureViewerHasRole(roles, group) {
     if (! this.viewerHasRole(roles, group)) {
-      throw new NotAuthorizedError('not-authorized', 'You are not authorized')
+      throw new NotAuthorizedError()
     }
   }
 }

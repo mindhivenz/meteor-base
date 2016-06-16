@@ -13,7 +13,8 @@ module.exports = {
   composeAll: reactKomposer.composeAll,
   NOT_AUTHORIZED: error.NOT_AUTHORIZED,
   ClientError: error.ClientError,
-  NotAuthorizedError: error.NotAuthorizedError,
+  notAuthorizedError: error.notAuthorizedError,
+  onNotAuthorized: error.onNotAuthorized,
 }
 
 /*

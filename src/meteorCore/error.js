@@ -11,7 +11,18 @@ export const NOT_AUTHORIZED = 'not-authorized'
 export const ClientError = global.Meteor ? global.Meteor.Error : MockMeteorError
 
 export class NotAuthorizedError extends ClientError {
-  constructor() {
-    super(NOT_AUTHORIZED, 'You are not authorized')
+  constructor(details) {
+    super(NOT_AUTHORIZED, 'You are not authorized', details)
   }
+}
+
+const notAuthorizedEvents = []
+
+export const notAuthorizedError = (apiContext, details) => {
+  notAuthorizedEvents.forEach(cb => cb(apiContext, details))
+  return new NotAuthorizedError(details)
+}
+
+export const onNotAuthorized = (callback) => {
+  notAuthorizedEvents.push(callback)
 }
