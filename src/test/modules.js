@@ -1,18 +1,12 @@
 import mockMeteorCoreModule from './mocks/core'
 
 
-export const mockInitModules = (...contextAndModules) =>
+export const mockInitModules = (...modules) =>
   () => {
-    const meteorCoreContext = mockMeteorCoreModule()
-    const passedContext = typeof contextAndModules[0] !== 'function'
-    const [context, ...modules] = passedContext ? contextAndModules : [{}, ...contextAndModules]
-    const resultContext = {
-      ...meteorCoreContext,
-      ...context,
-    }
-    modules.forEach(module => {
-      const moduleContext = module(resultContext)
-      Object.assign(resultContext, moduleContext)
+    const resultContext = {}
+    const allModules = [mockMeteorCoreModule, ...modules]
+    allModules.forEach(module => {
+      Object.assign(resultContext, module(resultContext))
     })
     return resultContext
   }
