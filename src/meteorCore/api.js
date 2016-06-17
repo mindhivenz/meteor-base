@@ -26,7 +26,7 @@ export class ApiRegistry {
       // Can't use arrow func as 'this' would be different
       const wrapper = function wrapper(...args) {
         const methodInvocation = this
-        self.enhanceApiContext(methodInvocation)
+        self.enhanceApiContext(methodInvocation, `call:${methodName}`)
         if (self.Meteor.isServer && ! runInSeries) {
           methodInvocation.unblock()
         }
@@ -59,7 +59,7 @@ export class ApiRegistry {
       // Can't use arrow func as 'this' would be different
       const wrapper = function wrapper(...args) {
         const subscription = this
-        self.enhanceApiContext(subscription)
+        self.enhanceApiContext(subscription, `pub:${recordSetName}`)
         subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
         return injectedFunc(subscription, ...args)
       }
@@ -78,10 +78,11 @@ export class ApiRegistry {
   apiContextEnhancer(objOrFunc) {
     this.enhancer.registerEnhancement(objOrFunc)
   }
-  
-  enhanceApiContext(instance) {
-    const hasPrototype = typeof instance.prototype == 'undefined'
+
+  enhanceApiContext(instance, apiName) {
+    const hasPrototype = typeof instance.prototype !== 'undefined'
     const target = hasPrototype ? Object.getPrototypeOf(instance) : instance
     this.enhancer.enhance(target)
+    target.apiName = apiName
   }
 }

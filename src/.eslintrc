@@ -26,7 +26,8 @@
           "_obj"
         ]
       }
-    ]
+    ],
+    "no-param-reassign": ["error", { "props": false }]
   },
   "ecmaFeatures": {
     "spread": true

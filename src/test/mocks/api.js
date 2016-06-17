@@ -68,6 +68,7 @@ export class MockApiRegistry {
       throw new ReferenceError(`Unknown method name "${methodName}"`)
     }
     this.enhancer.enhance(methodInvocation)
+    methodInvocation.apiName = `call:${methodName}`
     return inject(func)(
       methodInvocation,
       ...args
@@ -80,6 +81,7 @@ export class MockApiRegistry {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
     }
     this.enhancer.enhance(subscription)
+    subscription.apiName = `pub:${recordSetName}`
     return inject(func)(
       subscription,
       ...args
