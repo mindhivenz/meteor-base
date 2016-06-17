@@ -1,7 +1,7 @@
 import { inject } from '@mindhive/di'
 import some from '@mindhive/some'
 
-import { NotAuthorizedError } from '../../meteorCore/error'
+import { Enhancer } from '../../enhancer'
 
 
 export class MockApiContext {
@@ -13,28 +13,12 @@ export class MockApiContext {
       clientAddress: some.ipAddress(),
     },
   }) {
-    this.viewerUser = viewer
     this.userId = userId
     this.connection = connection
-  }
-
-  viewer() {
-    return this.viewerUser
-  }
-
-  viewerHasRole(roles, group) {
-    return global.Roles.userIsInRole(this.viewer(), roles, group)
-  }
-
-  ensureViewerHasRole(roles, group) {
-    if (! this.viewerHasRole(roles, group)) {
-      throw new NotAuthorizedError()
-    }
   }
 }
 
 export class MockMethodInvocation extends MockApiContext {
-
   constructor(options = {}) {
     super(options)
     this.isSimulation = false
@@ -42,7 +26,6 @@ export class MockMethodInvocation extends MockApiContext {
 }
 
 export class MockSubscription extends MockApiContext {
-
 }
 
 export class MockApiRegistry {
@@ -50,6 +33,7 @@ export class MockApiRegistry {
   constructor() {
     this.methodFuncs = new Map()
     this.publicationFuncs = new Map()
+    this.enhancer = new Enhancer()
   }
 
   method(methodName, serverFunc) {
@@ -74,26 +58,36 @@ export class MockApiRegistry {
     this.publication(...args)
   }
 
+  apiContextEnhancer(objOrFunc) {
+    this.enhancer.registerEnhancement(objOrFunc)
+  }
+
   call(methodName, methodInvocation = new MockMethodInvocation(), ...args) {
     const func = this.methodFuncs.get(methodName)
     if (! func) {
       throw new ReferenceError(`Unknown method name "${methodName}"`)
     }
+    this.enhancer.enhance(methodInvocation)
     return inject(func)(
       methodInvocation,
       ...args
     )
   }
 
-  subscribe(recordSetName, subscription = new MockSubscription(), ...args) {
+  subscribeCursor(recordSetName, subscription, ...args) {
     const func = this.publicationFuncs.get(recordSetName)
     if (! func) {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
     }
-    const cursor = inject(func)(
+    this.enhancer.enhance(subscription)
+    return inject(func)(
       subscription,
       ...args
     )
+  }
+
+  subscribe(recordSetName, subscription = new MockSubscription(), ...args) {
+    const cursor = this.subscribeCursor(recordSetName, subscription, ...args)
     if (typeof cursor.fetch !== 'function') {
       throw new TypeError('Have you called subscribe when you meant subscribeComposite?')
     }
@@ -101,14 +95,7 @@ export class MockApiRegistry {
   }
 
   subscribeComposite(recordSetName, subscription = new MockSubscription(), ...args) {
-    const func = this.publicationFuncs.get(recordSetName)
-    if (! func) {
-      throw new ReferenceError(`Unknown publication "${recordSetName}"`)
-    }
-    const tree = inject(func)(
-      subscription,
-      ...args
-    )
+    const tree = this.subscribeCursor(recordSetName, subscription, ...args)
     if (typeof tree.find !== 'function') {
       throw new TypeError('Have you called subscribeComposite when you meant subscribe?')
     }

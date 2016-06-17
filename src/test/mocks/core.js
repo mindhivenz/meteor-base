@@ -6,10 +6,8 @@ import { MockApiRegistry } from './api'
 export default () => {
   const {
     SimpleSchema,
-    Roles,
   } = global
   global.Meteor.users = new MiniMongo.Collection('users')
-  global.Meteor.roles = new MiniMongo.Collection('roles')
   return {
     Meteor: {
       isServer: true,
@@ -21,7 +19,7 @@ export default () => {
     apiRegistry: new MockApiRegistry(),
     Accounts: {
       config: sinon.spy(),
+      validateLoginAttempt: sinon.spy(),
     },
-    Roles,
   }
 }

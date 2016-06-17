@@ -11,10 +11,7 @@ module.exports = {
   initModules: init.initModules,
   withLiveData: compose.withLiveData,
   composeAll: reactKomposer.composeAll,
-  NOT_AUTHORIZED: error.NOT_AUTHORIZED,
   ClientError: error.ClientError,
-  notAuthorizedError: error.notAuthorizedError,
-  onNotAuthorized: error.onNotAuthorized,
 }
 
 /*

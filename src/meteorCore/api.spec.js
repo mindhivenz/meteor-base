@@ -101,94 +101,6 @@ describe('ApiRegistry', () => {
         thisInCall.unblock.should.not.have.been.called
       })
 
-      it('should provide viewer', () => {
-        Meteor.isServer = true
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const someMethodFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.viewer().should.equal(viewer)
-        })
-        apiRegistry.method('someMethod', someMethodFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        callWrappedSomeMethod()
-        someMethodFunc.should.have.been.called
-        Users.findOne.should.have.been.calledWith(userId)
-      })
-
-      it('should return null viewer when no userId', () => {
-        Meteor.isServer = true
-        Users.findOne = sinon.spy()
-        const someMethodFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          should.not.exist(methodInvocation.viewer())
-        })
-        apiRegistry.method('someMethod', someMethodFunc)
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = null
-        callWrappedSomeMethod()
-        someMethodFunc.should.have.been.called
-        Users.findOne.should.not.have.been.called
-      })
-
-      it('should cache viewer', () => {
-        Meteor.isServer = true
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const someMethodFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.viewer()
-          methodInvocation.viewer()
-        })
-        apiRegistry.method('someMethod', someMethodFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        callWrappedSomeMethod()
-        someMethodFunc.should.have.been.called
-        Users.findOne.should.have.been.calledOnce
-      })
-
-      it('should check roles', () => {
-        Meteor.isServer = true
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const expected = some.bool()
-        const roles = some.array()
-        const group = some.string()
-        Roles.userIsInRole = sinon.spy(() => expected)
-        const someMethodFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.viewerHasRole(roles, group).should.equal(expected)
-        })
-        apiRegistry.method('someMethod', someMethodFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        callWrappedSomeMethod()
-        someMethodFunc.should.have.been.called
-        Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
-      })
-
-      it('should ensure roles', () => {
-        Meteor.isServer = true
-        Meteor.Error = Error
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const roles = some.array()
-        const group = some.string()
-        Roles.userIsInRole = sinon.spy(() => false)
-        const someMethodFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.ensureViewerHasRole(roles, group)
-        })
-        apiRegistry.method('someMethod', someMethodFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        should.throw(() => {
-          callWrappedSomeMethod()
-        }, NotAuthorizedError)
-        Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
-      })
-
     })
 
   })
@@ -251,47 +163,6 @@ describe('ApiRegistry', () => {
       thisInCall.unblock.should.have.been.calledOnce
     })
 
-    describe('call context', () => {
-
-      it('should provide viewer', () => {
-        Meteor.isServer = true
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.viewer().should.equal(viewer)
-        })
-        apiRegistry.publication('somePub', publicationFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        callWrappedSomePub()
-        publicationFunc.should.have.been.called
-        Users.findOne.should.have.been.calledWith(userId)
-      })
-
-      it('should ensure roles', () => {
-        Meteor.isServer = true
-        Meteor.Error = Error
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const roles = some.array()
-        const group = some.string()
-        Roles.userIsInRole = sinon.spy(() => false)
-        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.ensureViewerHasRole(roles, group)
-        })
-        apiRegistry.publication('somePub', publicationFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        should.throw(() => {
-          callWrappedSomePub()
-        }, NotAuthorizedError)
-        Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
-      })
-
-    })
-
   })
 
   describe('publicationComposite', () => {
@@ -317,65 +188,7 @@ describe('ApiRegistry', () => {
       publicationFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
       thisInCall.unblock.should.have.been.calledOnce
     })
-
-    describe('call context (with no prototype)', () => {
-
-      it('should provide viewer', () => {
-        Meteor.isServer = true
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.viewer().should.equal(viewer)
-        })
-        apiRegistry.publicationComposite('somePub', publicationFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        callWrappedCompositeSomePub()
-        publicationFunc.should.have.been.called
-        Users.findOne.should.have.been.calledWith(userId)
-      })
-
-      it('should cache viewer', () => {
-        Meteor.isServer = true
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.viewer()
-          methodInvocation.viewer()
-        })
-        apiRegistry.publicationComposite('somePub', publicationFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        callWrappedCompositeSomePub()
-        publicationFunc.should.have.been.called
-        Users.findOne.should.have.been.calledOnce
-      })
-
-      it('should ensure roles', () => {
-        Meteor.isServer = true
-        Meteor.Error = Error
-        const viewer = some.object()
-        Users.findOne = sinon.spy(() => viewer)
-        const roles = some.array()
-        const group = some.string()
-        Roles.userIsInRole = sinon.spy(() => false)
-        const publicationFunc = sinon.spy((methodAppContext, methodInvocation) => {
-          methodInvocation.ensureViewerHasRole(roles, group)
-        })
-        apiRegistry.publicationComposite('somePub', publicationFunc)
-        const userId = some.string()
-        thisInCall.unblock = sinon.spy()
-        thisInCall.userId = userId
-        should.throw(() => {
-          callWrappedCompositeSomePub()
-        }, NotAuthorizedError)
-        Roles.userIsInRole.should.have.been.calledWith(viewer, roles, group)
-      })
-
-    })
-
+    
   })
 
 })

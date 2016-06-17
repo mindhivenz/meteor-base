@@ -1,14 +1,13 @@
-import extend from 'lodash.assign'
 import { inject } from '@mindhive/di'
 
-import { notAuthorizedError } from './error'
+import { Enhancer } from '../enhancer'
+
 
 export class ApiRegistry {
 
-  constructor(Meteor, Users, Roles) {
+  constructor(Meteor) {
     this.Meteor = Meteor
-    this.Users = Users
-    this.Roles = Roles
+    this.enhancer = new Enhancer()
   }
 
   method(
@@ -76,35 +75,13 @@ export class ApiRegistry {
     this.meteorPublication(this.Meteor.publishComposite, recordSetName, func)
   }
 
+  apiContextEnhancer(objOrFunc) {
+    this.enhancer.registerEnhancement(objOrFunc)
+  }
+  
   enhanceApiContext(instance) {
-    if (! ('viewer' in instance)) {
-      const self = this
-      const hasPrototype = typeof instance.prototype === 'undefined'
-      extend(hasPrototype ? instance : Object.getPrototypeOf(instance), {
-
-        viewer() {
-          if (! this.userId) {
-            return null
-          }
-          if (! this.cachedViewer) {
-            this.cachedViewer = self.Users.findOne(this.userId)
-          }
-          return this.cachedViewer
-        },
-
-        viewerHasRole(roles, group) {
-          return self.Roles.userIsInRole(this.viewer(), roles, group)
-        },
-
-        ensureViewerHasRole(roles, group) {
-          if (! this.viewerHasRole(roles, group)) {
-            const errorDetails =
-              `Viewer not ${Array.isArray(roles) ? `any of ${roles.join(', ')}` : `a ${roles}`}`
-            throw notAuthorizedError(this, errorDetails)
-          }
-        },
-
-      })
-    }
+    const hasPrototype = typeof instance.prototype == 'undefined'
+    const target = hasPrototype ? Object.getPrototypeOf(instance) : instance
+    this.enhancer.enhance(target)
   }
 }
