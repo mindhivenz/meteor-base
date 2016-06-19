@@ -1,4 +1,4 @@
-import { ApiRegistry } from './api'
+import { ApiRegistry } from './apiRegistry'
 
 
 export default () => {

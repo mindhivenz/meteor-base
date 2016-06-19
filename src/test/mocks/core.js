@@ -1,6 +1,6 @@
 import { sinon } from '../../mocha'
 import { MiniMongo } from './minimongo'
-import { MockApiRegistry } from './api'
+import { MockApiRegistry } from './apiRegistry'
 
 
 export default () => {
