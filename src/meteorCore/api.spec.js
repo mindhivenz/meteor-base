@@ -21,7 +21,7 @@ describe('ApiRegistry', () => {
     thisInCall = createWithUniquePrototype()
   })
 
-  describe('methods', () => {
+  describe('method', () => {
 
     const callWrappedSomeMethod = (...args) =>
       Meteor.methods.getCall(0).args[0].someMethod.call(thisInCall, ...args)
@@ -30,123 +30,103 @@ describe('ApiRegistry', () => {
       Meteor.methods = sinon.spy()
     })
 
-    describe('method', () => {
-
-      it('should call Meteor.methods with method name', () => {
-        Meteor.isServer = true
-        apiRegistry.method('someMethod', sinon.spy(), sinon.spy())
-        Meteor.methods.should.have.been.calledOnce
-        Meteor.methods.getCall(0).args[0].should.have.property('someMethod')
-      })
-
-      it('should pass the serverFunc when on server', () => {
-        Meteor.isServer = true
-        const someServerFunc = sinon.spy()
-        apiRegistry.method('someMethod', someServerFunc)
-        callWrappedSomeMethod()
-        someServerFunc.should.have.been.calledOnce
-      })
-
-      it('should pass the clientSimulationFunc when not on server', () => {
-        Meteor.isServer = false
-        const someClientFunc = sinon.spy()
-        apiRegistry.method('someMethod', sinon.spy(), someClientFunc)
-        callWrappedSomeMethod()
-        someClientFunc.should.have.been.calledOnce
-      })
-
-      it('should not call Meteor.methods if no function', () => {
-        Meteor.isServer = false
-        apiRegistry.method('someMethod', sinon.spy(), undefined)
-        Meteor.methods.should.not.have.been.called
-      })
-
-      it('should pass the appContext, call context, and args to the method function', () => {
-        Meteor.isServer = true
-        const someMethodFunc = sinon.spy()
-        apiRegistry.method('someMethod', someMethodFunc)
-        const args = some.array()
-        callWrappedSomeMethod(...args)
-        someMethodFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
-      })
-
-      describe('call context', () => {
-
-        it('should call unblock() on call context if not runInSeries', () => {
-          Meteor.isServer = true
-          apiRegistry.method(
-            'someMethod',
-            sinon.spy(),
-            sinon.spy(),
-            { runInSeries: false }
-          )
-          thisInCall.unblock = sinon.spy()
-          callWrappedSomeMethod()
-          thisInCall.unblock.should.have.been.calledOnce
-        })
-
-        it('should not call unblock() on the client', () => {
-          Meteor.isServer = false
-          apiRegistry.method(
-            'someMethod',
-            sinon.spy(),
-            sinon.spy(),
-            { runInSeries: false }
-          )
-          thisInCall.unblock = sinon.spy()
-          callWrappedSomeMethod()
-          thisInCall.unblock.should.not.have.been.called
-        })
-
-        it('should enhance', () => {
-          Meteor.isServer = true
-          apiRegistry.method(
-            'someMethod',
-            sinon.spy(),
-            sinon.spy(),
-          )
-          const someFunc = sinon.spy()
-          apiRegistry.apiContextEnhancer({
-            someEnhancement: someFunc,
-          })
-          callWrappedSomeMethod()
-          thisInCall.someEnhancement.should.equal(someFunc)
-        })
-
-        it('should add the apiName', () => {
-          Meteor.isServer = true
-          apiRegistry.method(
-            'someMethod',
-            sinon.spy(),
-            sinon.spy(),
-          )
-          callWrappedSomeMethod()
-          thisInCall.apiName.should.equal('call:someMethod')
-        })
-
-      })
+    it('should call Meteor.methods with method name', () => {
+      apiRegistry.method('someMethod', sinon.spy())
+      Meteor.methods.should.have.been.calledOnce
+      Meteor.methods.getCall(0).args[0].should.have.property('someMethod')
     })
 
-    describe('methodUniversal', () => {
+    it('should pass server when on server', () => {
+      Meteor.isServer = true
+      const server = sinon.spy()
+      apiRegistry.method('someMethod', { server })
+      callWrappedSomeMethod()
+      server.should.have.been.calledOnce
+    })
 
-      beforeEach(() => {
-        Meteor.methods = sinon.spy()
-      })
+    it('should pass clientSimulation when on client', () => {
+      Meteor.isServer = false
+      const clientSimulation = sinon.spy()
+      apiRegistry.method('someMethod', { clientSimulation })
+      callWrappedSomeMethod()
+      clientSimulation.should.have.been.calledOnce
+    })
 
-      it('should pass the func when on server', () => {
+    it('should pass simple function on either side', () => {
+      Meteor.isServer = some.bool()
+      const func = sinon.spy()
+      apiRegistry.method('someMethod', func)
+      callWrappedSomeMethod()
+      func.should.have.been.calledOnce
+    })
+
+    it('should not call Meteor.methods if no function', () => {
+      Meteor.isServer = some.bool()
+      apiRegistry.method('someMethod', {})
+      Meteor.methods.should.not.have.been.called
+    })
+
+    it('should pass the appContext, call context, and args to the method function', () => {
+      Meteor.isServer = some.bool()
+      const someMethodFunc = sinon.spy()
+      apiRegistry.method('someMethod', someMethodFunc)
+      const args = some.array()
+      callWrappedSomeMethod(...args)
+      someMethodFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
+    })
+
+    describe('call context', () => {
+
+      it('should call unblock() on call context if not runInSeries', () => {
         Meteor.isServer = true
-        const someUniversalFunc = sinon.spy()
-        apiRegistry.methodUniversal('someMethod', someUniversalFunc)
+        apiRegistry.method(
+          'someMethod',
+          {
+            server: sinon.spy(),
+            runInSeries: false,
+          }
+        )
+        thisInCall.unblock = sinon.spy()
         callWrappedSomeMethod()
-        someUniversalFunc.should.have.been.calledOnce
+        thisInCall.unblock.should.have.been.calledOnce
       })
 
-      it('should pass the func when on client', () => {
+      it('should not call unblock() on the client', () => {
         Meteor.isServer = false
-        const someUniversalFunc = sinon.spy()
-        apiRegistry.methodUniversal('someMethod', someUniversalFunc)
+        apiRegistry.method(
+          'someMethod',
+          {
+            clientSimulation: sinon.spy(),
+            runInSeries: false,
+          }
+        )
+        thisInCall.unblock = sinon.spy()
         callWrappedSomeMethod()
-        someUniversalFunc.should.have.been.calledOnce
+        thisInCall.unblock.should.not.have.been.called
+      })
+
+      it('should enhance', () => {
+        Meteor.isServer = some.bool()
+        apiRegistry.method(
+          'someMethod',
+          sinon.spy(),
+        )
+        const someFunc = sinon.spy()
+        apiRegistry.apiContextEnhancer({
+          someEnhancement: someFunc,
+        })
+        callWrappedSomeMethod()
+        thisInCall.someEnhancement.should.equal(someFunc)
+      })
+
+      it('should add the apiName', () => {
+        Meteor.isServer = some.bool()
+        apiRegistry.method(
+          'someMethod',
+          sinon.spy(),
+        )
+        callWrappedSomeMethod()
+        thisInCall.apiName.should.equal('call:someMethod')
       })
 
     })

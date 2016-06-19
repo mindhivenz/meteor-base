@@ -12,13 +12,18 @@ export class ApiRegistry {
 
   method(
     methodName,
-    serverFunc,
-    clientSimulationFunc = undefined,
-    {
-      runInSeries = true,
-    } = {}
+    funcOrOptions,
   ) {
-    const func = this.Meteor.isServer ? serverFunc : clientSimulationFunc
+    const options = typeof funcOrOptions === 'function' ? {
+      clientSimulation: funcOrOptions,
+      server: funcOrOptions,
+    } : funcOrOptions
+    const {
+      clientSimulation,
+      server,
+      runInSeries = true,
+    } = options
+    const func = this.Meteor.isServer ? server : clientSimulation
 
     if (func) {
       const self = this
@@ -37,19 +42,6 @@ export class ApiRegistry {
         [methodName]: wrapper,
       })
     }
-  }
-
-  methodUniversal(
-    methodName,
-    serverAndClientSimulationFunc,
-    options
-  ) {
-    this.method(
-      methodName,
-      serverAndClientSimulationFunc,
-      serverAndClientSimulationFunc,
-      options
-    )
   }
 
   meteorPublication(meteorPublishFunc, recordSetName, func) {

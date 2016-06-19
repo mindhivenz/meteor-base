@@ -36,15 +36,12 @@ export class MockApiRegistry {
     this.enhancer = new Enhancer()
   }
 
-  method(methodName, serverFunc) {
+  method(methodName, funcOrOptions) {
     if (this.methodFuncs.has(methodName)) {
       throw new ReferenceError(`More than one method with the name "${methodName}"`)
     }
+    const serverFunc = typeof funcOrOptions === 'function' ? funcOrOptions : funcOrOptions.server
     this.methodFuncs.set(methodName, serverFunc)
-  }
-
-  methodUniversal(methodName, serverAndClientSimulationFunc) {
-    this.method(methodName, serverAndClientSimulationFunc)
   }
 
   publication(recordSetName, func) {
