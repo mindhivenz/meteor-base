@@ -13,6 +13,7 @@ export class ValidationError extends ClientError {
   static ERROR_CODE = 'validation-failed'
 
   constructor(fieldErrors) {
-    super(ValidationError.ERROR_CODE, null, fieldErrors)
+    const reason = Object.keys(fieldErrors).map(k => fieldErrors[k]).join(', ')
+    super(ValidationError.ERROR_CODE, reason, fieldErrors)
   }
 }
