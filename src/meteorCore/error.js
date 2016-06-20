@@ -8,3 +8,11 @@ import { MockMeteorError } from '../test/mocks/error'
  Also to avoid importing of Meteor in our code.
  */
 export const ClientError = global.Meteor ? global.Meteor.Error : MockMeteorError
+
+export class ValidationError extends ClientError {
+  static ERROR_CODE = 'validation-failed'
+
+  constructor(fieldErrors) {
+    super(ValidationError.ERROR_CODE, null, fieldErrors)
+  }
+}
