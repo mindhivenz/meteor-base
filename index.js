@@ -1,7 +1,7 @@
 var di = require('@mindhive/di')
 var reactKomposer = require('react-komposer')
 
-var init = require('./dist/init') 
+var init = require('./dist/init')
 var compose = require('./dist/compose')
 var error = require('./dist/meteorCore/error')
 
@@ -12,6 +12,7 @@ module.exports = {
   withLiveData: compose.withLiveData,
   composeAll: reactKomposer.composeAll,
   ClientError: error.ClientError,
+  denodeify: require('es6-denodeify')(Promise),
 }
 
 /*

@@ -24,6 +24,7 @@
   ],
   "dependencies": {
     "@mindhive/di": "^1.1.0",
+    "es6-denodeify": "^0.1.5",
     "react-komposer": "^1.8.0"
   },
   "peerDependencies": {
