@@ -73,8 +73,8 @@ export class ApiRegistry {
 
   enhanceApiContext(instance, apiName) {
     instance.apiName = apiName
-    const hasPrototype = typeof instance.prototype !== 'undefined'
-    const target = hasPrototype ? Object.getPrototypeOf(instance) : instance
-    this.enhancer.enhance(target)
+    const instancePrototype = Object.getPrototypeOf(instance)
+    const hasPrototype = Object.getPrototypeOf(instancePrototype)  // Would be null/falsy if Object prototype
+    this.enhancer.enhance(hasPrototype ? instancePrototype : instance)
   }
 }

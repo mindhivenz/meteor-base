@@ -65,8 +65,7 @@ describe('Enhancer', () => {
     enhancerFunc.should.have.been.calledOnce
   })
 
-  it('should throw if enhancement registered after use' +
-    ' because prototype won\'t be enhanced again', () => {
+  it("should throw if enhancement registered after use because prototype won't be enhanced again", () => {
     const enhancer = new Enhancer()
     enhancer.registerEnhancement({
       someProperty: some.object(),

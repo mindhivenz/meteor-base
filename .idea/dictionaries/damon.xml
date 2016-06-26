@@ -2,6 +2,7 @@
   <dictionary name="damon">
     <words>
       <w>denodeify</w>
+      <w>falsy</w>
     </words>
   </dictionary>
 </component>
