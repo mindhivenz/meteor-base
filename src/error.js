@@ -1,4 +1,4 @@
-import { MockMeteorError } from '../test/mocks/error'
+import { MockMeteorError } from './test/mocks/error'
 
 
 /*

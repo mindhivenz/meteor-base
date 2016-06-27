@@ -1,4 +1,4 @@
-import { sinon } from '../mocha'
+import { sinon } from './mocha'
 import some from '@mindhive/some'
 import { appContext } from '@mindhive/di/test'
 

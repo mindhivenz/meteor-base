@@ -3,7 +3,7 @@ var reactKomposer = require('react-komposer')
 
 var init = require('./dist/init')
 var compose = require('./dist/compose')
-var error = require('./dist/meteorCore/error')
+var error = require('./dist/error')
 
 
 module.exports = {
@@ -20,7 +20,7 @@ module.exports = {
 
  So you shouldn't mind these being also tested as part of the unit in unit testing.
  Other Meteor objects and packages that should be injected as dependencies into your code
- go in the meteorCore/index.js module.
+ go in the meteorCoreModule.js module.
  */
 if (global.Package) {
   if (global.Package.check) {

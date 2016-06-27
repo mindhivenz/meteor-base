@@ -1,6 +1,6 @@
-import '../mocha'
+import './mocha'
 
-import meteorCoreModule from './'
+import meteorCoreModule from './meteorCoreModule'
 
 
 describe('meteorCoreModule', () => {

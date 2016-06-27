@@ -1,6 +1,6 @@
 import { inject } from '@mindhive/di'
 
-import { Enhancer } from '../enhancer'
+import { Enhancer } from './enhancer'
 
 
 export class ApiRegistry {

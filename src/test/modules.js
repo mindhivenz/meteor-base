@@ -1,4 +1,4 @@
-import mockMeteorCoreModule from './mocks/core'
+import mockMeteorCoreModule from './mocks/meteorCoreModule'
 
 
 export const mockInitModules = (...modules) =>
