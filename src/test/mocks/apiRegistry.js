@@ -40,7 +40,9 @@ export class MockApiRegistry {
     if (this.methodFuncs.has(methodName)) {
       throw new ReferenceError(`More than one method with the name "${methodName}"`)
     }
-    const serverFunc = typeof funcOrOptions === 'function' ? funcOrOptions : funcOrOptions.server
+    const serverFunc = typeof funcOrOptions === 'function' ? 
+      funcOrOptions 
+      : (funcOrOptions.universal || funcOrOptions.server)
     this.methodFuncs.set(methodName, serverFunc)
   }
 

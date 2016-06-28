@@ -14,13 +14,13 @@ export class ApiRegistry {
     methodName,
     funcOrOptions,
   ) {
-    const options = typeof funcOrOptions === 'function' ? {
-      clientSimulation: funcOrOptions,
-      server: funcOrOptions,
-    } : funcOrOptions
+    const options = typeof funcOrOptions === 'function' ?
+      { universal: funcOrOptions }
+      : funcOrOptions
     const {
-      clientSimulation,
-      server,
+      universal,
+      clientSimulation = universal,
+      server = universal,
       runInSeries = true,
     } = options
     const func = this.Meteor.isServer ? server : clientSimulation
@@ -28,7 +28,6 @@ export class ApiRegistry {
     if (func) {
       const self = this
       const injectedFunc = inject(func)
-      // Can't use arrow func as 'this' would be different
       const wrapper = function wrapper(...args) {
         const methodInvocation = this
         self.enhanceApiContext(methodInvocation, `call:${methodName}`)
@@ -48,7 +47,6 @@ export class ApiRegistry {
     if (this.Meteor.isServer) {
       const self = this
       const injectedFunc = inject(func)
-      // Can't use arrow func as 'this' would be different
       const wrapper = function wrapper(...args) {
         const subscription = this
         self.enhanceApiContext(subscription, `pub:${recordSetName}`)
