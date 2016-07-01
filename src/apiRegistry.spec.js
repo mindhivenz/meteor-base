@@ -77,13 +77,13 @@ describe('ApiRegistry', () => {
 
     describe('call context', () => {
 
-      it('should call unblock() on call context if not runInSeries', () => {
+      it('should call unblock() on call context if runInParallel', () => {
         Meteor.isServer = true
         apiRegistry.method(
           'someMethod',
           {
             server: sinon.spy(),
-            runInSeries: false,
+            runInParallel: true,
           }
         )
         thisInCall.unblock = sinon.spy()
@@ -97,7 +97,7 @@ describe('ApiRegistry', () => {
           'someMethod',
           {
             clientSimulation: sinon.spy(),
-            runInSeries: false,
+            runInParallel: true,
           }
         )
         thisInCall.unblock = sinon.spy()

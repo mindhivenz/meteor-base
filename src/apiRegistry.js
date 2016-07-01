@@ -21,7 +21,7 @@ export class ApiRegistry {
       universal,
       clientSimulation = universal,
       server = universal,
-      runInSeries = true,
+      runInParallel = false,
     } = options
     const func = this.Meteor.isServer ? server : clientSimulation
 
@@ -31,7 +31,7 @@ export class ApiRegistry {
       const wrapper = function wrapper(...args) {
         const methodInvocation = this
         self.enhanceApiContext(methodInvocation, `call:${methodName}`)
-        if (self.Meteor.isServer && ! runInSeries) {
+        if (self.Meteor.isServer && runInParallel) {
           methodInvocation.unblock()
         }
         return injectedFunc(methodInvocation, ...args)
