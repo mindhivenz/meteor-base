@@ -1,6 +1,15 @@
-import { composeWithTracker } from 'react-komposer'
+import { compose, composeWithTracker } from 'react-komposer'
 import { inject } from '@mindhive/di'
 
+
+export const withAsync = (asyncFunc) =>
+  compose(
+    inject((appContext, ownProps, onData) => {
+      const pushProps = (props = {}) =>
+        onData(null, props)
+      asyncFunc(appContext, pushProps, ownProps)
+    })
+  )
 
 /*
  Inside meteorDataUsingFunc calls to Meteor reactive calls are tracked,
@@ -15,11 +24,9 @@ import { inject } from '@mindhive/di'
  */
 export const withLiveData = (meteorDataUsingFunc) =>
   composeWithTracker(
-    inject(
-      (appContext, ownProps, onData) => {
-        const pushProps = (props = {}) =>
-          onData(null, props)
-        meteorDataUsingFunc(appContext, pushProps, ownProps)
-      }
-    )
+    inject((appContext, ownProps, onData) => {
+      const pushProps = (props = {}) =>
+        onData(null, props)
+      meteorDataUsingFunc(appContext, pushProps, ownProps)
+    })
   )

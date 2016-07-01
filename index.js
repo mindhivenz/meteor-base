@@ -9,6 +9,7 @@ var error = require('./dist/error')
 module.exports = {
   inject: di.inject,
   initModules: init.initModules,
+  withAsync: compose.withAsync,
   withLiveData: compose.withLiveData,
   composeAll: reactKomposer.composeAll,
   ClientError: error.ClientError,
