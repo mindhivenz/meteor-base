@@ -2,13 +2,15 @@ import { compose, composeWithTracker } from 'react-komposer'
 import { inject } from '@mindhive/di'
 
 
-export const withAsync = (asyncFunc) =>
+export const withAsync = (asyncFunc, shouldResubscribe) =>
   compose(
     inject((appContext, ownProps, onData) => {
       const pushProps = (props = {}) =>
         onData(null, props)
       asyncFunc(appContext, pushProps, ownProps)
-    })
+    }),
+    null, null,
+    { shouldResubscribe },
   )
 
 /*
