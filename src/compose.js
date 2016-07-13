@@ -2,6 +2,8 @@ import { compose, composeWithTracker } from 'react-komposer'
 import { inject } from '@mindhive/di'
 
 
+const Empty = () => null
+
 export const withAsync = (asyncFunc, shouldResubscribe) =>
   compose(
     inject((appContext, ownProps, onData) => {
@@ -9,7 +11,8 @@ export const withAsync = (asyncFunc, shouldResubscribe) =>
         onData(null, props)
       asyncFunc(appContext, pushProps, ownProps)
     }),
-    null, null,
+    Empty,
+    null,
     { shouldResubscribe },
   )
 
@@ -30,5 +33,6 @@ export const withLiveData = (meteorDataUsingFunc) =>
       const pushProps = (props = {}) =>
         onData(null, props)
       meteorDataUsingFunc(appContext, pushProps, ownProps)
-    })
+    }),
+    Empty,
   )
