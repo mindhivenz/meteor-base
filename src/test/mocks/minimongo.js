@@ -22,7 +22,7 @@ if (global.Mongo) {
           throw new Error(`Attempt to add an index key '${k}' which is not in the schema`)
         }
       })
-      this.indexes.push(keys)
+      this.indexes.push(options ? { keys, options } : keys)
       // MiniMongo would normally throw an exception but we ignore it
       // If this was ever used on the client it should throw still
     }
