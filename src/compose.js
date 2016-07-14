@@ -27,7 +27,7 @@ export const withAsync = (asyncFunc, shouldResubscribe) =>
  Note: we don't use the loading and error component of react-komposer.
  Push that data through props to handle it nicely.
  */
-export const withLiveData = (meteorDataUsingFunc) =>
+export const withReactiveData = (meteorDataUsingFunc) =>
   composeWithTracker(
     inject((appContext, ownProps, onData) => {
       const pushProps = (props = {}) =>

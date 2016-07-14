@@ -10,7 +10,7 @@ module.exports = {
   inject: di.inject,
   initModules: init.initModules,
   withAsync: compose.withAsync,
-  withLiveData: compose.withLiveData,
+  withReactiveData: compose.withReactiveData,
   composeAll: reactKomposer.composeAll,
   ClientError: error.ClientError,
   denodeify: require('es6-denodeify')(Promise),
