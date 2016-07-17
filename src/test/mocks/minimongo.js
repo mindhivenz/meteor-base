@@ -10,7 +10,7 @@ const inSchema = (key, schemaDoc, mustBeBlackbox = false) => {
   }
   const parts = key.split('.')
   if (parts.length > 1) {
-    return inSchema(parts.splice(-1, 1).join('.'), schemaDoc, true)
+    return inSchema(parts.slice(0, 1).join('.'), schemaDoc, true)
   }
   return false
 }
