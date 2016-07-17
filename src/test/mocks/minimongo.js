@@ -4,6 +4,17 @@ export const MiniMongo = {}
 
 const NAME_TO_CAUSE_MINIMONGO = null
 
+const inSchema = (key, schemaDoc, mustBeBlackbox = false) => {
+  if (key in schemaDoc) {
+    return ! mustBeBlackbox || schemaDoc[key].blackbox
+  }
+  const parts = key.split('.')
+  if (parts.length > 1) {
+    return inSchema(parts.splice(-1, 1).join('.'), schemaDoc, true)
+  }
+  return false
+}
+
 if (global.Mongo) {
   MiniMongo.Collection = class MiniMongoCollection extends global.Mongo.Collection {
     constructor(name) {
@@ -18,7 +29,7 @@ if (global.Mongo) {
       }
       const schemaDoc = this._c2._simpleSchema._schema
       Object.keys(keys).forEach(k => {
-        if (! (k in schemaDoc)) {
+        if (! inSchema(k, schemaDoc)) {
           throw new Error(`Attempt to add an index key '${k}' which is not in the schema`)
         }
       })
