@@ -8,14 +8,21 @@ export class MockApiContext {
   constructor({
     viewer,
     userId = viewer && viewer._id,
-    connection = {
-      id: some.string(),
-      clientAddress: some.ipAddress(),
-    },
+    connection = MockApiContext.mockConnection(),
   }) {
     this.userId = userId
     this.connection = connection
   }
+
+  static mockConnection = (
+    {
+      id = some.string(),
+      clientAddress = some.ipAddress(),
+    } = {}
+  ) => ({
+    id,
+    clientAddress,
+  })
 }
 
 export class MockMethodInvocation extends MockApiContext {
@@ -40,8 +47,8 @@ export class MockApiRegistry {
     if (this.methodFuncs.has(methodName)) {
       throw new ReferenceError(`More than one method with the name "${methodName}"`)
     }
-    const serverFunc = typeof funcOrOptions === 'function' ? 
-      funcOrOptions 
+    const serverFunc = typeof funcOrOptions === 'function' ?
+      funcOrOptions
       : (funcOrOptions.universal || funcOrOptions.server)
     this.methodFuncs.set(methodName, serverFunc)
   }
