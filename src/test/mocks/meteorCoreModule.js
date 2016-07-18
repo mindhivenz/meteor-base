@@ -6,6 +6,7 @@ import { MockApiRegistry } from './apiRegistry'
 export default () => {
   const {
     SimpleSchema,
+    Random,
   } = global
   global.Meteor.users = new MiniMongo.Collection('users')
   return {
@@ -21,5 +22,6 @@ export default () => {
       config: sinon.spy(),
       validateLoginAttempt: sinon.spy(),
     },
+    Random,
   }
 }

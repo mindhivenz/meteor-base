@@ -8,6 +8,7 @@ export default () => {
     Mongo,
     SimpleSchema,
     Accounts,
+    Random,
   } = global  // Import like this so it can be used in Wallaby
   const Users = Meteor.users
   return {
@@ -17,6 +18,7 @@ export default () => {
     Mongo,
     SimpleSchema,
     Accounts,
+    Random,
     apiRegistry: new ApiRegistry(Meteor),
   }
 }
