@@ -4,15 +4,21 @@ export const MiniMongo = {}
 
 const NAME_TO_CAUSE_MINIMONGO = null
 
-const inSchema = (key, schemaDoc, mustBeBlackbox = false) => {
-  if (key in schemaDoc) {
-    return ! mustBeBlackbox || schemaDoc[key].blackbox
+const removeArrayPartsFromKey = (k) => k.split('.$').join('')
+
+const inSchema = (indexKey, schemaDoc, mustBeBlackbox = false) => {
+  const schemaKey = Object.keys(schemaDoc).find(k =>
+    removeArrayPartsFromKey(k) === indexKey &&
+    (! mustBeBlackbox || schemaDoc[k].blackbox)
+  )
+  if (schemaKey) {
+    return true
   }
-  const parts = key.split('.')
-  if (parts.length > 1) {
-    return inSchema(parts.slice(0, 1).join('.'), schemaDoc, true)
+  const parts = indexKey.split('.')
+  if (parts.length <= 1) {
+    return false
   }
-  return false
+  return inSchema(parts.slice(0, -1).join('.'), schemaDoc, true)
 }
 
 if (global.Mongo) {
