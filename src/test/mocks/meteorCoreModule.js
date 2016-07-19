@@ -1,26 +1,27 @@
-import { sinon } from '../../mocha'
 import { MiniMongo } from './minimongo'
 import { MockApiRegistry } from './apiRegistry'
 
 
 export default () => {
   const {
+    Meteor,
     SimpleSchema,
     Random,
+    Accounts,
   } = global
-  global.Meteor.users = new MiniMongo.Collection('users')
+  Meteor.users = new MiniMongo.Collection('users')
   return {
     Meteor: {
       isServer: true,
+      wrapAsync: Meteor.wrapAsync,
     },
     Tracker: {},
     Mongo: MiniMongo,
-    Users: global.Meteor.users,
+    Users: Meteor.users,
     SimpleSchema,
     apiRegistry: new MockApiRegistry(),
     Accounts: {
-      config: sinon.spy(),
-      validateLoginAttempt: sinon.spy(),
+      _bcryptRounds: Accounts._bcryptRounds,  // eslint-disable-line no-underscore-dangle
     },
     Random,
   }
