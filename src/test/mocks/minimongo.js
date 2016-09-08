@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { appContext } from '@mindhive/di/test'
+import { initModules } from '@mindhive/di'
 
 
 export const MiniMongo = {}
@@ -24,31 +25,31 @@ const inSchema = (indexKey, schemaDoc, mustBeBlackbox = false) => {
   return inSchema(parts.slice(0, -1).join('.'), schemaDoc, true)
 }
 
-export const useRealMongoCollection = (moduleInit, collectionName) =>
-  moduleInit.preModules.push(({ useRealMongoCollectionNames }) => {
-    if (useRealMongoCollectionNames) {
-      useRealMongoCollectionNames.unshift(collectionName)
-      return null
-    }
-    console.log(`Creating useRealMongoCollectionNames with ${collectionName}`)
-    return { useRealMongoCollectionNames: [collectionName] }
-  })
+export const withRealMongoCollection = (testModules, collectionName) =>
+  () => {
+    initModules([
+      ({ realMongoCollectionNames }) => {
+        if (realMongoCollectionNames) {
+          realMongoCollectionNames.push(collectionName)
+          return null
+        }
+        return { realMongoCollectionNames: [collectionName] }
+      },
+    ])
+    return testModules()
+  }
 
 if (global.Mongo) {
 
   MiniMongo.Collection = class MiniMongoCollection extends global.Mongo.Collection {
 
     constructor(name) {
-      console.log(appContext.useRealMongoCollectionNames)
-      const useRealMongo = appContext.useRealMongoCollectionNames &&
-        appContext.useRealMongoCollectionNames.includes(name)
+      const useRealMongo = appContext.realMongoCollectionNames && appContext.realMongoCollectionNames.includes(name)
       if (useRealMongo) {
-        super(name)
-        console.log(`Using real mongo for ${name}`)
+        super(name, { _suppressSameNameError: true })
         this.remove({})
       } else {
         super(NAME_TO_CAUSE_MINIMONGO)
-        console.log(`Using MINI mongo for ${name}`)
         this._name = name
       }
       this.indexes = []
