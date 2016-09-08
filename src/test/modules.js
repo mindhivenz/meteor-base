@@ -1,15 +1,13 @@
+import { initModules } from '@mindhive/di'
+
 import mockMeteorCoreModule from './mocks/meteorCoreModule'
 
 
-export const mockInitModules = (...modules) =>
-  () => {
-    const resultContext = {}
-    const allModules = [mockMeteorCoreModule, ...modules]
-    allModules.forEach(module => {
-      const newContext = module(resultContext)
-      if (newContext) {
-        Object.assign(resultContext, newContext)
-      }
-    })
-    return resultContext
+export const mockInitModules = (...modules) => {
+  const preModules = [mockMeteorCoreModule]
+  const moduleInit = () => {
+    initModules([...preModules, ...modules])
   }
+  moduleInit.preModules = preModules
+  return moduleInit
+}

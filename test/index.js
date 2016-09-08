@@ -10,6 +10,7 @@ module.exports = {
   mockAppContext: test.mockAppContext,
   mockInitModules: modules.mockInitModules,
   MiniMongo: minimongo.MiniMongo,
+  useRealMongoCollection: minimongo.useRealMongoCollection,
   MockMethodInvocation: mockApiRegistry.MockMethodInvocation,
   MockSubscription: mockApiRegistry.MockSubscription,
   chaiPlugin: chaiPlugin.plugin,
