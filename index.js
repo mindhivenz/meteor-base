@@ -8,7 +8,7 @@ var error = require('./dist/error')
 
 module.exports = {
   inject: di.inject,
-  initModules: init.initModules,
+  initMeteorModules: init.initMeteorModules,
   withAsync: compose.withAsync,
   withReactiveData: compose.withReactiveData,
   composeAll: reactKomposer.composeAll,

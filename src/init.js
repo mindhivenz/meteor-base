@@ -1,4 +1,4 @@
-import { initModules as superInitModules } from '@mindhive/di'
+import { initModules } from '@mindhive/di'
 
 import meteorCoreModule from './meteorCoreModule'
 
@@ -17,13 +17,13 @@ import meteorCoreModule from './meteorCoreModule'
 
 let coreApplied = false
 
-export const initModules = (modules) => {
+export const initMeteorModules = (modules) => {
   Meteor.startup(() => {
     if (! coreApplied) {
-      superInitModules([meteorCoreModule])
+      initModules([meteorCoreModule])
       coreApplied = true
     }
-    superInitModules(modules)
+    initModules(modules)
   })
 }
 

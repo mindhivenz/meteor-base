@@ -34,7 +34,9 @@ inject `apiRegistry`. This has a cleaner callback (no use of `this`), calls
 
 An [example domain test](https://github.com/mindhivenz/todos-basis-webapp/blob/master/tests/specs/domain/tasks.spec.js).
 
-- Use `test.mockInitModules` to initialise modules in test
+- Use `mockServerContext` of `@mindhvie/meteor/test` to initialise modules in test
+	- Most likely you'll want to import and pass `@mindhvie/meteor/test/mockMeteorCoreModule`
+	  as the first module into `mockServerContext`
 - From the returned context get the mock `apiRegistry` which can `call` and `subscribe` to methods and publications
   in the modules being tested
 - Use `test.MiniMongo` to use in memory Mongo instead of on disk
