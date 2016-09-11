@@ -9,7 +9,8 @@ export default () => {
     Random,
     Accounts,
   } = global
-  Meteor.users = new MiniMongo.Collection('users')
+  Accounts.users = new MiniMongo.Collection('users')
+  Meteor.users = Accounts.users
   return {
     Meteor: {
       isServer: true,
@@ -17,12 +18,10 @@ export default () => {
     },
     Tracker: {},
     Mongo: MiniMongo,
-    Users: Meteor.users,
+    Users: Accounts.users,
     SimpleSchema,
     apiRegistry: new MockApiRegistry(),
-    Accounts: {
-      _bcryptRounds: Accounts._bcryptRounds,  // eslint-disable-line no-underscore-dangle
-    },
+    Accounts,
     Random,
   }
 }
