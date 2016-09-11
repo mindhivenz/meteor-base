@@ -39,4 +39,4 @@ An [example domain test](https://github.com/mindhivenz/todos-basis-webapp/blob/m
 	  as the first module into `mockServerContext`
 - From the returned context get the mock `apiRegistry` which can `call` and `subscribe` to methods and publications
   in the modules being tested
-- Use `test.MiniMongo` to use in memory Mongo instead of on disk
+- Use `test.TestMongo` to use in memory Mongo instead of on disk

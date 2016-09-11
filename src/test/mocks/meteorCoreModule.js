@@ -1,4 +1,4 @@
-import { MiniMongo } from './minimongo'
+import { TestMongo } from './testMongo'
 import { MockApiRegistry } from './apiRegistry'
 
 
@@ -9,7 +9,7 @@ export default () => {
     Random,
     Accounts,
   } = global
-  Accounts.users = new MiniMongo.Collection('users')
+  Accounts.users = new TestMongo.Collection('users')
   Meteor.users = Accounts.users
   return {
     Meteor: {
@@ -17,7 +17,7 @@ export default () => {
       wrapAsync: Meteor.wrapAsync,
     },
     Tracker: {},
-    Mongo: MiniMongo,
+    Mongo: TestMongo,
     Users: Accounts.users,
     SimpleSchema,
     apiRegistry: new MockApiRegistry(),

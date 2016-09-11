@@ -4,7 +4,7 @@ import { appContext } from '@mindhive/di/test'
 import { initModules } from '@mindhive/di'
 
 
-export const MiniMongo = {}
+export const TestMongo = {}
 
 const NAME_TO_CAUSE_MINIMONGO = null
 
@@ -41,7 +41,7 @@ export const withRealMongoCollection = (testModules, collectionName) =>
 
 if (global.Mongo) {
 
-  MiniMongo.Collection = class MiniMongoCollection extends global.Mongo.Collection {
+  TestMongo.Collection = class MiniMongoCollection extends global.Mongo.Collection {
 
     constructor(name) {
       const useRealMongo = appContext.realMongoCollectionNames && appContext.realMongoCollectionNames.includes(name)
@@ -58,7 +58,7 @@ if (global.Mongo) {
     _ensureIndex(keys, options) {
       const isClient = appContext.Meteor && ! appContext.Meteor.isServer
       if (isClient) {
-        // MiniMongo will throw an exception
+        // TestMongo will throw an exception
         super._ensureIndex(keys, options)
       }
       const schemaDoc = this._c2 && this._c2._simpleSchema && this._c2._simpleSchema._schema
