@@ -11,6 +11,7 @@ export default () => {
   } = global
   Accounts.users = new TestMongo.Collection('users')
   Meteor.users = Accounts.users
+  Accounts._options = {}  // eslint-disable-line no-underscore-dangle
   return {
     Meteor: {
       isServer: true,
