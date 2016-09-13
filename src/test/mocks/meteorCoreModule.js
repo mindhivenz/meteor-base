@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+
 import { TestMongo } from './testMongo'
 import { MockApiRegistry } from './apiRegistry'
 
@@ -11,7 +13,9 @@ export default () => {
   } = global
   Accounts.users = new TestMongo.Collection('users')
   Meteor.users = Accounts.users
-  Accounts._options = {}  // eslint-disable-line no-underscore-dangle
+  Accounts._options = {}
+  Accounts._loginHandlers = []
+  Accounts._validateLoginHook.callbacks = {}
   return {
     Meteor: {
       isServer: true,
