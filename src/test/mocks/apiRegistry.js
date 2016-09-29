@@ -68,13 +68,17 @@ export class MockApiRegistry {
     this.enhancer.registerEnhancement(objOrFunc)
   }
 
+  mockEnhance(apiContext, includeInApiName = '') {
+    this.enhancer.enhance(apiContext)
+    apiContext.apiName = some.unique.string('apiName') + includeInApiName
+  }
+
   call(methodName, methodInvocation = new MockMethodInvocation(), ...args) {
     const func = this.methodFuncs.get(methodName)
     if (! func) {
       throw new ReferenceError(`Unknown method name "${methodName}"`)
     }
-    this.enhancer.enhance(methodInvocation)
-    methodInvocation.apiName = `call:${methodName}`
+    this.mockEnhance(methodInvocation, methodName)
     return inject(func)(
       methodInvocation,
       ...args
@@ -86,8 +90,7 @@ export class MockApiRegistry {
     if (! func) {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
     }
-    this.enhancer.enhance(subscription)
-    subscription.apiName = `pub:${recordSetName}`
+    this.mockEnhance(subscription, recordSetName)
     return inject(func)(
       subscription,
       ...args
