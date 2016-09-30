@@ -13,7 +13,6 @@ module.exports = {
   withReactiveData: compose.withReactiveData,
   composeAll: reactKomposer.composeAll,
   ClientError: error.ClientError,
-  denodeify: require('es6-denodeify')(Promise),
 }
 
 /*
