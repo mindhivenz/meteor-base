@@ -1,4 +1,4 @@
-import { inject } from '@mindhive/di'
+import { app } from '@mindhive/di'
 import some from '@mindhive/some'
 
 import { Enhancer } from '../../enhancer'
@@ -79,10 +79,7 @@ export class MockApiRegistry {
       throw new ReferenceError(`Unknown method name "${methodName}"`)
     }
     this.mockEnhance(methodInvocation, methodName)
-    return inject(func)(
-      methodInvocation,
-      ...args
-    )
+    return func(app(), methodInvocation, ...args)
   }
 
   subscribeCursor(recordSetName, subscription, ...args) {
@@ -91,10 +88,7 @@ export class MockApiRegistry {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
     }
     this.mockEnhance(subscription, recordSetName)
-    return inject(func)(
-      subscription,
-      ...args
-    )
+    return func(app(), subscription, ...args)
   }
 
   subscribe(recordSetName, subscription = new MockSubscription(), ...args) {

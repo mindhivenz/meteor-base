@@ -1,4 +1,4 @@
-import { inject } from '@mindhive/di'
+import { app } from '@mindhive/di'
 
 import { Enhancer } from './enhancer'
 
@@ -27,14 +27,13 @@ export class ApiRegistry {
 
     if (func) {
       const self = this
-      const injectedFunc = inject(func)
       const wrapper = function wrapper(...args) {
         const methodInvocation = this
         self.enhanceApiContext(methodInvocation, `call:${methodName}`)
         if (self.Meteor.isServer && runInParallel) {
           methodInvocation.unblock()
         }
-        return injectedFunc(methodInvocation, ...args)
+        return func(app(), methodInvocation, ...args)
       }
 
       this.Meteor.methods({
@@ -46,12 +45,11 @@ export class ApiRegistry {
   meteorPublication(meteorPublishFunc, recordSetName, func) {
     if (this.Meteor.isServer) {
       const self = this
-      const injectedFunc = inject(func)
       const wrapper = function wrapper(...args) {
         const subscription = this
         self.enhanceApiContext(subscription, `pub:${recordSetName}`)
         subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
-        return injectedFunc(subscription, ...args)
+        return func(app(), subscription, ...args)
       }
       meteorPublishFunc(recordSetName, wrapper)
     }

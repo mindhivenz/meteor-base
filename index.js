@@ -7,7 +7,7 @@ var error = require('./dist/error')
 
 
 module.exports = {
-  inject: di.inject,
+  app: di.app,
   initMeteorModules: init.initMeteorModules,
   withAsync: compose.withAsync,
   withReactiveData: compose.withReactiveData,
@@ -16,7 +16,7 @@ module.exports = {
 }
 
 /*
- Import Meteor standard packages that we would want to use directly, rather than injecting
+ Import Meteor standard packages that we would want to use directly / declarative, rather than injecting
 
  So you shouldn't mind these being also tested as part of the unit in unit testing.
  Other Meteor objects and packages that should be injected as dependencies into your code
@@ -28,4 +28,6 @@ if (global.Package) {
     module.exports.Match = global.Package.check.Match
   }
 }
-
+if (global.SimpleSchema) {
+  module.exports.SimpleSchema = global.SimpleSchema
+}

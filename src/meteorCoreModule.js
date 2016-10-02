@@ -6,7 +6,6 @@ export default () => {
     Meteor,
     Tracker,
     Mongo,
-    SimpleSchema,
     Accounts,
     Random,
   } = global  // Import like this so it can be used in Wallaby
@@ -16,7 +15,6 @@ export default () => {
     Tracker,
     Users,
     Mongo,
-    SimpleSchema,
     Accounts,
     Random,
     apiRegistry: new ApiRegistry(Meteor),

@@ -1,5 +1,5 @@
 import { compose, composeWithTracker } from 'react-komposer'
-import { inject } from '@mindhive/di'
+import { app } from '@mindhive/di'
 
 
 const PushPropsNotCalled = () => {
@@ -7,11 +7,11 @@ const PushPropsNotCalled = () => {
 }
 
 const composeFunc = (asyncFunc) =>
-  inject((appContext, ownProps, onData) => {
+  (ownProps, onData) => {
     const pushProps = (props = {}) =>
       onData(null, props)
-    asyncFunc(appContext, pushProps, ownProps)
-  })
+    asyncFunc(app(), pushProps, ownProps)
+  }
 
 /*
  asyncFunc: (appContext, pushProps, ownProps)
