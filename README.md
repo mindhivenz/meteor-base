@@ -21,7 +21,7 @@ This package also makes Meteor core services available in the appContext:
 - Mongo: Meteor's Mongo, or in testing it is our own TestMongo (see below)
 - Tracker
 - Random
-- Accounts
+- Accounts: with appropriate internal data reset each test
 - Users: Meteor's `users` Mongo collection
 - apiRegistry: see below
 
