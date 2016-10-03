@@ -1,7 +1,7 @@
 import { mockAppContext } from '@mindhive/di/test'
 
 
-const runInFiber = (func) =>
+const inFiberTestRunner = (func) =>
   (done) => {
     func.future()().resolve((err) => {
       done(err)
@@ -9,4 +9,4 @@ const runInFiber = (func) =>
   }
 
 export const mockServerContext = (testModules, testFunc) =>
-  runInFiber(mockAppContext(testModules, testFunc))
+  inFiberTestRunner(mockAppContext(testModules, testFunc))
