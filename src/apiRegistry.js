@@ -8,6 +8,11 @@ export class ApiRegistry {
   constructor(Meteor) {
     this.Meteor = Meteor
     this.enhancer = new Enhancer()
+    this.errorCallbacks = []
+  }
+
+  onError(callback) {
+    this.errorCallbacks.push(callback)
   }
 
   method(
@@ -23,17 +28,22 @@ export class ApiRegistry {
       server = universal,
       runInParallel = false,
     } = options
-    const func = this.Meteor.isServer ? server : clientSimulation
+    const self = this
+    const func = self.Meteor.isServer ? server : clientSimulation
 
     if (func) {
-      const self = this
       const wrapper = function wrapper(...args) {
         const methodInvocation = this
         self.enhanceApiContext(methodInvocation, `call:${methodName}`)
         if (self.Meteor.isServer && runInParallel) {
           methodInvocation.unblock()
         }
-        return func(app(), methodInvocation, ...args)
+        try {
+          return func(app(), methodInvocation, ...args)
+        } catch (e) {
+          self._errorEvent(methodInvocation, e)
+          throw e
+        }
       }
 
       this.Meteor.methods({
@@ -42,25 +52,34 @@ export class ApiRegistry {
     }
   }
 
-  meteorPublication(meteorPublishFunc, recordSetName, func) {
+  _publication(meteorPublishFunc, recordSetName, func) {
     if (this.Meteor.isServer) {
       const self = this
       const wrapper = function wrapper(...args) {
         const subscription = this
         self.enhanceApiContext(subscription, `pub:${recordSetName}`)
         subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
-        return func(app(), subscription, ...args)
+        try {
+          return func(app(), subscription, ...args)
+        } catch (e) {
+          self._errorEvent(subscription, e)
+          throw e
+        }
       }
       meteorPublishFunc(recordSetName, wrapper)
     }
   }
 
+  _errorEvent(e) {
+    this.errorCallbacks.forEach(cb => cb(e))
+  }
+
   publication(recordSetName, func) {
-    this.meteorPublication(this.Meteor.publish, recordSetName, func)
+    this._publication(this.Meteor.publish, recordSetName, func)
   }
 
   publicationComposite(recordSetName, func) {
-    this.meteorPublication(this.Meteor.publishComposite, recordSetName, func)
+    this._publication(this.Meteor.publishComposite, recordSetName, func)
   }
 
   apiContextEnhancer(objOrFunc) {

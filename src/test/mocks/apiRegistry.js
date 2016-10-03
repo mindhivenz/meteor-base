@@ -43,6 +43,8 @@ export class MockApiRegistry {
     this.enhancer = new Enhancer()
   }
 
+  onError() {}
+
   method(methodName, funcOrOptions) {
     if (this.methodFuncs.has(methodName)) {
       throw new ReferenceError(`More than one method with the name "${methodName}"`)
