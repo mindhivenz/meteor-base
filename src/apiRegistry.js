@@ -71,7 +71,7 @@ export class ApiRegistry {
   }
 
   _errorEvent(e) {
-    this.errorCallbacks.forEach(cb => cb(e))
+    this.errorCallbacks.forEach(cb => cb(this, e))
   }
 
   publication(recordSetName, func) {
