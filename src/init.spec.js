@@ -2,10 +2,10 @@ import some from '@mindhive/some'
 import { sinon } from './mocha'
 import { mockAppContext, appContext } from '@mindhive/di/test'
 
-import { initModules } from './init'
+import { initMeteorModules } from './init'
 
 
-describe('initModules', () => {
+describe('initMeteorModules', () => {
 
   beforeEach(() => {
     global.Meteor = {}
@@ -19,7 +19,7 @@ describe('initModules', () => {
   it('should not init if Meteor not started',
     mockAppContext(() => {
       appContext.should.be.empty
-      initModules([])
+      initMeteorModules([])
       appContext.should.be.empty
     })
   )
@@ -27,7 +27,7 @@ describe('initModules', () => {
   it('should init once started and add core module',
     mockAppContext(() => {
       appContext.should.be.empty
-      initModules([])
+      initMeteorModules([])
       Meteor.startup.yield()
       appContext.should.have.property('Meteor')
     })
@@ -35,7 +35,7 @@ describe('initModules', () => {
 
   it('should add passed modules',
     mockAppContext(() => {
-      initModules([
+      initMeteorModules([
         () => ({
           someContext: some.object(),
         }),
@@ -48,12 +48,12 @@ describe('initModules', () => {
   it('should be callable multiple times',
     mockAppContext(() => {
       Meteor.startup.yields()
-      initModules([
+      initMeteorModules([
         () => ({
           firstContext: some.object(),
         }),
       ])
-      initModules([
+      initMeteorModules([
         () => ({
           secondContext: some.object(),
         }),

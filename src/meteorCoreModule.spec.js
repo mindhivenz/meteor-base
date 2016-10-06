@@ -20,7 +20,6 @@ describe('meteorCoreModule', () => {
       'Tracker',
       'Users',
       'Mongo',
-      'SimpleSchema',
       'Accounts',
       'apiRegistry',
       'Random',

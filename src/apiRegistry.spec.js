@@ -1,4 +1,4 @@
-import { sinon } from './mocha'
+import { sinon, should } from './mocha'
 import some from '@mindhive/some'
 import { appContext } from '@mindhive/di/test'
 
@@ -75,6 +75,14 @@ describe('ApiRegistry', () => {
       someMethodFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
     })
 
+    it('should bubble error out to Meteor', () => {
+      Meteor.isServer = some.bool()
+      apiRegistry.method('someMethod', () => { throw new Error() })
+      should.throw(() => {
+        callWrappedSomeMethod()
+      })
+    })
+
     describe('call context', () => {
 
       it('should call unblock() on call context if runInParallel', () => {
@@ -127,6 +135,25 @@ describe('ApiRegistry', () => {
         )
         callWrappedSomeMethod()
         thisInCall.apiName.should.equal('call:someMethod')
+      })
+
+    })
+
+    describe('onError', () => {
+
+      it('should call onError when an exception bubbles out of func', () => {
+        Meteor.isServer = some.bool()
+        const expectedError = new Error()
+        const errorHandler = sinon.spy()
+        apiRegistry.onError(errorHandler)
+        apiRegistry.method(
+          'someMethod',
+          () => { throw expectedError },
+        )
+        should.throw(() => {
+          callWrappedSomeMethod()
+        })
+        errorHandler.should.have.been.calledWith(thisInCall, expectedError)
       })
 
     })
@@ -196,6 +223,25 @@ describe('ApiRegistry', () => {
 
     })
 
+    describe('onError', () => {
+
+      it('should call onError when an exception bubbles out of func', () => {
+        Meteor.isServer = true
+        const expectedError = new Error()
+        const errorHandler = sinon.spy()
+        apiRegistry.onError(errorHandler)
+        apiRegistry.publication(
+          'somePub',
+          () => { throw expectedError },
+        )
+        should.throw(() => {
+          callWrappedSomePub()
+        })
+        errorHandler.should.have.been.calledWith(thisInCall, expectedError)
+      })
+
+    })
+
   })
 
   describe('publicationComposite', () => {
@@ -246,6 +292,26 @@ describe('ApiRegistry', () => {
       })
 
     })
+
+    describe('onError', () => {
+
+      it('should call onError when an exception bubbles out of func', () => {
+        Meteor.isServer = true
+        const expectedError = new Error()
+        const errorHandler = sinon.spy()
+        apiRegistry.onError(errorHandler)
+        apiRegistry.publicationComposite(
+          'somePub',
+          () => { throw expectedError },
+        )
+        should.throw(() => {
+          callWrappedCompositeSomePub()
+        })
+        errorHandler.should.have.been.calledWith(thisInCall, expectedError)
+      })
+
+    })
+
   })
 
 })
