@@ -26,7 +26,7 @@ export class MockApiContext {
 }
 
 export class MockMethodInvocation extends MockApiContext {
-  constructor(options = {}) {
+  constructor(options) {
     super(options)
     this.isSimulation = false
   }

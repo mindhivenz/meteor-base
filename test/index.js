@@ -17,5 +17,6 @@ module.exports = {
   withRealMongoCollection: testMongo.withRealMongoCollection,
   MockMethodInvocation: mockApiRegistry.MockMethodInvocation,
   MockSubscription: mockApiRegistry.MockSubscription,
+  MockApiContext: mockApiRegistry.MockApiContext,
   chaiPlugin: chaiPlugin.plugin,
 }
