@@ -106,8 +106,9 @@ export class MockApiRegistry {
     if (typeof tree.fetch === 'function') {
       throw new TypeError('Have you called subscribeComposite when you meant subscribe?')
     }
+    const cursor = tree.find()
     const result = {
-      found: tree.find ? tree.find().fetch() : [],
+      found: cursor ? cursor.fetch() : [],
       children: [],
     }
     if (tree.children) {
