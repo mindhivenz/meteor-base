@@ -7,6 +7,7 @@
 
 ### Meteor package peer dependencies (optional)
 
+1. `meteor add xolvio:backdoor`
 1. `meteor add aldeed:collection2`
 2. `meteor add reywood:publish-composite`
 3. `meteor add meteor/mizzao:timesync`
