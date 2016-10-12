@@ -4,8 +4,13 @@
 
 1. `npm install --save @mindhive/meteor`
 2. `meteor add meteorhacks:unblock`
-3. (optionally for SimpleSchema export) `meteor add aldeed:collection2`
-4. (optional) `meteor add reywood:publish-composite`
+
+### Meteor package peer dependencies (optional)
+
+1. `meteor add aldeed:collection2`
+2. `meteor add reywood:publish-composite`
+3. `meteor add meteor/mizzao:timesync`
+3. `meteor add alanning:roles`
 
 ## How to use this
  

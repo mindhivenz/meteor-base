@@ -1,10 +1,11 @@
 import { app } from '@mindhive/di'
 import some from '@mindhive/some'
 
-import { Enhancer } from '../../enhancer'
+import { ApiRegistry } from '../../apiRegistry'
 
 
 export class MockApiContext {
+
   constructor({
     viewer,
     userId = viewer && viewer._id,
@@ -26,6 +27,7 @@ export class MockApiContext {
 }
 
 export class MockMethodInvocation extends MockApiContext {
+
   constructor(options) {
     super(options)
     this.isSimulation = false
@@ -35,15 +37,10 @@ export class MockMethodInvocation extends MockApiContext {
 export class MockSubscription extends MockApiContext {
 }
 
-export class MockApiRegistry {
+export class MockApiRegistry extends ApiRegistry {
 
-  constructor() {
-    this.methodFuncs = new Map()
-    this.publicationFuncs = new Map()
-    this.enhancer = new Enhancer()
-  }
-
-  onError() {}
+  methodFuncs = new Map()
+  publicationFuncs = new Map()
 
   method(methodName, funcOrOptions) {
     if (this.methodFuncs.has(methodName)) {
@@ -84,7 +81,7 @@ export class MockApiRegistry {
     return func(app(), methodInvocation, ...args)
   }
 
-  subscribeCursor(recordSetName, subscription, ...args) {
+  _subscribeCursor(recordSetName, subscription, ...args) {
     const func = this.publicationFuncs.get(recordSetName)
     if (! func) {
       throw new ReferenceError(`Unknown publication "${recordSetName}"`)
@@ -94,7 +91,7 @@ export class MockApiRegistry {
   }
 
   subscribe(recordSetName, subscription = new MockSubscription(), ...args) {
-    const cursor = this.subscribeCursor(recordSetName, subscription, ...args)
+    const cursor = this._subscribeCursor(recordSetName, subscription, ...args)
     if (typeof cursor.fetch !== 'function') {
       throw new TypeError('Have you called subscribe when you meant subscribeComposite?')
     }
@@ -102,7 +99,7 @@ export class MockApiRegistry {
   }
 
   subscribeComposite(recordSetName, subscription = new MockSubscription(), ...args) {
-    const tree = this.subscribeCursor(recordSetName, subscription, ...args)
+    const tree = this._subscribeCursor(recordSetName, subscription, ...args)
     if (typeof tree.fetch === 'function') {
       throw new TypeError('Have you called subscribeComposite when you meant subscribe?')
     }

@@ -5,10 +5,11 @@ import { Enhancer } from './enhancer'
 
 export class ApiRegistry {
 
+  enhancer = new Enhancer()
+  errorCallbacks = []
+
   constructor(Meteor) {
     this.Meteor = Meteor
-    this.enhancer = new Enhancer()
-    this.errorCallbacks = []
   }
 
   onError(callback) {

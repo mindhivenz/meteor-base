@@ -18,3 +18,5 @@ export class MockMeteorError {
     }
   }
 }
+
+export const notAuthorizedErrorMatch = /\[not-authorized]/

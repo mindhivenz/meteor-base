@@ -6,6 +6,7 @@ var serverContext = require('../dist/test/serverContext')
 var testMongo = require('../dist/test/mocks/testMongo')
 var mockApiRegistry = require('../dist/test/mocks/apiRegistry')
 var chaiPlugin = require('../dist/test/chaiPlugin')
+var error = require('../dist/test/mocks/error')
 
 module.exports = {
   initModules: di.initModules,
@@ -18,5 +19,8 @@ module.exports = {
   MockMethodInvocation: mockApiRegistry.MockMethodInvocation,
   MockSubscription: mockApiRegistry.MockSubscription,
   MockApiContext: mockApiRegistry.MockApiContext,
+  MockApiRegistry: mockApiRegistry.MockApiRegistry,
+  MockMeteorError: error.MockMeteorError,
+  notAuthorizedErrorMatch: error.notAuthorizedErrorMatch,
   chaiPlugin: chaiPlugin.plugin,
 }

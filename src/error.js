@@ -1,6 +1,5 @@
 import { MockMeteorError } from './test/mocks/error'
 
-
 /*
  Expose Meteor.Error under a better name to throw with
 
@@ -8,3 +7,13 @@ import { MockMeteorError } from './test/mocks/error'
  Also to avoid importing of Meteor in our code.
  */
 export const ClientError = global.Meteor ? global.Meteor.Error : MockMeteorError
+
+export const NOT_AUTHORIZED = 'not-authorized'
+
+export const notAuthorizedError = (details) =>
+  // REVISIT: constructing ClientError's directly as Babel transpiling to ES5 can't subclass built-in classes
+  new ClientError(
+    NOT_AUTHORIZED,
+    'You are not authorized',
+    details,
+  )

@@ -4,7 +4,7 @@ var reactKomposer = require('react-komposer')
 var init = require('./dist/init')
 var compose = require('./dist/compose')
 var error = require('./dist/error')
-
+var focusedView = require('./dist/focusedView')
 
 module.exports = {
   app: di.app,
@@ -13,6 +13,10 @@ module.exports = {
   withReactiveData: compose.withReactiveData,
   composeAll: reactKomposer.composeAll,
   ClientError: error.ClientError,
+  NOT_AUTHORIZED: error.NOT_AUTHORIZED,
+  notAuthorizedError: error.notAuthorizedError,
+  FocusedView: focusedView.FocusedView,
+  prefixKeys: focusedView.prefixKeys,
 }
 
 /*

@@ -16,6 +16,7 @@ export default () => {
   Accounts._options = {}
   Accounts._loginHandlers = []
   Accounts._validateLoginHook.callbacks = {}
+  Accounts._onLogoutHook.callbacks = {}
   return {
     Meteor: {
       isServer: true,
