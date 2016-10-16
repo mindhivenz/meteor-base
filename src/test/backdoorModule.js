@@ -1,12 +1,4 @@
-import { appContext } from '@mindhive/di/test'
 
-
-const globallyApply = (globalPropertyName, value) => {
-  if (global[globalPropertyName]) {
-    throw new ReferenceError(`${globalPropertyName} already defined in global`)
-  }
-  global[globalPropertyName] = value
-}
 
 const resetDatabase = () => {
   const db = MongoInternals.defaultRemoteCollectionDriver().mongo.db
@@ -34,8 +26,7 @@ export default () => {
     if (process.env.NODE_ENV !== 'test') {
       throw new Error('Only open the backdoor in when NODE_ENV=test')
     }
-    globallyApply('appContext', appContext)
-    globallyApply('resetDatabase', resetDatabase)
+    global.resetDatabase = resetDatabase
     applyBackDoorMethods()
   }
 }

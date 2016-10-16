@@ -25,7 +25,7 @@
     "meteor"
   ],
   "dependencies": {
-    "@mindhive/di": "^2.1.0",
+    "@mindhive/di": "^2.3.0",
     "react-komposer": "damonmaria/react-komposer#shouldResubscribe-option"
   },
   "peerDependencies": {
