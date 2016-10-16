@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@mindhive/di": "^2.3.0",
+    "mobx": "^2.6.0",
     "react-komposer": "damonmaria/react-komposer#shouldResubscribe-option"
   },
   "peerDependencies": {

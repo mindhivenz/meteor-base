@@ -3,8 +3,8 @@ import { TimeSync } from 'meteor/mizzao:timesync'  // eslint-disable-line import
 /* eslint-disable no-console */
 
 export default () => ({
-  clock: (...args) => {
-    const serverTime = TimeSync.serverTime(...args)
+  clock: () => {
+    const serverTime = TimeSync.serverTime()
     if (! serverTime) {
       console.warn('clock() called before time synced with server, defaulting to browser/client time')
       if (console.trace) {
