@@ -22,7 +22,7 @@ class TickAtom {
 
   getCurrent = () => {
     if (! this.atom.reportObserved()) {
-      // Called from outside a reaction
+      console.warn('Observable time requested outside of any observer')   // eslint-disable-line no-console
       return app().clock()
     }
     return this.currentTick
