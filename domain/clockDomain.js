@@ -1,2 +1,2 @@
 
-module.exports = require('../dist/client/clockDomain')
+module.exports = require('../dist/domain/clockDomain')

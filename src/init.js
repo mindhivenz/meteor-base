@@ -18,7 +18,7 @@ import meteorCoreModule from './meteorCoreModule'
 let coreApplied = false
 
 export const initMeteorModules = (modules) => {
-  Meteor.startup(() => {
+  global.Meteor.startup(() => {
     if (! coreApplied) {
       initModules([meteorCoreModule])
       coreApplied = true

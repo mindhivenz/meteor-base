@@ -1,17 +1,12 @@
 var di = require('@mindhive/di')
-var reactKomposer = require('react-komposer')
 
 var init = require('./dist/init')
-var compose = require('./dist/compose')
 var error = require('./dist/error')
 var focusedView = require('./dist/focusedView')
 
 module.exports = {
   app: di.app,
   initMeteorModules: init.initMeteorModules,
-  withAsync: compose.withAsync,
-  withReactiveData: compose.withReactiveData,
-  composeAll: reactKomposer.composeAll,
   ClientError: error.ClientError,
   NOT_AUTHORIZED: error.NOT_AUTHORIZED,
   notAuthorizedError: error.notAuthorizedError,
