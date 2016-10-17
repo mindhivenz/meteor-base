@@ -45,11 +45,11 @@ class TickAtom {
 }
 
 class ClockDomain {
-  _perSeond = new TickAtom(1)
+  _perSecond = new TickAtom(1)
   _perTenSeconds = new TickAtom(10)
 
   get perSecond() {
-    return this._perSeond.getCurrent()
+    return this._perSecond.getCurrent()
   }
 
   get perTenSeconds() {
