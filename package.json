@@ -12,7 +12,8 @@
   "main": "./index.js",
   "scripts": {
     "lint": "eslint --ext .jsx,.js src",
-    "build": "rm -r dist/* && babel src --ignore *.spec.js --out-dir dist",
+    "build": "babel src --ignore *.spec.js --out-dir dist",
+    "build:clean": "rm -r dist/*",
     "test": "mocha --compilers js:babel-core/register --reporter spec \"src/**/*.spec.js\"",
     "prepublish": "npm run build"
   },
