@@ -1,6 +1,6 @@
 import { app } from '@mindhive/di'
 
-import { NOT_AUTHORIZED } from '../error'
+import { NOT_AUTHORIZED, VALIDATION_ERROR } from '../error'
 
 
 export class UnhandledExceptionReporter {
@@ -41,10 +41,12 @@ const registerApi = (apiRegistry) => {
   })
 }
 
+const HANDLED_ERRORS = [NOT_AUTHORIZED, VALIDATION_ERROR]
+
 export default ({ apiRegistry }) => {
   registerApi(apiRegistry)
   const unhandledExceptionReporter = new UnhandledExceptionReporter()
-  unhandledExceptionReporter.registerHandledErrorFilter(e => e.error === NOT_AUTHORIZED)
+  unhandledExceptionReporter.registerHandledErrorFilter(e => HANDLED_ERRORS.includes(e.error))
   apiRegistry.onError(unhandledExceptionReporter.onError)
   return {
     unhandledExceptionReporter,

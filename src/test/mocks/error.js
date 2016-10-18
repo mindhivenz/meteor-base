@@ -20,3 +20,4 @@ export class MockMeteorError {
 }
 
 export const notAuthorizedErrorMatch = /\[not-authorized]/
+export const validationErrorMatch = /\[validation-error]/

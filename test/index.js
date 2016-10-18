@@ -22,5 +22,6 @@ module.exports = {
   MockApiRegistry: mockApiRegistry.MockApiRegistry,
   MockMeteorError: error.MockMeteorError,
   notAuthorizedErrorMatch: error.notAuthorizedErrorMatch,
+  validationErrorMatch: error.validationErrorMatch,
   chaiPlugin: chaiPlugin.plugin,
 }

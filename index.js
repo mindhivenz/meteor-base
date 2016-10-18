@@ -10,6 +10,8 @@ module.exports = {
   ClientError: error.ClientError,
   NOT_AUTHORIZED: error.NOT_AUTHORIZED,
   notAuthorizedError: error.notAuthorizedError,
+  VALIDATION_ERROR: error.VALIDATION_ERROR,
+  validationError: error.validationError,
   FocusedView: focusedView.FocusedView,
   prefixKeys: focusedView.prefixKeys,
 }
