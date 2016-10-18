@@ -12,7 +12,7 @@ export class ViewerDomain {
   @observable loading = true
   @observable user = asStructure(null)
 
-  @action change = (user) => {
+  @action change(user) {
     this.user = user
     this.loading = false
   }
