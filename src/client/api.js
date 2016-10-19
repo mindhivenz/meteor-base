@@ -1,7 +1,7 @@
 import { app } from '@mindhive/di'
 
 
-class Api {
+export class Api {
 
   meteorCall = (
     methodName,
@@ -11,7 +11,7 @@ class Api {
   ) => {
     const { Meteor, connectionDomain } = app()
     let connectionCallDisposer
-    if (notifyViewerPending) {
+    if (connectionDomain && notifyViewerPending) {
       connectionCallDisposer = connectionDomain.callStarted()
     }
     Meteor.apply(methodName, [args], { returnStubValue: true }, (error, result) => {
@@ -49,7 +49,3 @@ class Api {
       }
     })
 }
-
-export default () => ({
-  api: new Api(),
-})

@@ -1,2 +1,2 @@
 
-module.exports = require('../dist/client/apiModule')
+module.exports = require('../dist/client/timeModule')

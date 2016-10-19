@@ -1,6 +1,6 @@
 import { initModules } from '@mindhive/di'
 
-import meteorCoreModule from './meteorCoreModule'
+import meteorCoreModule from './universal/meteorCoreModule'
 
 
 /*

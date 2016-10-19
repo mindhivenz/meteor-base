@@ -1,4 +1,5 @@
-import { ApiRegistry } from './apiRegistry'
+import { ApiRegistry } from '../apiRegistry'
+import { Api } from '../client/api'
 
 
 export default () => {
@@ -10,7 +11,7 @@ export default () => {
     Random,
   } = global  // Import like this so it can be used in Wallaby
   const Users = Meteor.users
-  return {
+  const result = {
     Meteor,
     Tracker,
     Users,
@@ -19,4 +20,8 @@ export default () => {
     Random,
     apiRegistry: new ApiRegistry(Meteor),
   }
+  if (Meteor.isClient) {
+    result.api = new Api()
+  }
+  return result
 }

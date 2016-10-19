@@ -55,7 +55,7 @@ export class FocusedView {
     return (selector && selector._id) || typeof selector === 'string'
   }
 
-  _reportAccessDeniedFindOne(apiContext, selector, operation) {
+  _reportAccessDenied(apiContext, selector, operation) {
 
     const selectorAsFieldsOptions = (s) => {
       const result = {}
@@ -110,7 +110,7 @@ export class FocusedView {
   loadOne(apiContext, selector, options) {
     const doc = this.collection.findOne(this.selector(apiContext, selector, 'loadOne'), options)
     if (! doc) {
-      this._reportAccessDeniedFindOne(apiContext, selector, 'loadOne')
+      this._reportAccessDenied(apiContext, selector, 'loadOne')
     }
     return doc
   }
@@ -126,7 +126,7 @@ export class FocusedView {
   updateOne(apiContext, selector, modifier) {
     const updateCount = this.collection.update(this.selector(apiContext, selector, 'updateOne'), modifier)
     if (! updateCount) {
-      this._reportAccessDeniedFindOne(apiContext, selector, 'updateOne')
+      this._reportAccessDenied(apiContext, selector, 'updateOne')
     }
     return updateCount
   }
@@ -142,7 +142,7 @@ export class FocusedView {
     }
     const removeCount = this.collection.remove(fullSelector)
     if (! removeCount) {
-      this._reportAccessDeniedFindOne(apiContext, selector, 'removeOne')
+      this._reportAccessDenied(apiContext, selector, 'removeOne')
     }
     return removeCount
   }

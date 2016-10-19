@@ -1,4 +1,4 @@
-import './mocha'
+import '../mocha'
 
 import meteorCoreModule from './meteorCoreModule'
 

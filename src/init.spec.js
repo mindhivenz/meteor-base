@@ -28,7 +28,7 @@ describe('initMeteorModules', () => {
     mockAppContext(() => {
       appContext.should.be.empty
       initMeteorModules([])
-      Meteor.startup.yield()
+      global.Meteor.startup.yield()
       appContext.should.have.property('Meteor')
     })
   )
@@ -40,14 +40,14 @@ describe('initMeteorModules', () => {
           someContext: some.object(),
         }),
       ])
-      Meteor.startup.yield()
+      global.Meteor.startup.yield()
       appContext.should.have.property('someContext')
     })
   )
 
   it('should be callable multiple times',
     mockAppContext(() => {
-      Meteor.startup.yields()
+      global.Meteor.startup.yields()
       initMeteorModules([
         () => ({
           firstContext: some.object(),
