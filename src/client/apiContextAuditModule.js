@@ -1,11 +1,18 @@
+import { app } from '@mindhive/di'
 
 
 export const auditEnhancer = () => ({
-  auditLog() {
-    // Don't log in here because assume we're inside a client
-    // method simulation and so this is about to happen on the server.
+  auditLog(entry) {
+    // Don't log if is simulation because this is about to happen on the server
     if (! this.isSimulation) {
-      throw new Error('Somehow auditLog was called while not in a method simulation')
+      app().api.optimisticCall(
+        'audit.log',
+        {
+          context: this.apiName,
+          entry,
+        },
+        { notifyViewerPending: false },
+      )
     }
   },
 })
