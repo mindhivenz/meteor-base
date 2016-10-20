@@ -10,7 +10,7 @@ module.exports = {
   asyncContainer: containers.asyncContainer,
 
   withAsync: compose.withAsync,
-  withReactiveData: compose.withReactiveData,
+  withMeteorReactive: compose.withMeteorReactive,
   withApiCallResult: compose.withApiCallResult,
   connectSubscription: compose.connectSubscription,
 }

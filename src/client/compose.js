@@ -38,7 +38,7 @@ export const withAsync = (asyncFunc, shouldResubscribe) =>
  and asyncFunc rerun if the result of those Meteor calls changes.
  This rerun is not blocked by shouldResubscribe.
  */
-export const withReactiveData = (asyncFunc, shouldResubscribe) =>
+export const withMeteorReactive = (asyncFunc, shouldResubscribe) =>
   composeWithTracker(
     composeFunc(asyncFunc),
     PushPropsNotCalled,
@@ -83,7 +83,7 @@ export const connectSubscription = ({
   overrideCallProps = () => null,
 }) =>
   withDisplayName(`connect(${recordSetName})`,
-    withReactiveData(
+    withMeteorReactive(
       ({ Meteor }, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
         if (overrideProps) {
