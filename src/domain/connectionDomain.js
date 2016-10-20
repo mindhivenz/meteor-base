@@ -5,18 +5,16 @@ import { app } from '@mindhive/di'
 // REVISIT: Expose calls that are taking a long time to complete even if Meteor still saying 'connected'
 // REVISIT: use an interval to get time until next connect attempt and display
 
-const STARTUP_MS = 5000
-
 class ConnectionDomain {
 
   callCounter = 0
 
-  @observable startingUp = true
+  @observable statusKnown = false
   @observable connected = true
   @observable _pendingCalls = []
 
   @computed get connectionDown() {
-    return ! this.connected && ! this.startingUp
+    return ! this.connected && this.statusKnown
   }
 
   @computed get hasPendingCalls() {
@@ -33,12 +31,11 @@ class ConnectionDomain {
     this._pendingCalls.remove(callRecord)
   }
 
-  @action setConnected = (connected) => {
-    this.connected = connected
-  }
-
-  @action startupComplete = () => {
-    this.startingUp = false
+  @action setStatus = (status) => {
+    this.connected = status.connected
+    if (status.connected || status.status === 'waiting' || status.retryCount) {
+      this.statusKnown = true
+    }
   }
 
   @action reconnect = () => {
@@ -48,9 +45,8 @@ class ConnectionDomain {
 
 export default ({ Meteor, Tracker }) => {
   const connectionDomain = new ConnectionDomain()
-  Meteor.setTimeout(connectionDomain.startupComplete, STARTUP_MS)
   Tracker.autorun(() => {
-    connectionDomain.setConnected(Meteor.status().connected)
+    connectionDomain.setStatus(Meteor.status())
   })
   return {
     connectionDomain,

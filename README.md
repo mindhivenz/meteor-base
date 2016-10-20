@@ -1,3 +1,4 @@
+
 # Mindhive's base Meteor package
 
 ## Install
@@ -7,11 +8,14 @@
 
 ### Meteor package peer dependencies (optional)
 
-1. `meteor add xolvio:backdoor`
-1. `meteor add aldeed:collection2`
-2. `meteor add reywood:publish-composite`
-3. `meteor add meteor/mizzao:timesync`
-3. `meteor add alanning:roles`
+1. `backdoorModule`: `meteor add xolvio:backdoor`
+1. `SimpleSchema`: `meteor add aldeed:collection2`
+2. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
+3. client `timeModule`: `meteor add meteor/mizzao:timesync`
+4. `hasRole`: `meteor add alanning:roles`
+5. offline:
+	- `meteor add space:tracker-mobx-autorun`
+	- `meteor add ground:db@2.0.0-alpha.2` 
 
 ## How to use this
  
@@ -25,7 +29,8 @@ This package also makes Meteor core services available in the appContext:
  
 - Meteor
 - Mongo: Meteor's Mongo, or in testing it is our own TestMongo (see below)
-- Tracker
+- Tracker: if `meteor/space:tracker-mobx-autorun` installed this will 
+ 	react to both Meteor *and Mobx* reactive changes
 - Random
 - Accounts: with appropriate internal data reset each test
 - Users: Meteor's `users` Mongo collection
