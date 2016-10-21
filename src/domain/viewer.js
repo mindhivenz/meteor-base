@@ -32,10 +32,8 @@ export class ViewerDomain {
     this.user = state.user
   }
 
-  buildOfflineState() {
-    return {
-      user: this.userJson,
-    }
+  buildOfflineState(state) {
+    state.user = this.userJson
   }
 
   @computed get isAuthenticated() {
@@ -48,6 +46,26 @@ export class ViewerDomain {
 
   hasRole = (role) =>
     app().Roles.userIsInRole(this.userJson, role)
+}
+
+export class ViewerWithOrgDomain extends ViewerDomain {
+  @observable org = asStructure(null)
+
+  applyFromServer(user) {
+    super.applyFromServer(user)
+    this.org = user && app().Orgs.findOne(user.orgId)
+  }
+
+  applyFromOfflineState(state) {
+    super.applyFromOfflineState(state)
+    this.org = state.org
+  }
+
+  buildOfflineState(state) {
+    super.buildOfflineState(state)
+    state.org = toJS(this.org)
+  }
+
 }
 
 const VIEWER_STATE_PATH = 'viewerState'
