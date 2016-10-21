@@ -10,56 +10,54 @@ describe('LocalStorage', () => {
   let localStorage
   let path
   let value
+  let valueJson
 
   beforeEach(() => {
-    // noinspection JSAnnotator
-    global.localStorage = {}
+    global.localStorage = {
+      getItem: sinon.stub(),
+      setItem: sinon.stub(),
+      removeItem: sinon.stub(),
+    }
     path = some.string()
-    value = some.string()
+    value = some.object()
+    valueJson = JSON.stringify(value)
     localStorage = new LocalStorage()
   })
 
   describe('read', () => {
 
-    beforeEach(() => {
-      global.localStorage.getItem = sinon.stub()
+    it('should return getItem parsed', () => {
+      global.localStorage.getItem.returns(valueJson)
+      const actual = localStorage.read(path)
+      return actual.should.deep.equal(value)
     })
 
-    it('should resolve to getItem result', () => {
-      global.localStorage.getItem.returns(value)
+    it('should return getItem un-parsed if parsing fails to maintain compatibility with old deviceTokens', () => {
+      const excepted = some.string()
+      global.localStorage.getItem.returns(excepted)
       const actual = localStorage.read(path)
-      global.localStorage.getItem.should.have.been.calledWith(path)
-      return actual.should.eventually.equal(value)
+      return actual.should.deep.equal(excepted)
     })
 
   })
 
   describe('write', () => {
 
-    beforeEach(() => {
-      global.localStorage.setItem = sinon.stub()
-      global.localStorage.removeItem = sinon.stub()
-    })
-
-    it('should setItem and resolve to value', () => {
+    it('should setItem as JSON and return true', () => {
       const actual = localStorage.write(path, value)
-      global.localStorage.setItem.should.have.been.calledWith(path, value)
-      return actual.should.eventually.equal(value)
+      actual.should.equal(true)
+      global.localStorage.setItem.should.have.been.calledWith(path, valueJson)
     })
 
     it('should removeItem when value is null', () => {
-      value = null
-      const actual = localStorage.write(path, value)
+      localStorage.write(path, null)
       global.localStorage.removeItem.should.have.been.calledWith(path)
-      return actual.should.eventually.equal(value)
     })
 
-    it('should reject when removeItem throws', () => {
-      value = null
-      const error = new Error()
-      global.localStorage.removeItem.throws(error)
+    it('should return false when setItem throws (when full or iOS Safari private mode)', () => {
+      global.localStorage.setItem.throws()
       const actual = localStorage.write(path, value)
-      return actual.should.be.rejectedWith(error)
+      actual.should.equal(false)
     })
 
   })

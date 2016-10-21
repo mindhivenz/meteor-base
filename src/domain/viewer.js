@@ -65,29 +65,22 @@ export const linkViewerDomainToSubscription = (viewerDomain, subscription = 'vie
   const updateFromServer = (user) => {
     viewerDomain.updateFromServer(user)
     if (offlineEnabled) {
-      storage.write(VIEWER_STATE_PATH, JSON.stringify(viewerDomain.buildOfflineState()))
+      storage.write(VIEWER_STATE_PATH, viewerDomain.buildOfflineState())
     }
   }
 
   Tracker.autorun(() => {
     if (offlineEnabled && viewerDomain.loading && connectionDomain.connectionDown) {
-      storage.read(VIEWER_STATE_PATH)
-        .then(state => {
-          // Check we're still in the same state
-          if (viewerDomain.loading && connectionDomain.connectionDown) {
-            viewerDomain.updateFromOfflineState(JSON.parse(state))
-          }
-        })
+      const offlineState = storage.read(VIEWER_STATE_PATH)
+      if (offlineState) {
+        viewerDomain.updateFromOfflineState(offlineState)
+      }
     } else {
-      if (Meteor.subscribe(subscription).ready()) {
-        if (Meteor.userId()) {
+      if (Meteor.userId()) {
+        if (Meteor.subscribe(subscription).ready()) {
           updateFromServer(Users.findOne(Meteor.userId()))
-        } else {
-          updateFromServer(null)
         }
-      } else if (! Meteor.userId()) {
-        // Be proactive, if the subscription is not ready but we know they're not logged in
-        // then we can still fire viewer changed to set loading false
+      } else {
         updateFromServer(null)
       }
     }

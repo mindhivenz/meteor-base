@@ -1,21 +1,29 @@
 
 
+// For consistency, use same storage as Meteor
+
 export class LocalStorage {
 
   read(path) {
-    return Promise.resolve(global.localStorage.getItem(path))
+    const value = global.localStorage.getItem(path)
+    try {
+      return JSON.parse(value)
+    } catch (e) {
+      return value
+    }
   }
 
   write(path, data) {
     try {
       if (data) {
-        global.localStorage.setItem(path, data)
+        global.localStorage.setItem(path, JSON.stringify(data))
       } else {
         global.localStorage.removeItem(path)
       }
-      return Promise.resolve(data)
+      return true
     } catch (e) {
-      return Promise.reject(e)
+      console.warn(`Failed to write to localStorage path ${path}`, e)
+      return false
     }
   }
 }
