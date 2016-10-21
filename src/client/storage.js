@@ -9,7 +9,8 @@ export class LocalStorage {
     try {
       return JSON.parse(value)
     } catch (e) {
-      return value
+      console.warn(`Failed to JSON parse from localStorage path ${path}`, e)
+      return null
     }
   }
 

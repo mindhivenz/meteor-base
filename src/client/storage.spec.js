@@ -1,6 +1,6 @@
 import some from '@mindhive/some'
 
-import { sinon } from '../mocha'
+import { sinon, should } from '../mocha'
 
 import { LocalStorage } from './storage'
 
@@ -32,11 +32,16 @@ describe('LocalStorage', () => {
       return actual.should.deep.equal(value)
     })
 
-    it('should return getItem un-parsed if parsing fails to maintain compatibility with old deviceTokens', () => {
-      const excepted = some.string()
-      global.localStorage.getItem.returns(excepted)
+    it('should return null when getItem returns null', () => {
+      global.localStorage.getItem.returns(null)
       const actual = localStorage.read(path)
-      return actual.should.deep.equal(excepted)
+      should.equal(actual, null)
+    })
+
+    it('should return null when parsing fails', () => {
+      global.localStorage.getItem.returns('invalid JSON')
+      const actual = localStorage.read(path)
+      should.equal(actual, null)
     })
 
   })
