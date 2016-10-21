@@ -82,16 +82,17 @@ export const linkViewerDomainToSubscription = (viewerDomain, subscription = 'vie
 
   const updateFromServer = (user) => {
     viewerDomain.updateFromServer(user)
-    if (offlineEnabled) {
-      const offlineState = {}
-      viewerDomain.buildOfflineState(offlineState)
-      storage.write(VIEWER_STATE_PATH, offlineState)
-    }
+    const offlineState = {}
+    viewerDomain.buildOfflineState(offlineState)
+    storage.write(VIEWER_STATE_PATH, offlineState)
   }
+
+  const readOfflineState = () =>
+    storage.read(VIEWER_STATE_PATH)
 
   Tracker.autorun(() => {
     if (offlineEnabled && viewerDomain.loading && connectionDomain.connectionDown) {
-      const offlineState = storage.read(VIEWER_STATE_PATH)
+      const offlineState = readOfflineState()
       if (offlineState) {
         viewerDomain.updateFromOfflineState(offlineState)
       }
@@ -99,6 +100,13 @@ export const linkViewerDomainToSubscription = (viewerDomain, subscription = 'vie
       if (Meteor.userId()) {
         if (Meteor.subscribe(subscription).ready()) {
           updateFromServer(Users.findOne(Meteor.userId()))
+        } else {
+          if (viewerDomain.loading) {
+            const offlineState = readOfflineState()
+            if (offlineState && offlineState.user && offlineState.user._id === Meteor.userId()) {
+              viewerDomain.updateFromOfflineState(offlineState)
+            }
+          }
         }
       } else {
         updateFromServer(null)
