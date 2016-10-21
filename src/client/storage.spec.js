@@ -1,12 +1,13 @@
 import some from '@mindhive/some'
 
-import { sinon } from '../../test'
+import { sinon } from '../mocha'
 
-import { localStorage } from './storageModule'
+import { LocalStorage } from './storage'
 
 
-describe('localStorage', () => {
+describe('LocalStorage', () => {
 
+  let localStorage
   let path
   let value
 
@@ -15,6 +16,7 @@ describe('localStorage', () => {
     global.localStorage = {}
     path = some.string()
     value = some.string()
+    localStorage = new LocalStorage()
   })
 
   describe('read', () => {

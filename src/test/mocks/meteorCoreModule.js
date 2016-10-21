@@ -22,7 +22,6 @@ export default () => {
       isServer: true,
       wrapAsync: Meteor.wrapAsync,
     },
-    Tracker: {},
     Mongo: TestMongo,
     Users: Accounts.users,
     SimpleSchema,

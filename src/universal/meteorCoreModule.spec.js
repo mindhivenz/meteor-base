@@ -17,7 +17,6 @@ describe('meteorCoreModule', () => {
     const context = meteorCoreModule()
     context.should.have.keys([
       'Meteor',
-      'Tracker',
       'Users',
       'Mongo',
       'Accounts',

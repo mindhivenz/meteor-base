@@ -1,9 +1,10 @@
 
 
-export const localStorage = {
+export class LocalStorage {
+
   read(path) {
     return Promise.resolve(global.localStorage.getItem(path))
-  },
+  }
 
   write(path, data) {
     try {
@@ -16,9 +17,5 @@ export const localStorage = {
     } catch (e) {
       return Promise.reject(e)
     }
-  },
+  }
 }
-
-export default () => ({
-  storage: localStorage,
-})

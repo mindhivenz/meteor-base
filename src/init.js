@@ -1,6 +1,7 @@
 import { initModules } from '@mindhive/di'
 
-import meteorCoreModule from './universal/meteorCoreModule'
+import universalMeteorCoreModule from './universal/meteorCoreModule'
+import clientMeteorCoreModule from './client/meteorCoreModule'
 
 
 /*
@@ -20,10 +21,13 @@ let coreApplied = false
 export const initMeteorModules = (modules) => {
   global.Meteor.startup(() => {
     if (! coreApplied) {
-      initModules([meteorCoreModule])
+      const coreModules = [universalMeteorCoreModule]
+      if (global.Meteor.isClient) {
+        coreModules.push(clientMeteorCoreModule)
+      }
+      initModules(coreModules)
       coreApplied = true
     }
     initModules(modules)
   })
 }
-

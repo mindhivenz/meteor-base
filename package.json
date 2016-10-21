@@ -44,6 +44,7 @@
     "babel-preset-stage-2": "^6.17.0",
     "chai": "^3.5.0",
     "chai-properties": "vbardales/chai-properties#pull/8/head",
+    "chai-as-promised": "^6.0.0",
     "eslint": "^2.12.0",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.8.1",
@@ -51,7 +52,8 @@
     "eslint-plugin-react": "^5.0.1",
     "mocha": "^2.5.3",
     "sinon": "^1.17.4",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "sinon-stub-promise": "^3.0.1"
   },
   "homepage": "https://github.com/mindhivenz/meteor-base",
   "bugs": {
