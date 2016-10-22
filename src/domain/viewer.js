@@ -2,15 +2,16 @@ import {
   observable,
   computed,
   action,
-  toJS,
-  asStructure,
+  asReference,
 } from 'mobx'
 import { app } from '@mindhive/di'
 
 
 export class ViewerDomain {
   @observable loading = true
-  @observable user = asStructure(null)
+  // Use atReference because we don't update the internals, only this reference,
+  // and makes user pure JS (avoiding issues with Roles package thinking user.roles is not an array)
+  @observable user = asReference(null)
   @observable isAuthenticatedLive = false
 
   @action updateFromServer(user) {
@@ -33,23 +34,19 @@ export class ViewerDomain {
   }
 
   buildOfflineState(state) {
-    state.user = this.userJson
+    state.user = this.user
   }
 
   @computed get isAuthenticated() {
     return !! this.user
   }
 
-  get userJson() {
-    return toJS(this.user)
-  }
-
   hasRole = (role) =>
-    app().Roles.userIsInRole(this.userJson, role)
+    app().Roles.userIsInRole(this.user, role)
 }
 
 export class ViewerWithOrgDomain extends ViewerDomain {
-  @observable org = asStructure(null)
+  @observable org = asReference(null)
 
   applyFromServer(user) {
     super.applyFromServer(user)
@@ -63,7 +60,7 @@ export class ViewerWithOrgDomain extends ViewerDomain {
 
   buildOfflineState(state) {
     super.buildOfflineState(state)
-    state.org = toJS(this.org)
+    state.org = this.org
   }
 
 }
