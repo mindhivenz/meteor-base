@@ -1,8 +1,11 @@
 import * as mobx from 'mobx'
 
 
+const docId = (doc) =>
+  typeof doc === 'string' ? doc : doc._id
+
 const sameDoc = (d1, d2) =>
-  d1._id === d2._id
+  docId(d1) === docId(d2)
 
 export class MockTracker {
 
