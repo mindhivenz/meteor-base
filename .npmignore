@@ -1,6 +1,7 @@
 .idea
 *.iml
-wallaby.js
-src/
+/wallaby.js
+/src/
 .babelrc
 .meteor-portable
+/harness.meteor/

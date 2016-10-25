@@ -1,0 +1,4 @@
+globals:
+  Factory: false
+rules:
+  no-unused-vars: 0

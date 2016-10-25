@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Meteor harness for Wallaby" type="meteor-app-runner" factoryName="Meteor" programParameters="--port 2997" workingDirectory="$PROJECT_DIR$/harness.meteor/">
+    <option name="exePath" value="/usr/local/bin/meteor" />
+    <option name="startBrowserSettings">
+      <browser url="http://localhost:3000" />
+    </option>
+    <meteor-runner-state>
+      <startBrowserSettings>
+        <browser url="http://localhost:3000" />
+      </startBrowserSettings>
+    </meteor-runner-state>
+    <method />
+  </configuration>
+</component>

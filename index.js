@@ -3,6 +3,8 @@ var di = require('@mindhive/di')
 var init = require('./dist/init')
 var error = require('./dist/error')
 var focusedView = require('./dist/focusedView')
+var roles = require('./dist/roles')
+var check = require('./dist/check')
 
 module.exports = {
   app: di.app,
@@ -14,21 +16,16 @@ module.exports = {
   validationError: error.validationError,
   FocusedView: focusedView.FocusedView,
   prefixKeys: focusedView.prefixKeys,
-}
+  SUPER_USER: roles.SUPER_USER,
 
-/*
- Import Meteor standard packages that we would want to use directly / declarative, rather than injecting
+  /*
+   Import Meteor standard packages that we would want to use directly / declarative, rather than injecting
 
- So you shouldn't mind these being also tested as part of the unit in unit testing.
- Other Meteor objects and packages that should be injected as dependencies into your code
- go in the meteorCoreModule.js module.
- */
-if (global.Package) {
-  if (global.Package.check) {
-    module.exports.check = global.Package.check.check
-    module.exports.Match = global.Package.check.Match
-  }
-}
-if (global.SimpleSchema) {
-  module.exports.SimpleSchema = global.SimpleSchema
+   So you shouldn't mind these being also tested as part of the unit in unit testing.
+   Other Meteor objects and packages that should be injected as dependencies into your code
+   go in the meteorCoreModule.js module.
+   */
+  check: check.check,
+  Match: check.Match,
+  SimpleSchema: check.SimpleSchema,
 }

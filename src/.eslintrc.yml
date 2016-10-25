@@ -1,9 +1,10 @@
 parser: babel-eslint
 extends:
-- airbnb
+- airbnb/base
 env:
   mocha: true
 rules:
+  arrow-parens: 0
   max-len:
   - warn
   - code: 120
