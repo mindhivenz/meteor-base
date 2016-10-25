@@ -155,6 +155,16 @@ describe('focusedView', () => {
       Collection.find.should.have.been.calledWith(builtSelector('find'), options)
     })
 
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.find(apiContext, selector, options)
+      }, reason)
+    })
+
   })
 
   describe('loadOne', () => {
@@ -165,6 +175,16 @@ describe('focusedView', () => {
       const actual = focusedViewer.loadOne(apiContext, selector, options)
       actual.should.equal(expected)
       Collection.findOne.should.have.been.calledWith(builtSelector('loadOne'), options)
+    })
+
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.loadOne(apiContext, selector, options)
+      }, reason)
     })
 
     it('should accessDenied if no matching doc', () => {
@@ -273,6 +293,26 @@ describe('focusedView', () => {
       Collection.insert.should.have.been.calledWith(originalDoc)
     })
 
+    it('should throw if updateFirewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        updateFirewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.insert(apiContext, some.object())
+      }, reason)
+    })
+
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.insert(apiContext, some.object())
+      }, reason)
+    })
+
   })
 
   describe('updateOne', () => {
@@ -311,6 +351,26 @@ describe('focusedView', () => {
       Collection.update.should.have.been.calledWith(builtSelector('updateOne'), modifier)
     })
 
+    it('should throw if updateFirewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        updateFirewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.updateOne(apiContext, selector, modifier)
+      }, reason)
+    })
+
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.updateOne(apiContext, selector, modifier)
+      }, reason)
+    })
+
   })
 
   describe('updateMaybe', () => {
@@ -337,6 +397,26 @@ describe('focusedView', () => {
       const actual = focusedViewer.updateMaybe(apiContext, selector, modifier)
       actual.should.equal(0)
       Collection.update.should.have.been.calledWith(builtSelector('updateMaybe'), modifier)
+    })
+
+    it('should throw if updateFirewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        updateFirewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.updateMaybe(apiContext, selector, modifier)
+      }, reason)
+    })
+
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.updateMaybe(apiContext, selector, modifier)
+      }, reason)
     })
 
   })
@@ -400,6 +480,26 @@ describe('focusedView', () => {
           },
         },
       )
+    })
+
+    it('should throw if updateFirewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        updateFirewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.removeOne(apiContext, selector)
+      }, reason)
+    })
+
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.removeOne(apiContext, selector)
+      }, reason)
     })
 
   })

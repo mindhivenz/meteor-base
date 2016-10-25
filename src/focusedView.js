@@ -11,10 +11,15 @@ export const prefixKeys = (prefix, fields) => {
   return result
 }
 
-const VIEW_SPEC_PROPERTIES = ['findSelector', 'updateSelector', 'insertDocMerge']
+const VIEW_SPEC_PROPERTIES = [
+  'firewall',
+  'findSelector',
+  'updateFirewall',
+  'updateSelector',
+  'insertDocMerge',
+]
 
 export class FocusedView {
-
   collection
   viewSpec
 
@@ -55,7 +60,7 @@ export class FocusedView {
     return (selector && selector._id) || typeof selector === 'string'
   }
 
-  _reportAccessDenied(apiContext, selector, operation) {
+  _reportAccessDeniedForNotFound(apiContext, selector, operation) {
 
     const selectorAsFieldsOptions = (s) => {
       const result = {}
@@ -103,19 +108,35 @@ export class FocusedView {
     }
   }
 
+  _firewall(apiContext) {
+    if (this.viewSpec.firewall) {
+      this.viewSpec.firewall(apiContext)
+    }
+  }
+
+  _updateFirewall(apiContext) {
+    if (this.viewSpec.updateFirewall) {
+      this.viewSpec.updateFirewall(apiContext)
+    }
+    this._firewall(apiContext)
+  }
+
   find(apiContext, selector, options) {
+    this._firewall(apiContext)
     return this.collection.find(this.selector(apiContext, selector, 'find'), options)
   }
 
   loadOne(apiContext, selector, options) {
+    this._firewall(apiContext)
     const doc = this.collection.findOne(this.selector(apiContext, selector, 'loadOne'), options)
     if (! doc) {
-      this._reportAccessDenied(apiContext, selector, 'loadOne')
+      this._reportAccessDeniedForNotFound(apiContext, selector, 'loadOne')
     }
     return doc
   }
 
   insert(apiContext, doc) {
+    this._updateFirewall(apiContext)
     return this.collection.insert(
       this.viewSpec.insertDocMerge ?
         this.viewSpec.insertDocMerge(apiContext.viewer(), doc)
@@ -124,25 +145,28 @@ export class FocusedView {
   }
 
   updateOne(apiContext, selector, modifier) {
+    this._updateFirewall(apiContext)
     const updateCount = this.collection.update(this.selector(apiContext, selector, 'updateOne'), modifier)
     if (! updateCount) {
-      this._reportAccessDenied(apiContext, selector, 'updateOne')
+      this._reportAccessDeniedForNotFound(apiContext, selector, 'updateOne')
     }
     return updateCount
   }
 
   updateMaybe(apiContext, selector, modifier) {
+    this._updateFirewall(apiContext)
     return this.collection.update(this.selector(apiContext, selector, 'updateMany'), modifier)
   }
 
   removeOne(apiContext, selector) {
+    this._updateFirewall(apiContext)
     const fullSelector = this.selector(apiContext, selector, 'removeOne')
     if (! this._selectorIsById(fullSelector)) {
       throw new Error('Can only perform removeOne by id')
     }
     const removeCount = this.collection.remove(fullSelector)
     if (! removeCount) {
-      this._reportAccessDenied(apiContext, selector, 'removeOne')
+      this._reportAccessDeniedForNotFound(apiContext, selector, 'removeOne')
     }
     return removeCount
   }
