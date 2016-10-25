@@ -7,6 +7,7 @@ var testMongo = require('../dist/test/mocks/testMongo')
 var mockApiRegistry = require('../dist/test/mocks/apiRegistry')
 var chaiPlugin = require('../dist/test/chaiPlugin')
 var error = require('../dist/test/mocks/error')
+var fixture = require('../dist/test/fixture')
 
 module.exports = {
   initModules: di.initModules,
@@ -24,4 +25,8 @@ module.exports = {
   notAuthorizedErrorMatch: error.notAuthorizedErrorMatch,
   validationErrorMatch: error.validationErrorMatch,
   chaiPlugin: chaiPlugin.plugin,
+  lastAuditEntry: fixture.lastAuditEntry,
+  onlyAuditEntry: fixture.onlyAuditEntry,
+  userHasPassword: fixture.userHasPassword,
+  resetRolesCollection: fixture.resetRolesCollection,
 }
