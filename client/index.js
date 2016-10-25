@@ -1,6 +1,7 @@
 
 var containers = require('../dist/client/containers')
 var compose = require('../dist/client/compose')
+var localContext = require('../dist/client/localContext')
 
 module.exports = {
   withDisplayName: containers.withDisplayName,
@@ -13,4 +14,6 @@ module.exports = {
   withMeteorReactive: compose.withMeteorReactive,
   withApiCallResult: compose.withApiCallResult,
   connectSubscription: compose.connectSubscription,
+
+  LocalContext: localContext.LocalContext,
 }
