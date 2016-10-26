@@ -5,6 +5,7 @@ import {
   asReference,
 } from 'mobx'
 import { app } from '@mindhive/di'
+import { SUPER_USER } from '../roles'
 
 
 export class ViewerDomain {
@@ -43,6 +44,10 @@ export class ViewerDomain {
 
   hasRole = (role) =>
     app().Roles.userIsInRole(this.user, role)
+
+  @computed get isSuperUser() {
+    return this.hasRole(SUPER_USER)
+  }
 }
 
 export class ViewerWithOrgDomain extends ViewerDomain {
