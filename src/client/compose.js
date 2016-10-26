@@ -55,20 +55,20 @@ export const withApiCallResult = ({
 }) =>
   withDisplayName(`withApiCallResult(${methodName})`,
     withAsync(
-      (appContext, pushProps, props) => {
+      async (appContext, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
         if (overrideProps) {
           pushProps(overrideProps)
           return
         }
         pushProps(loadingProps())
-        app().api.call(methodName, propsToArgs(props), { notifyViewerPending: false })
-          .then(result => {
-            pushProps(resultToProps(result))
-          })
-          .catch(error => {
-            pushProps(errorProps(error, props))
-          })
+        try {
+          pushProps(resultToProps(
+            await app().api.call(methodName, propsToArgs(props), { notifyViewerPending: false })
+          ))
+        } catch (e) {
+          pushProps(errorProps(e, props))
+        }
       },
       (currentProps, nextProps) =>
       ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
