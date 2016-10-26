@@ -42,8 +42,9 @@ export class ViewerDomain {
     return !! this.user
   }
 
-  hasRole = (role) =>
-    app().Roles.userIsInRole(this.user, role)
+  hasRole(role) {
+    return app().Roles.userIsInRole(this.user, role)
+  }
 
   @computed get isSuperUser() {
     return this.hasRole(SUPER_USER)
