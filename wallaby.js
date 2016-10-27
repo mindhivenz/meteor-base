@@ -46,10 +46,12 @@ module.exports = function (wallaby) {
     files: [
       'src/**/*.js',
       '!src/**/*.spec.js',
+      '!src/.meteor/**/*',
     ],
 
     tests: [
       'src/**/*.spec.js',
+      '!src/.meteor/**/*',
     ],
 
     compilers: {

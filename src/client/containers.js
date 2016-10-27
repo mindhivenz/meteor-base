@@ -53,10 +53,8 @@ export const errorContainer = (Component) =>
         { errors, ...props },
         { asyncContainerComponents: { Error } },
       ) =>
-        errors ?
-          <Error errors={errors} />
-        :
-          <Component {...props} />
+        errors ? React.createElement(Error, { errors })
+        : React.createElement(Component, props)
     ),
     Component,
   )
@@ -69,13 +67,8 @@ export const asyncContainer = (Component) =>
         { errors, loading, ...props },
         { asyncContainerComponents: { Error, Loading } },
       ) =>
-        errors ?
-          <Error errors={errors} />
-        :
-          loading ?
-            <Loading />
-          :
-            <Component {...props} />
+        errors ? React.createElement(Error, { errors })
+        : (loading ? React.createElement(Loading) : React.createElement(Component, props))
     ),
     Component,
   )

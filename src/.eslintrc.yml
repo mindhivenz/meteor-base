@@ -1,8 +1,9 @@
 parser: babel-eslint
 extends:
-- airbnb/base
+- airbnb-base
 env:
   mocha: true
+  meteor: true
 rules:
   arrow-parens: 0
   max-len:
@@ -38,3 +39,9 @@ rules:
   react/no-did-mount-set-state: 0
 ecmaFeatures:
   spread: true
+settings:
+  import/resolver:
+    meteor:
+      extensions:
+      - ".js"
+      - ".jsx"

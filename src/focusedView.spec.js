@@ -139,7 +139,7 @@ describe('focusedView', () => {
     it('should throw when selector does not exist to avoid subtle bugs (calc result is undefined for example)', () => {
       givenFocusedViewer({})
       should.throw(() => {
-        focusedViewer.selector(apiContext, some.nonExistantReference())
+        focusedViewer.selector(apiContext, some.nonExistentReference())
       }, /use \{} for all/)
     })
 

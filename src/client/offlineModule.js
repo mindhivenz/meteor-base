@@ -1,4 +1,4 @@
-import { Ground } from 'meteor/ground:db'  // eslint-disable-line import/no-unresolved
+import { Ground } from 'meteor/ground:db'
 
 
 export default ({ Meteor, Tracker, Mongo }) => {

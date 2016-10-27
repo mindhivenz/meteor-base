@@ -22,7 +22,8 @@ class ConnectionDomain {
   }
 
   @action callStarted = () => {
-    const callRecord = ++this.callCounter
+    this.callCounter += 1
+    const callRecord = this.callCounter
     this._pendingCalls.push(callRecord)
     return () => this.callFinished(callRecord)
   }

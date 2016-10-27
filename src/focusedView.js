@@ -19,6 +19,9 @@ const VIEW_SPEC_PROPERTIES = [
   'insertDocMerge',
 ]
 
+const selectorIsById = selector =>
+  (selector && selector._id) || typeof selector === 'string'
+
 export class FocusedView {
   collection
   viewSpec
@@ -54,10 +57,6 @@ export class FocusedView {
       ...selectorObj,
       ...viewSelector,
     }
-  }
-
-  _selectorIsById(selector) {
-    return (selector && selector._id) || typeof selector === 'string'
   }
 
   _reportAccessDeniedForNotFound(apiContext, selector, operation) {
@@ -161,7 +160,7 @@ export class FocusedView {
   removeOne(apiContext, selector) {
     this._updateFirewall(apiContext)
     const fullSelector = this.selector(apiContext, selector, 'removeOne')
-    if (! this._selectorIsById(fullSelector)) {
+    if (! selectorIsById(fullSelector)) {
       throw new Error('Can only perform removeOne by id')
     }
     const removeCount = this.collection.remove(fullSelector)

@@ -1,7 +1,7 @@
-import { sinon, should } from './mocha'
 import some from '@mindhive/some'
 import { appContext } from '@mindhive/di/test'
 
+import { sinon, should } from './mocha'
 import { ApiRegistry } from './apiRegistry'
 
 

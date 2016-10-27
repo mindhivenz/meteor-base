@@ -1,11 +1,14 @@
 
+/* eslint-disable no-console */
 
 // For consistency, use same storage as Meteor
 
 export class LocalStorage {
 
+  localStorage = global.localStorage
+
   read(path) {
-    const value = global.localStorage.getItem(path)
+    const value = this.localStorage.getItem(path)
     try {
       return JSON.parse(value)
     } catch (e) {
@@ -17,9 +20,9 @@ export class LocalStorage {
   write(path, data) {
     try {
       if (data) {
-        global.localStorage.setItem(path, JSON.stringify(data))
+        this.localStorage.setItem(path, JSON.stringify(data))
       } else {
-        global.localStorage.removeItem(path)
+        this.localStorage.removeItem(path)
       }
       return true
     } catch (e) {

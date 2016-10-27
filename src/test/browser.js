@@ -1,4 +1,4 @@
-/* global browser */
+/* global browser, Meteor */
 
 /*
  Sets the userId on a browser connection in a webdriver test to appear as tho you're logged in

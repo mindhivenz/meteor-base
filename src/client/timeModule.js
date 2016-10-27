@@ -1,4 +1,4 @@
-import { TimeSync } from 'meteor/mizzao:timesync'  // eslint-disable-line import/no-unresolved
+import { TimeSync } from 'meteor/mizzao:timesync'
 
 /* eslint-disable no-console */
 

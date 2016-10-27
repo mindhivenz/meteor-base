@@ -1,3 +1,4 @@
+/* global MongoInternals */
 
 
 const resetDatabase = () => {
@@ -5,9 +6,9 @@ const resetDatabase = () => {
   const syncCollections = global.Meteor.wrapAsync(db.collections, db)
   const collections = syncCollections()
 
-  collections.
-    filter(col => col.collectionName !== 'system.indexes').
-    forEach(col => {
+  collections
+    .filter(col => col.collectionName !== 'system.indexes')
+    .forEach(col => {
       const syncRemove = global.Meteor.wrapAsync(col.remove, col)
       syncRemove({})
     })
@@ -15,7 +16,7 @@ const resetDatabase = () => {
 
 const applyBackDoorMethods = () => {
   global.Meteor.methods({
-    'backdoor.setUserId'(userId) {
+    'backdoor.setUserId'(userId) {  // eslint-disable-line object-shorthand
       this.setUserId(userId)
     },
   })

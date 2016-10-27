@@ -99,21 +99,19 @@ export const linkViewerDomainToSubscription = (viewerDomain, subscription = 'vie
       if (offlineState) {
         viewerDomain.updateFromOfflineState(offlineState)
       }
-    } else {
-      if (Meteor.userId()) {
-        if (Meteor.subscribe(subscription).ready()) {
-          updateFromServer(Users.findOne(Meteor.userId()))
-        } else {
-          if (viewerDomain.loading) {
-            const offlineState = readOfflineState()
-            if (offlineState && offlineState.user && offlineState.user._id === Meteor.userId()) {
-              viewerDomain.updateFromOfflineState(offlineState)
-            }
-          }
+    } else if (Meteor.userId()) {
+      if (Meteor.subscribe(subscription).ready()) {
+        updateFromServer(Users.findOne(Meteor.userId()))
+      } else if (viewerDomain.loading) {
+        const offlineState = readOfflineState()
+        if (offlineState && offlineState.user && offlineState.user._id === Meteor.userId()) {
+          viewerDomain.updateFromOfflineState(offlineState)
         }
       } else {
-        updateFromServer(null)
+        // waiting for subscription to be ready
       }
+    } else {
+      updateFromServer(null)
     }
   })
 }
