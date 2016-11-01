@@ -3,7 +3,7 @@ import { MockApiRegistry } from './apiRegistry'
 import { MockTracker } from './mockTracker'
 
 
-export default (meteorProperties = { isSever: true }) =>
+export default (meteorProperties = { isServer: true, isClient: false, isCordova: false }) =>
   () => {
     const {
       Meteor,
@@ -14,9 +14,12 @@ export default (meteorProperties = { isSever: true }) =>
     Accounts.users = new TestMongo.Collection('users')
     Meteor.users = Accounts.users
     Accounts._options = {}
-    Accounts._loginHandlers = []
-    Accounts._validateLoginHook.callbacks = {}
-    Accounts._onLogoutHook.callbacks = {}
+    if (meteorProperties.isServer) {
+      Accounts._loginHandlers = []
+      Accounts._validateLoginHook.callbacks = {}
+      Accounts._onLogoutHook.callbacks = {}
+      delete Accounts._onCreateUserHook
+    }
     const result = {
       Meteor: {
         ...meteorProperties,
