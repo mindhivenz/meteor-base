@@ -1,7 +1,7 @@
 import { mockAppContext } from '@mindhive/di/test'
 
 
-const inFiberAsPromise = (func) =>
+const inFiberAsPromise = func =>
   () =>
     new Promise((resolve, reject) => {
       func.future()().resolve((err, result) => {

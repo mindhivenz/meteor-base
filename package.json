@@ -25,7 +25,7 @@
     "meteor"
   ],
   "dependencies": {
-    "@mindhive/di": "^2.3.0",
+    "@mindhive/di": "^2.4.0",
     "mobx": "^2.6.0",
     "react-komposer": "damonmaria/react-komposer#shouldResubscribe-option",
     "shallowequal": "^0.2.2"
@@ -46,7 +46,7 @@
     "bcrypt": "^0.8.7",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "chai-properties": "vbardales/chai-properties#pull/8/head",
+    "chai-properties": "51ulong/chai-properties",
     "date-fns": "^1.9.0",
     "eslint": "^3.8.1",
     "eslint-config-airbnb-base": "^9.0.0",
