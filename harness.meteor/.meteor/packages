@@ -16,7 +16,7 @@ ecmascript@0.5.9              # Enable ECMAScript2015+ syntax in app code
 shell-server@0.2.1            # Server-side component of the `meteor shell` command
 
 
-accounts-password@1.3.1		# Account management based on passwords (other services can be added)
+accounts-password@1.3.2		# Account management based on passwords (other services can be added)
 meteorhacks:unblock		# Allow parallel (per-client) processing of subscriptions
 static-html@1.1.12_1             # Needed to include html/css after removing blaze
 xolvio:backdoor			# Run arbitrary code on server in acceptance tests
