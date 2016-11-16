@@ -15,7 +15,7 @@
 4. `hasRole`: `meteor add alanning:roles`
 5. offline:
 	- `meteor add space:tracker-mobx-autorun`
-	- `meteor add ground:db@2.0.0-alpha.2` 
+	- `meteor add ground:db@2.0.0-rc.6` 
 
 ## How to use this
  
