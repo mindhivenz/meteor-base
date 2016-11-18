@@ -72,17 +72,17 @@ export const withApiCallResult = ({
       },
       (currentProps, nextProps) =>
       ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-      ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps))
+      (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
     )
   )
 
 export const connectSubscription = ({
-  recordSetName,
+  publicationName,
   dataToProps,
   propsToArgs = () => null,
   overrideCallProps = () => null,
 }) =>
-  withDisplayName(`connect(${recordSetName})`,
+  withDisplayName(`connect(${publicationName})`,
     withMeteorReactive(
       ({ Meteor }, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
@@ -97,7 +97,7 @@ export const connectSubscription = ({
             }
           },
         }
-        if (Meteor.subscribe(recordSetName, propsToArgs(props), callbacks).ready()) {
+        if (Meteor.subscribe(publicationName, propsToArgs(props), callbacks).ready()) {
           pushProps(dataToProps(app(), props))
         } else {
           pushProps(loadingProps())
@@ -105,6 +105,6 @@ export const connectSubscription = ({
       },
       (currentProps, nextProps) =>
       ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-      ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps))
+      (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
     )
   )

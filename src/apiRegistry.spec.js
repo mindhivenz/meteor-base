@@ -255,14 +255,14 @@ describe('ApiRegistry', () => {
     const callWrappedCompositeSomePub = (...args) =>
       Meteor.publishComposite.getCall(0).args[1].call(thisInCall, ...args)
 
-    it('should pass recordSetName and pass the appContext, and args to function', () => {
+    it('should pass publicationName and pass the appContext, and args to function', () => {
       Meteor.isServer = true
       thisInCall.unblock = sinon.spy()
       const args = some.array()
       const publicationFunc = sinon.spy()
-      const recordSetName = some.unique.string()
-      apiRegistry.publicationComposite(recordSetName, publicationFunc)
-      Meteor.publishComposite.should.have.been.calledWith(recordSetName)
+      const publicationName = some.unique.string()
+      apiRegistry.publicationComposite(publicationName, publicationFunc)
+      Meteor.publishComposite.should.have.been.calledWith(publicationName)
       callWrappedCompositeSomePub(...args)
       publicationFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
       thisInCall.unblock.should.have.been.calledOnce

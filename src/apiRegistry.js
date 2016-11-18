@@ -53,12 +53,12 @@ export class ApiRegistry {
     }
   }
 
-  _publication(meteorPublishFunc, recordSetName, func) {
+  _publication(meteorPublishFunc, publicationName, func) {
     if (this.Meteor.isServer) {
       const self = this
       const wrapper = function wrapper(...args) {
         const subscription = this
-        self.enhanceApiContext(subscription, `pub:${recordSetName}`)
+        self.enhanceApiContext(subscription, `pub:${publicationName}`)
         subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
         try {
           return func(app(), subscription, ...args)
@@ -67,7 +67,7 @@ export class ApiRegistry {
           throw e
         }
       }
-      meteorPublishFunc(recordSetName, wrapper)
+      meteorPublishFunc(publicationName, wrapper)
     }
   }
 
@@ -75,12 +75,12 @@ export class ApiRegistry {
     this.errorCallbacks.forEach(cb => cb(apiContext, e))
   }
 
-  publication(recordSetName, func) {
-    this._publication(this.Meteor.publish, recordSetName, func)
+  publication(publicationName, func) {
+    this._publication(this.Meteor.publish, publicationName, func)
   }
 
-  publicationComposite(recordSetName, func) {
-    this._publication(this.Meteor.publishComposite, recordSetName, func)
+  publicationComposite(publicationName, func) {
+    this._publication(this.Meteor.publishComposite, publicationName, func)
   }
 
   apiContextEnhancer(objOrFunc) {

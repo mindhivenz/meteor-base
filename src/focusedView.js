@@ -23,8 +23,6 @@ const selectorIsById = selector =>
   (selector && selector._id) || typeof selector === 'string'
 
 export class FocusedView {
-  collection
-  viewSpec
 
   constructor(collection, viewSpec = {}) {
     this.collection = collection
