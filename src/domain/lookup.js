@@ -10,7 +10,7 @@ export class Lookup {
   }
 
   @computed get _doc() {  // Dereference the observable as late as possible
-    return this._domain.idMap.get(this.id)
+    return this.id && this._domain.idMap.get(this.id)
   }
 }
 
@@ -31,6 +31,12 @@ export class LookupDomain {
   }
 
   get = idOrDoc => new this.LookupClass(this, typeof idOrDoc === 'string' ? idOrDoc : idOrDoc._id)
+
+  map = (...args) => this.idMap.values().map(...args)
+
+  get size() {
+    return this.idMap.size
+  }
 
   stop = () => {
     this.subscription.stop()
