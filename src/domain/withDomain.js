@@ -29,6 +29,7 @@ export const withDomain = ({
 
       componentWillUnmount() {
         this.stop()
+        this.domain = null
       }
 
       stop() {
