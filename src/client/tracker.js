@@ -5,6 +5,8 @@ import shallowCopy from 'shallow-copy'
 import { LocalContext } from './localContext'
 
 
+// Based on https://github.com/meteor-space/tracker-mobx-autorun
+
 const readySubscription = {
   ready: () => true,
 }
