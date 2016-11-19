@@ -74,7 +74,7 @@ const pumpMongoToMobx = ({
           observableArray.replace(mongoCursor.fetch())
         })
       })
-      mongoCursor.observe({  // More efficient than observe()
+      mongoCursor.observe({
         _suppress_initial: true,  // suppresses addedAt callback for documents initially fetched
         addedAt: action(`${actionPrefix}: document added`, (doc, index) => {
           observableArray.splice(index, 0, doc)
