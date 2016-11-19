@@ -1,6 +1,11 @@
-import { action, observable, runInAction, toJS, autorun as mobxAutorun } from 'mobx'
+import {
+  action,
+  observable,
+  runInAction,
+  autorun as mobxAutorun,
+  toJS,
+} from 'mobx'
 import { app } from '@mindhive/di'
-import shallowCopy from 'shallow-copy'
 
 import { LocalContext } from './localContext'
 
@@ -50,7 +55,7 @@ const pumpMongoToMobx = ({
 }) => {
   if (! meteorTracker.active) {
     console.warn('You are setting up a pump outside of a Tracker.autorun().\n' +  // eslint-disable-line no-console
-      'Cannot follow subscription.ready() changes, and observe/observeChanges will not stop')
+      'Cannot follow subscription.ready() changes, and observe/observeChanges will not be stopped')
   }
   if (observableArray) {
     if (subscription.ready()) {
@@ -68,6 +73,9 @@ const pumpMongoToMobx = ({
           observableArray.splice(index, 1)
         }),
         changedAt: action(`${actionPrefix}: document changed`, (doc, oldDoc, index) => {
+          // REVISIT: if existing value isObservable we could be more efficient here and just assign top level fields
+          // Probably using extendObservable but also handling fields disappearing
+          // Or use observeChanges instead so we just get fields
           observableArray[index] = doc
         }),
         movedTo: action(`${actionPrefix}: document moved`, (doc, fromIndex, toIndex) => {
@@ -98,8 +106,10 @@ const pumpMongoToMobx = ({
           observableMap.remove(id)
         }),
         changed: action(`${actionPrefix}: document changed`, (id, fields) => {
-          // Shallow copy is all we need because we / Meteor only update top-level fields
-          const doc = shallowCopy(toJS(observableMap.get(id), false))
+          // REVISIT: if existing value isObservable we could be more efficient here and just assign new fields
+          // Probably using extendObservable but also handling fields disappearing (undefined in fields)
+          const doc = toJS(observableMap.get(id) || {}, false)  // If was observable, toJS clones
+          // Doesn't matter we may be overwriting existing object here, as we know it's not observable
           Object.entries(fields).forEach(([k, v]) => {
             if (v === undefined) {
               delete doc[k]
