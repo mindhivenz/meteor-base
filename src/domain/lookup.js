@@ -16,7 +16,7 @@ export class Lookup {
 
 export class LookupDomain {
 
-  @observable idMap = asMap(asReference)
+  @observable idMap = asMap([], asReference)
 
   constructor(LookupClass, pumpSubscriptionOptions) {
     this.LookupClass = LookupClass

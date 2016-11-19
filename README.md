@@ -13,9 +13,7 @@
 2. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
 3. client `timeModule`: `meteor add meteor/mizzao:timesync`
 4. `hasRole`: `meteor add alanning:roles`
-5. offline:
-	- `meteor add space:tracker-mobx-autorun`
-	- `meteor add ground:db@2.0.0-rc.6` 
+5. offline: `meteor add ground:db@2.0.0-rc.6` 
 
 ## How to use this
  

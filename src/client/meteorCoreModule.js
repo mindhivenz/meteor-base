@@ -1,10 +1,10 @@
 import { Api } from './api'
 import { LocalStorage } from './storage'
-import { buildTracker } from './tracker'
+import { Tracker } from './tracker'
 
 
 export default () => ({
   api: new Api(),
-  Tracker: buildTracker(),
+  Tracker,
   storage: new LocalStorage(),
 })

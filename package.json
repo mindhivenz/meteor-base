@@ -29,6 +29,7 @@
     "babel-runtime": "^6.18.0",
     "mobx": "^2.6.0",
     "react-komposer": "damonmaria/react-komposer#shouldResubscribe-option",
+    "shallow-copy": "^0.0.1",
     "shallowequal": "^0.2.2"
   },
   "peerDependencies": {
