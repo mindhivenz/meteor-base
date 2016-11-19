@@ -52,10 +52,20 @@ const pumpMongoToMobx = ({
   mongoCursor,
   observableArray,
   observableMap,
+  endless = false,
 }) => {
   if (! meteorTracker.active) {
-    console.warn('You are setting up a pump outside of a Tracker.autorun().\n' +  // eslint-disable-line no-console
-      'Cannot follow subscription.ready() changes, and observe/observeChanges will not be stopped')
+    if (endless) {
+      if (! subscription.ready()) {
+        // If we wanted to handle this we could with slightly more complicated code below
+        console.error('When using endless pump outside a Tracker.autorun() ' +  // eslint-disable-line no-console
+          'the subscription must be ready as we cannot react to it changing')
+      }
+    } else {
+      console.warn('You are setting up a pump outside of a Tracker.autorun().\n' +  // eslint-disable-line no-console
+        'Cannot follow subscription.ready() changes, and observe/observeChanges cannot be stopped.\n' +
+        'If that is what you intended then specify endless.')
+    }
   }
   if (observableArray) {
     if (subscription.ready()) {
@@ -85,7 +95,7 @@ const pumpMongoToMobx = ({
       })
     } else {
       runInAction(`${actionPrefix}: initialized`, () => {
-        observableMap.clear()
+        observableArray.clear()
       })
     }
   }
