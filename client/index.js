@@ -2,6 +2,7 @@
 var containers = require('../dist/client/containers')
 var compose = require('../dist/client/compose')
 var localContext = require('../dist/client/localContext')
+var latchedProps = require('../dist/client/latchedProps')
 
 module.exports = {
   withDisplayName: containers.withDisplayName,
@@ -16,4 +17,6 @@ module.exports = {
   connectSubscription: compose.connectSubscription,
 
   LocalContext: localContext.LocalContext,
+
+  withLatchedProps: latchedProps.withLatchedProps,
 }
