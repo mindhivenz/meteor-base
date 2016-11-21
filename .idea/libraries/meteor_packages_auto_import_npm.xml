@@ -22,10 +22,6 @@
         <item url="file://$USER_HOME$/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/lru-cache/lib/lru-cache.js" />
         <item url="file://$USER_HOME$/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/lib/async.js" />
         <item url="file://$USER_HOME$/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/support/sync-package-managers.js" />
-        <item url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/regenerator-runtime/runtime.js" />
-        <item url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/meteor-babel-helpers/index.js" />
-        <item url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/regenerator-runtime/path.js" />
-        <item url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/regenerator-runtime/runtime-module.js" />
         <item url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/Gruntfile.js" />
         <item url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/src/utils/serializer.js" />
         <item url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/src/drivers/localstorage.js" />
@@ -42,7 +38,6 @@
         <item url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/site/javascripts/jquery.tocify.js" />
         <item url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/site/javascripts/all.js" />
         <item url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/site/stylesheets/normalize.css" />
-        <item url="file://$USER_HOME$/.meteor/packages/tmeasday_check-npm-versions/0.3.1/npm/node_modules/semver/semver.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/core-js/modules/es7.math.umulh.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/core-js/modules/es7.reflect.has-metadata.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/core-js/modules/es7.math.iaddh.js" />
@@ -4930,6 +4925,7 @@
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/src/tokentype.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/src/tokenize.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/src/lval.js" />
+        <item url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.1/npm/node_modules/meteor-babel-helpers/index.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/bin/generate-identifier-regex.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/ansi-styles/index.js" />
         <item url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn-es7-plugin/acorn-es7-plugin.js" />
@@ -5075,10 +5071,6 @@
       <root url="file://$USER_HOME$/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/lru-cache/lib/lru-cache.js" />
       <root url="file://$USER_HOME$/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/lib/async.js" />
       <root url="file://$USER_HOME$/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/support/sync-package-managers.js" />
-      <root url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/regenerator-runtime/runtime.js" />
-      <root url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/meteor-babel-helpers/index.js" />
-      <root url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/regenerator-runtime/path.js" />
-      <root url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.0/npm/node_modules/regenerator-runtime/runtime-module.js" />
       <root url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/Gruntfile.js" />
       <root url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/src/utils/serializer.js" />
       <root url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/src/drivers/localstorage.js" />
@@ -5095,7 +5087,6 @@
       <root url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/site/javascripts/jquery.tocify.js" />
       <root url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/site/javascripts/all.js" />
       <root url="file://$USER_HOME$/.meteor/packages/ground_db/2.0.0-rc.5/npm/node_modules/localforage/site/stylesheets/normalize.css" />
-      <root url="file://$USER_HOME$/.meteor/packages/tmeasday_check-npm-versions/0.3.1/npm/node_modules/semver/semver.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/core-js/modules/es7.math.umulh.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/core-js/modules/es7.reflect.has-metadata.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/core-js/modules/es7.math.iaddh.js" />
@@ -9983,6 +9974,7 @@
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/src/tokentype.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/src/tokenize.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/src/lval.js" />
+      <root url="file://$USER_HOME$/.meteor/packages/babel-runtime/1.0.1/npm/node_modules/meteor-babel-helpers/index.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn/bin/generate-identifier-regex.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/ansi-styles/index.js" />
       <root url="file://$USER_HOME$/.meteor/packages/babel-compiler/6.13.0/npm/node_modules/acorn-es7-plugin/acorn-es7-plugin.js" />
