@@ -25,14 +25,19 @@ See our [DI package](https://github.com/mindhivenz/di-js).
 
 This package also makes Meteor core services available in the appContext:
  
-- Meteor
-- Mongo: Meteor's Mongo, or in testing it is our own TestMongo (see below)
-- Tracker: if `meteor/space:tracker-mobx-autorun` installed this will 
- 	react to both Meteor *and Mobx* reactive changes
-- Random
-- Accounts: with appropriate internal data reset each test
-- Users: Meteor's `users` Mongo collection
-- apiRegistry: see below
+- `Meteor`
+- `Mongo`: Meteor's Mongo, or in testing it is our own `TestMongo` (see below)
+- `Random`
+- `Accounts`: with appropriate internal data reset each test
+- `Users`: Meteor's 'users' Mongo collection (`TestMongo` in testing)
+- `apiRegistry`: see below
+
+...and only on the client:
+
+- `Tracker`: like Meteor's Tracker but will react to both Meteor *and Mobx* reactive changes
+- `api`: how to call methods on the server 
+- `storage`: HTML5 localStorage
+- `mongoMirror`: high level mirroring of publications to Mobx domains and offline
 
 ## ApiRegistry
 

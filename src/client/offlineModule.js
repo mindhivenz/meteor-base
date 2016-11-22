@@ -1,12 +1,7 @@
 import { Ground } from 'meteor/ground:db'
 
 
-export default ({ Meteor, Tracker, Mongo }) => {
-  if (! Meteor.isProduction) {
-    if (! Tracker.pumpMongoToMobx) {
-      console.warn('space:tracker-mobx-autorun package does not appear to be installed yet you want offline')  // eslint-disable-line no-console
-    }
-  }
+export default ({ Mongo }) => {
   Ground.Collection.prototype.attachSchema = Mongo.Collection.prototype.attachSchema
   if (! Ground.Collection.prototype.deny) {
     // Otherwise attachSchema doesn't work, but what functionality are we losing with attachSchema using deby?
