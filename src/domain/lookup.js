@@ -18,10 +18,10 @@ export class LookupDomain {
 
   @observable idMap = asMap([], asReference)
 
-  constructor(LookupClass, pumpSubscriptionOptions) {
+  constructor(LookupClass, mirrorSubscriptionOptions) {
     this.LookupClass = LookupClass
-    this.subscription = app().Tracker.pumpSubscriptionToMobx({
-      ...pumpSubscriptionOptions,
+    this.subscription = app().mongoMirror.subscriptionToDomain({
+      ...mirrorSubscriptionOptions,
       observableMap: this.idMap,
     })
   }
