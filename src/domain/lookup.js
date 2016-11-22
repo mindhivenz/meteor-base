@@ -34,6 +34,8 @@ export class LookupDomain {
 
   map = (...args) => this.idMap.values().map(...args)
 
+  filter = (...args) => this.idMap.values().filter(...args)
+
   get size() {
     return this.idMap.size
   }
