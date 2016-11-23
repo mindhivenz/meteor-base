@@ -105,6 +105,21 @@ export class MockMongoMirror {
 
   subscriptionToOffline = sinon.spy()
 
+  subscriptionToDomainCachedOffline = ({
+    publicationName,
+    groundCollection,
+    observableArray,
+    observableMap,
+  }) => {
+    this.cursorToDomain({
+      actionPrefix: `mirror:(offline)${publicationName}->domain`,
+      observableArray,
+      observableMap,
+      mongoCursor: groundCollection.find(),
+      endless: true,
+    })
+  }
+
   added(...docsOrIds) {
     return this.awaitAdded.awaitAll(docsOrIds)
   }

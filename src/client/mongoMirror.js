@@ -130,7 +130,7 @@ export class MongoMirror {
     viewSelector = {},
     observableArray,
     observableMap,
-    context = `subscription:${publicationName}`,
+    context = `mirror:${publicationName}`,
   }) {
     const result = observable({
       loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready method
@@ -160,7 +160,7 @@ export class MongoMirror {
     focusedView,
     viewSelector = {},
     groundCollection,
-    context = `subscription:${publicationName}->mirror:${groundCollection._name}`,
+    context = `mirror:${publicationName}`,
   }) {
     return this._autorunWhenViewerInfoAvailableForFocusedViews(() => {
       const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
@@ -172,6 +172,31 @@ export class MongoMirror {
         groundCollection.keep(orgProfilesCursor)
         groundCollection.observeSource(orgProfilesCursor)
       }
+    })
+  }
+
+  subscriptionToDomainCachedOffline({
+    publicationName,
+    subscriptionArgs,
+    focusedView,
+    viewSelector = {},
+    groundCollection,
+    observableArray,
+    observableMap,
+  }) {
+    this.cursorToDomain({
+      actionPrefix: `mirror:(offline)${publicationName}->domain`,
+      observableArray,
+      observableMap,
+      mongoCursor: groundCollection.find(),
+      endless: true,
+    })
+    this.subscriptionToOffline({
+      publicationName,
+      subscriptionArgs,
+      focusedView,
+      viewSelector,
+      groundCollection,
     })
   }
 }
