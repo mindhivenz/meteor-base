@@ -25,6 +25,7 @@ module.exports = {
   notAuthorizedErrorMatch: error.notAuthorizedErrorMatch,
   validationErrorMatch: error.validationErrorMatch,
   chaiPlugin: chaiPlugin.plugin,
+  auditEntries: fixture.auditEntries,
   lastAuditEntry: fixture.lastAuditEntry,
   onlyAuditEntry: fixture.onlyAuditEntry,
   userHasPassword: fixture.userHasPassword,
