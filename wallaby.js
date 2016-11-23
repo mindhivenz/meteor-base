@@ -83,7 +83,9 @@ module.exports = function (wallaby) {
         process.env.MONGO_URL = 'mongodb://127.0.0.1:27017/meteor-base-wallaby-server';
       }
 
-      require('babel-polyfill')
+      process.on('unhandledRejection', (reason, promise) => {
+        console.log('Unhandled promise rejection', reason)
+      })
 
       var path = require('path');
       var appPath = path.resolve(wallaby.localProjectDir, relativeMeteorAppPath);
