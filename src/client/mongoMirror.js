@@ -168,7 +168,6 @@ export class MongoMirror {
         const orgProfilesCursor = focusedView.find(
           new LocalContext(context),
           viewSelector,
-          { reactive: false },
         )
         groundCollection.keep(orgProfilesCursor)
         groundCollection.observeSource(orgProfilesCursor)
