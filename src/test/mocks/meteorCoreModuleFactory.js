@@ -58,8 +58,11 @@ export default (meteorProperties = { isServer: true, isClient: false, isCordova:
       Random,
     }
     if (meteorProperties.isClient) {
-      result.Tracker = new MockTracker()
-      result.mongoMirror = new MockMongoMirror()
+      Object.assign(result, {
+        Tracker: new MockTracker(),
+        mongoMirror: new MockMongoMirror(),
+        api: {},
+      })
     }
     return result
   }
