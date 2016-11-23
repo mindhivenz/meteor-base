@@ -4,6 +4,25 @@ import { MockTracker } from './mockTracker'
 import { MockMongoMirror } from './mockMongoMirror'
 
 
+const possiblyRunTimerFuncInFiber = timer =>
+  (func, timeout) => {
+    const wasInFiber = require('fibers').current
+    return timer(
+      () => {
+        if (wasInFiber) {
+          func.future()().resolve((err) => {
+            if (err) {
+              throw err
+            }
+          })
+        } else {
+          func()
+        }
+      },
+      timeout,
+    )
+  }
+
 export default (meteorProperties = { isServer: true, isClient: false, isCordova: false }) =>
   () => {
     const {
@@ -25,6 +44,11 @@ export default (meteorProperties = { isServer: true, isClient: false, isCordova:
       Meteor: {
         ...meteorProperties,
         wrapAsync: Meteor.wrapAsync,
+        defer: func => Meteor.setTimeout(func, 0),
+        setTimeout: possiblyRunTimerFuncInFiber(setTimeout),
+        clearTimeout,
+        setInterval: possiblyRunTimerFuncInFiber(setInterval),
+        clearInterval,
       },
       Mongo: TestMongo,
       Users: Accounts.users,
