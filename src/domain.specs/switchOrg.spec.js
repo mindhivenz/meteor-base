@@ -3,7 +3,7 @@ import { appContext } from '@mindhive/di/test'
 import { mockServerContext } from '../test/serverContext'
 import { MockMethodInvocation } from '../test/mocks/apiRegistry'
 import { notAuthorizedErrorMatch } from '../test/mocks/error'
-import { onlyAuditEntry, lastAuditEntry, resetRolesCollection } from '../test/fixture'
+import { onlyAuditEntry, auditEntries, resetRolesCollection } from '../test/fixture'
 
 import mockMeteorCoreModuleFactory from '../test/mocks/meteorCoreModuleFactory'
 import auditModule from '../server/auditModule'
@@ -113,7 +113,7 @@ describe('switchOrgModule', () => {
         viewer = Factory.create('superUser')
         whenCalled(viewer.orgId)
         Users.findOne(viewer._id).should.deep.equal(viewer)
-        should.not.exist(lastAuditEntry())
+        auditEntries().should.have.length(0)
       })
     )
 
