@@ -88,7 +88,7 @@ export class MongoMirror {
             observableMap.set(id, doc)
           }),
           removed: action(`${actionPrefix}: document removed`, (id) => {
-            observableMap.remove(id)
+            observableMap.delete(id)
           }),
           changed: action(`${actionPrefix}: document changed`, (id, fields) => {
             // REVISIT: if existing value isObservable we could be more efficient here and just assign new fields

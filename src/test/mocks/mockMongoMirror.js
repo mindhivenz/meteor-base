@@ -81,7 +81,7 @@ export class MockMongoMirror {
           this.awaitAdded.process(id)
         },
         removed: (id) => {
-          observableMap.remove(id)
+          observableMap.delete(id)
           this.awaitRemoved.process(id)
         },
         changed: (id, fields) => {
