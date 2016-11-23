@@ -1,17 +1,27 @@
 import { TimeSync } from 'meteor/mizzao:timesync'
 
+import { extendClock } from '../universal/time'
+
 /* eslint-disable no-console */
 
-export default () => ({
-  clock: () => {
-    const serverTime = TimeSync.serverTime()
-    if (! serverTime) {
-      console.warn('clock() called before time synced with server, defaulting to browser/client time')
-      if (console.trace) {
-        console.trace()
-      }
-      return new Date()
+let warnedOfEarlyCall = false
+
+const clock = () => {
+  const serverTime = TimeSync.serverTime()
+  if (! serverTime) {
+    if (! warnedOfEarlyCall) {
+      (console.trace || console.warn)(
+        'clock() called before time synced with server, defaulting to browser/client time'
+      )
+      warnedOfEarlyCall = true
     }
-    return new Date(serverTime)
-  },
+    return new Date()
+  }
+  return new Date(serverTime)
+}
+
+extendClock(clock)
+
+export default () => ({
+  clock,
 })
