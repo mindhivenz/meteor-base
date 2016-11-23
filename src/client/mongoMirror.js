@@ -22,8 +22,8 @@ export class MongoMirror {
   cursorToDomain({
     actionPrefix,
     mongoCursor,
-    observableArray,
-    observableMap,
+    observableArray,  // Should be declared as: array = asFlat([])
+    observableMap,    // Should be declared as: map = asMap([], asReference)
     subscription = readySubscription,  // Pass subscription handle if from a subscription
     endless = false,
   }) {

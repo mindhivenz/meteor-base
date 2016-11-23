@@ -43,8 +43,8 @@ export class MockMongoMirror {
   awaitRemoved = new AwaitDocs()
 
   cursorToDomain({
-    observableArray,  // Should be declared as: array = asFlat([])
-    observableMap,    // Should be declared as: map = asMap([], asReference)
+    observableArray,
+    observableMap,
     mongoCursor,
   }) {
     if (observableArray) {
