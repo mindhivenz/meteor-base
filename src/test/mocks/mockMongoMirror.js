@@ -2,16 +2,45 @@ import { toJS } from 'mobx'
 import sinon from 'sinon'
 
 
-const docId = (doc) =>
-  typeof doc === 'string' ? doc : doc._id
+const docId = (docOrId) =>
+  typeof docOrId === 'string' ? docOrId : docOrId._id
 
-const sameDoc = (d1, d2) =>
-  docId(d1) === docId(d2)
+class AwaitDocs {
+
+  processedIds = []
+  awaits = []
+
+  process(docOrId) {
+    const id = docId(docOrId)
+    this.processedIds.push(id)
+    this.awaits.forEach(a => {
+      if (a.id === id) {
+        a.resolve()
+      }
+    })
+  }
+
+  awaitAll(docsOrIds) {
+    return Promise.all(docsOrIds
+      .map(docId)
+      .filter(id => ! this.processedIds.includes(id))
+      .map(id =>
+        new Promise((resolve) => {
+          this.awaits.push({
+            id,
+            resolve,
+          })
+        })
+      )
+    )
+  }
+}
 
 export class MockMongoMirror {
 
-  addedDocs = []
-  addAwaits = []
+  awaitAdded = new AwaitDocs()
+  awaitUpdated = new AwaitDocs()
+  awaitRemoved = new AwaitDocs()
 
   cursorToDomain({
     observableArray,  // Should be declared as: array = asFlat([])
@@ -24,18 +53,15 @@ export class MockMongoMirror {
         _suppress_initial: true,  // _suppress_initial suppresses addedAt callback for docs initially fetched
         addedAt: (doc, index) => {
           observableArray.splice(index, 0, doc)
-          this.addedDocs.push(doc)
-          this.addAwaits.forEach(a => {
-            if (sameDoc(a.doc, doc)) {
-              a.resolve()
-            }
-          })
+          this.awaitAdded.process(doc)
         },
         changedAt: (newDoc, oldDoc, index) => {
           observableArray[index] = newDoc
+          this.awaitUpdated.process(newDoc)
         },
         removedAt: (oldDoc, index) => {
           observableArray.splice(index, 1)
+          this.awaitRemoved.process(oldDoc)
         },
         movedTo: (doc, fromIndex, toIndex) => {
           observableArray.splice(fromIndex, 1)
@@ -52,9 +78,11 @@ export class MockMongoMirror {
         _suppress_initial: true,  // suppresses addedAt callback for documents initially fetched
         added: (id, doc) => {
           observableMap.set(id, doc)
+          this.awaitAdded.process(id)
         },
         removed: (id) => {
           observableMap.remove(id)
+          this.awaitRemoved.process(id)
         },
         changed: (id, fields) => {
           const doc = toJS(observableMap.get(id) || {}, false)  // If was observable, toJS clones
@@ -67,6 +95,7 @@ export class MockMongoMirror {
             }
           })
           observableMap.set(id, doc)
+          this.awaitUpdated.process(id)
         },
       })
     }
@@ -76,18 +105,16 @@ export class MockMongoMirror {
 
   subscriptionToOffline = sinon.spy()
 
-  added(...findDocs) {
-    return Promise.all(findDocs
-      .filter(findDoc => ! this.addedDocs.find(d => sameDoc(d, findDoc)))
-      .map(findDoc =>
-        new Promise(resolve => {
-          this.addAwaits.push({
-            doc: findDoc,
-            resolve,
-          })
-        })
-      )
-    )
+  added(...docsOrIds) {
+    return this.awaitAdded.awaitAll(docsOrIds)
+  }
+
+  updated(...docsOrIds) {
+    return this.awaitUpdated.awaitAll(docsOrIds)
+  }
+
+  removed(...docsOrIds) {
+    return this.awaitRemoved.awaitAll(docsOrIds)
   }
 
 }
