@@ -8,6 +8,7 @@
 
 ### Meteor package peer dependencies (optional)
 
+1. `FocusedView`: `meteor add ejson`
 1. `backdoorModule`: `meteor add xolvio:backdoor`
 1. `SimpleSchema`: `meteor add aldeed:collection2`
 2. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
