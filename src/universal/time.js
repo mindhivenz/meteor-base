@@ -3,7 +3,7 @@ import { app } from '@mindhive/di'
 
 export const extendClock = (clock) => {
   if (typeof clock.sleep === 'undefined') {
-    clock.sleep = async (milliseconds) =>
+    clock.sleep = (milliseconds) =>
       new Promise(resolve =>
         app().Meteor.setTimeout(resolve, milliseconds)
       )
@@ -18,10 +18,11 @@ export class ProgressiveBackoff {
     retryMultiplier = 2,
     maxMs = 10 * 60 * 1000,
   } = {}) {
-    this.currentMs = Math.max(initialMs, 1)
+    this.initialMs = Math.max(initialMs, 1)
     this.collisionAvoidanceMaxRandomMs = collisionAvoidanceMaxRandomMs
     this.retryMultiplier = retryMultiplier
     this.maxMs = maxMs
+    this.reset()
   }
 
   sleep() {
@@ -32,6 +33,10 @@ export class ProgressiveBackoff {
       this.currentMs = this.maxMs
     }
     return clock.sleep(delayMs)
+  }
+
+  reset() {
+    this.currentMs = this.initialMs
   }
 }
 
