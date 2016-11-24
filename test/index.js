@@ -16,6 +16,7 @@ module.exports = {
   mockServerContext: serverContext.mockServerContext,
   mockMeteorCoreModule: mockMeteorCoreModule.default,
   TestMongo: testMongo.TestMongo,
+  TestGround: testMongo.TestGround,
   withRealMongoCollection: testMongo.withRealMongoCollection,
   MockMethodInvocation: mockApiRegistry.MockMethodInvocation,
   MockSubscription: mockApiRegistry.MockSubscription,

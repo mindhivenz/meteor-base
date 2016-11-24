@@ -13,8 +13,9 @@ export default () => {
     testTime = func(testTime)
     return testTime
   }
-  clock.sleep = async (milliseconds) => {
+  clock.sleep = (milliseconds) => {
     clock.adjust(time => addMilliseconds(time, milliseconds))
+    return Promise.resolve()
   }
   clock.totalAdjustedMs = () =>
     testTime - initialTime
