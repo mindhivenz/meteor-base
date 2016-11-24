@@ -1,4 +1,4 @@
-import { extendClock } from '../universal/time'
+import { extendClock, ProgressiveBackoff } from '../universal/time'
 
 
 const clock = () =>
@@ -8,4 +8,5 @@ extendClock(clock)
 
 export default () => ({
   clock,
+  ProgressiveBackoff,
 })

@@ -1,6 +1,6 @@
 import { TimeSync } from 'meteor/mizzao:timesync'
 
-import { extendClock } from '../universal/time'
+import { extendClock, ProgressiveBackoff } from '../universal/time'
 
 /* eslint-disable no-console */
 
@@ -24,4 +24,5 @@ extendClock(clock)
 
 export default () => ({
   clock,
+  ProgressiveBackoff,
 })
