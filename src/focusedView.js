@@ -1,5 +1,7 @@
 
 
+const clone = global.EJSON.clone
+
 export const prefixKeys = (prefix, fields) => {
   if (! fields) {
     return {}
@@ -134,9 +136,9 @@ export class FocusedView {
 
   insert(apiContext, doc) {
     this._updateFirewall(apiContext)
-    return this.collection.insert(
-      (this.viewSpec.insertDocMerge && this.viewSpec.insertDocMerge(apiContext.viewer(), doc)) || doc
-    )
+    const insertDoc = this.viewSpec.insertDocMerge ? this.viewSpec.insertDocMerge(apiContext.viewer(), doc) : clone(doc)
+    insertDoc._id = this.collection.insert(insertDoc)
+    return insertDoc
   }
 
   updateOne(apiContext, selector, modifier) {

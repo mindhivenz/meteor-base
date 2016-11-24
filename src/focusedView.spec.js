@@ -15,7 +15,8 @@ describe('focusedView', () => {
   let selector
   let options
   let modifier
-  let expected
+  let expectedId
+  let expectedDoc
   let viewer
   let apiContext
   let focusedViewer
@@ -35,9 +36,10 @@ describe('focusedView', () => {
     }
     selector = someSelector()
     viewSelector = someSelector()
-    expected = {
+    expectedId = some.string()
+    expectedDoc = {
       ...some.object(),
-      _id: some.string(),
+      _id: expectedId,
     }
     options = some.object()
     modifier = some.object()
@@ -149,9 +151,9 @@ describe('focusedView', () => {
 
     it('should call find with built selector', () => {
       givenFindSelector()
-      Collection.find.returns(expected)
+      Collection.find.returns(expectedDoc)
       const actual = focusedViewer.find(apiContext, selector, options)
-      actual.should.equal(expected)
+      actual.should.equal(expectedDoc)
       Collection.find.should.have.been.calledWith(builtSelector('find'), options)
     })
 
@@ -171,9 +173,9 @@ describe('focusedView', () => {
 
     it('should call findOne with built selector', () => {
       givenFindSelector()
-      Collection.findOne.returns(expected)
+      Collection.findOne.returns(expectedDoc)
       const actual = focusedViewer.loadOne(apiContext, selector, options)
-      actual.should.equal(expected)
+      actual.should.equal(expectedDoc)
       Collection.findOne.should.have.been.calledWith(builtSelector('loadOne'), options)
     })
 
@@ -208,7 +210,7 @@ describe('focusedView', () => {
       givenFindSelector()
       viewSelector = { a: some.primitive(), b: some.primitive() }
       Collection.findOne.withArgs(builtSelector('loadOne')).returns(null)
-      Collection.findOne.withArgs(selector).returns(expected)
+      Collection.findOne.withArgs(selector).returns(expectedDoc)
       should.throw(() => {
         focusedViewer.loadOne(apiContext, selector, options)
       })
@@ -216,10 +218,10 @@ describe('focusedView', () => {
         'loadOne doc is out of focus',
         {
           collection: Collection,
-          id: expected._id,
+          id: expectedId,
           data: {
             viewFocus: viewSelector,
-            foundDoc: expected,
+            foundDoc: expectedDoc,
           },
         }
       )
@@ -228,10 +230,10 @@ describe('focusedView', () => {
 
     it('should accessDenied when _id passed and other passed selectors were reason for not finding doc', () => {
       givenFindSelector()
-      selector = { _id: expected._id, a: some.primitive(), b: some.primitive() }
+      selector = { _id: expectedId, a: some.primitive(), b: some.primitive() }
       Collection.findOne.withArgs(builtSelector('loadOne')).returns(null)
       Collection.findOne.withArgs(selector).returns(null)
-      Collection.findOne.withArgs(selector._id).returns(expected)
+      Collection.findOne.withArgs(selector._id).returns(expectedDoc)
       should.throw(() => {
         focusedViewer.loadOne(apiContext, selector, options)
       })
@@ -241,7 +243,7 @@ describe('focusedView', () => {
           collection: Collection,
           id: selector._id,
           data: {
-            foundDoc: expected,
+            foundDoc: expectedDoc,
           },
         },
       )
@@ -271,43 +273,53 @@ describe('focusedView', () => {
 
   describe('insert', () => {
 
-    it('should insert merged doc returned', () => {
-      const mergedDoc = some.object()
-      const insertDocMerge = sinon.spy(() => (mergedDoc))
-      const originalDoc = some.object()
-      Collection.insert.returns(expected)
-      givenFocusedViewer({
-        insertDocMerge,
+    it('should call insert and return doc with _id and any SimpleSchema changes, leaving original untouched', () => {
+      const withinSchemaFields = some.object()
+      const originalDoc = {
+        ...withinSchemaFields,
+        simpleSchemaCleanedField: some.primitive(),
+      }
+      Collection.insert = sinon.spy((d) => {
+        d.should.deep.equal(originalDoc)
+        delete d.simpleSchemaCleanedField
+        return expectedId
       })
+      givenFocusedViewer()
       const actual = focusedViewer.insert(apiContext, originalDoc)
-      actual.should.equal(expected)
-      Collection.insert.should.have.been.calledWith(mergedDoc)
-      insertDocMerge.should.have.been.calledWith(viewer, originalDoc)
+      actual.should.deep.equal({
+        _id: expectedId,
+        ...withinSchemaFields,
+      })
+      originalDoc.should.have.any.key('simpleSchemaCleanedField')
     })
 
-    it('should insert merged doc modified in place', () => {
-      const addedValue = some.primitive()
-      const insertDocMerge = sinon.spy((v, d) => { d.addedField = addedValue })
+    it('should insert merged doc and return', () => {
       const originalDoc = some.object()
-      console.log(originalDoc)
-      Collection.insert.returns(expected)
+      const mergedDoc = some.object()
+      const insertDocMerge = sinon.spy(() => (mergedDoc))
+      Collection.insert = sinon.spy((d) => {
+        d.should.deep.equal(mergedDoc)
+        return expectedId
+      })
       givenFocusedViewer({
         insertDocMerge,
       })
       const actual = focusedViewer.insert(apiContext, originalDoc)
-      actual.should.equal(expected)
-      Collection.insert.should.have.been.calledWith({
-        ...originalDoc,
-        addedField: addedValue,
+      actual.should.deep.equal({
+        _id: expectedId,
+        ...mergedDoc,
       })
+      insertDocMerge.should.have.been.calledWith(viewer, originalDoc)
     })
 
     it('should insert unmerged doc if no viewSpec', () => {
       const originalDoc = some.object()
-      Collection.insert.returns(expected)
+      Collection.insert = sinon.spy((d) => {
+        d.should.deep.equal(originalDoc)
+        return expectedId
+      })
       givenFocusedViewer({})
       focusedViewer.insert(apiContext, originalDoc)
-      Collection.insert.should.have.been.calledWith(originalDoc)
     })
 
     it('should throw if updateFirewall does', () => {
