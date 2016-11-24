@@ -271,7 +271,7 @@ describe('focusedView', () => {
 
   describe('insert', () => {
 
-    it('should insert merged doc', () => {
+    it('should insert merged doc returned', () => {
       const mergedDoc = some.object()
       const insertDocMerge = sinon.spy(() => (mergedDoc))
       const originalDoc = some.object()
@@ -283,6 +283,23 @@ describe('focusedView', () => {
       actual.should.equal(expected)
       Collection.insert.should.have.been.calledWith(mergedDoc)
       insertDocMerge.should.have.been.calledWith(viewer, originalDoc)
+    })
+
+    it('should insert merged doc modified in place', () => {
+      const addedValue = some.primitive()
+      const insertDocMerge = sinon.spy((v, d) => { d.addedField = addedValue })
+      const originalDoc = some.object()
+      console.log(originalDoc)
+      Collection.insert.returns(expected)
+      givenFocusedViewer({
+        insertDocMerge,
+      })
+      const actual = focusedViewer.insert(apiContext, originalDoc)
+      actual.should.equal(expected)
+      Collection.insert.should.have.been.calledWith({
+        ...originalDoc,
+        addedField: addedValue,
+      })
     })
 
     it('should insert unmerged doc if no viewSpec', () => {

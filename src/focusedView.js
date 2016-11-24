@@ -135,9 +135,7 @@ export class FocusedView {
   insert(apiContext, doc) {
     this._updateFirewall(apiContext)
     return this.collection.insert(
-      this.viewSpec.insertDocMerge ?
-        this.viewSpec.insertDocMerge(apiContext.viewer(), doc)
-        : doc
+      (this.viewSpec.insertDocMerge && this.viewSpec.insertDocMerge(apiContext.viewer(), doc)) || doc
     )
   }
 
