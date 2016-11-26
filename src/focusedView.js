@@ -1,6 +1,12 @@
 
 
-const clone = global.EJSON.clone
+const clone = (obj) => {
+  // Lazily get EJSON.clone so we can be used in environments without it
+  if (! global.EJSON) {
+    throw new Error('You need to `meteor add ejson`')
+  }
+  return global.EJSON.clone(obj)
+}
 
 export const prefixKeys = (prefix, fields) => {
   if (! fields) {
