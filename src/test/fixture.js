@@ -3,17 +3,18 @@ import { appContext } from '@mindhive/di/test'
 import { TestMongo } from './mocks/testMongo'
 
 
-export const lastAuditEntry = () =>
-  appContext.AuditEntries.findOne(
-    {},
-    {
-      limit: 1,
-      sort: { timestamp: -1 },
-    }
-  )
+export const auditEntries = () =>
+  // Assume (since it's in Minimongo) that find() order matches insertion order
+  appContext.AuditEntries.find().fetch()
+
+export const lastAuditEntry = () => {
+  const entries = auditEntries()
+  entries.should.have.length.of.at.least(1)
+  return entries[entries.length - 1]
+}
 
 export const onlyAuditEntry = () => {
-  const entries = appContext.AuditEntries.find().fetch()
+  const entries = auditEntries()
   entries.should.have.length(1)
   return entries[0]
 }

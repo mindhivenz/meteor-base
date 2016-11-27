@@ -1,5 +1,13 @@
 
 
+const clone = (obj) => {
+  // Lazily get EJSON.clone so we can be used in environments without it
+  if (! global.EJSON) {
+    throw new Error('You need to `meteor add ejson`')
+  }
+  return global.EJSON.clone(obj)
+}
+
 export const prefixKeys = (prefix, fields) => {
   if (! fields) {
     return {}
@@ -134,11 +142,9 @@ export class FocusedView {
 
   insert(apiContext, doc) {
     this._updateFirewall(apiContext)
-    return this.collection.insert(
-      this.viewSpec.insertDocMerge ?
-        this.viewSpec.insertDocMerge(apiContext.viewer(), doc)
-        : doc
-    )
+    const insertDoc = this.viewSpec.insertDocMerge ? this.viewSpec.insertDocMerge(apiContext.viewer(), doc) : clone(doc)
+    insertDoc._id = this.collection.insert(insertDoc)
+    return insertDoc
   }
 
   updateOne(apiContext, selector, modifier) {

@@ -6,7 +6,7 @@ export class Api {
   meteorCall = (
     methodName,
     args,
-    { notifyViewerPending = true } = {},
+    { notifyViewerPending = true, ...meteorOptions } = {},
     callback,
   ) => {
     const { Meteor, connectionDomain } = app()
@@ -14,7 +14,7 @@ export class Api {
     if (connectionDomain && notifyViewerPending) {
       connectionCallDisposer = connectionDomain.callStarted()
     }
-    Meteor.apply(methodName, [args], { returnStubValue: true }, (error, result) => {
+    Meteor.apply(methodName, [args], { returnStubValue: true, ...meteorOptions }, (error, result) => {
       if (connectionCallDisposer) {
         connectionCallDisposer()
       }

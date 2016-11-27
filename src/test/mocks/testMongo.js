@@ -5,6 +5,7 @@ import { initModules } from '@mindhive/di'
 
 
 export const TestMongo = {}
+export const TestGround = {}
 
 const NAME_TO_CAUSE_MINIMONGO = null
 
@@ -41,7 +42,7 @@ export const withRealMongoCollection = (testModules, collectionName) =>
 
 if (global.Mongo) {
 
-  TestMongo.Collection = class MiniMongoCollection extends global.Mongo.Collection {
+  TestMongo.Collection = class extends global.Mongo.Collection {
 
     constructor(name) {
       const useRealMongo = appContext.realMongoCollectionNames && appContext.realMongoCollectionNames.includes(name)
@@ -58,7 +59,7 @@ if (global.Mongo) {
     _ensureIndex(keys, options) {
       const isClient = appContext.Meteor && ! appContext.Meteor.isServer
       if (isClient) {
-        // TestMongo will throw an exception
+        // MiniMongo will throw an exception
         super._ensureIndex(keys, options)
       }
       const schemaDoc = this._c2 && this._c2._simpleSchema && this._c2._simpleSchema._schema
@@ -73,4 +74,19 @@ if (global.Mongo) {
       this.indexes.push(options ? { keys, options } : keys)
     }
   }
+
+  if (global.Ground) {
+
+    TestGround.Collection = class extends global.Mongo.Collection {
+
+      constructor() {
+        super(NAME_TO_CAUSE_MINIMONGO)
+      }
+
+      attachSchema() {
+        throw new Error("Can't attach schemas to GroundDB collections")
+      }
+    }
+  }
 }
+

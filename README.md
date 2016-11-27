@@ -8,10 +8,11 @@
 
 ### Meteor package peer dependencies (optional)
 
+1. `FocusedView`: `meteor add ejson`
 1. `backdoorModule`: `meteor add xolvio:backdoor`
 1. `SimpleSchema`: `meteor add aldeed:collection2`
 2. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
-3. client `timeModule`: `meteor add meteor/mizzao:timesync`
+3. client `timeModule`: `meteor add mizzao:timesync`
 4. `hasRole`: `meteor add alanning:roles`
 5. offline: `meteor add ground:db@2.0.0-rc.6` 
 

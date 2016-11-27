@@ -22,8 +22,8 @@ export class MongoMirror {
   cursorToDomain({
     actionPrefix,
     mongoCursor,
-    observableArray,
-    observableMap,
+    observableArray,  // Should be declared as: array = asFlat([])
+    observableMap,    // Should be declared as: map = asMap([], asReference)
     subscription = readySubscription,  // Pass subscription handle if from a subscription
     endless = false,
   }) {
@@ -88,7 +88,7 @@ export class MongoMirror {
             observableMap.set(id, doc)
           }),
           removed: action(`${actionPrefix}: document removed`, (id) => {
-            observableMap.remove(id)
+            observableMap.delete(id)
           }),
           changed: action(`${actionPrefix}: document changed`, (id, fields) => {
             // REVISIT: if existing value isObservable we could be more efficient here and just assign new fields
@@ -130,7 +130,7 @@ export class MongoMirror {
     viewSelector = {},
     observableArray,
     observableMap,
-    context = `subscription:${publicationName}`,
+    context = `mirror:${publicationName}`,
   }) {
     const result = observable({
       loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready method
@@ -160,7 +160,7 @@ export class MongoMirror {
     focusedView,
     viewSelector = {},
     groundCollection,
-    context = `subscription:${publicationName}->mirror:${groundCollection._name}`,
+    context = `mirror:${publicationName}`,
   }) {
     return this._autorunWhenViewerInfoAvailableForFocusedViews(() => {
       const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
@@ -168,11 +168,35 @@ export class MongoMirror {
         const orgProfilesCursor = focusedView.find(
           new LocalContext(context),
           viewSelector,
-          { reactive: false },
         )
         groundCollection.keep(orgProfilesCursor)
         groundCollection.observeSource(orgProfilesCursor)
       }
+    })
+  }
+
+  subscriptionToDomainCachedOffline({
+    publicationName,
+    subscriptionArgs,
+    focusedView,
+    viewSelector = {},
+    groundCollection,
+    observableArray,
+    observableMap,
+  }) {
+    this.cursorToDomain({
+      actionPrefix: `mirror:(offline)${publicationName}->domain`,
+      observableArray,
+      observableMap,
+      mongoCursor: groundCollection.find(),
+      endless: true,
+    })
+    this.subscriptionToOffline({
+      publicationName,
+      subscriptionArgs,
+      focusedView,
+      viewSelector,
+      groundCollection,
     })
   }
 }

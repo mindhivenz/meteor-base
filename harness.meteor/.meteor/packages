@@ -29,3 +29,4 @@ mizzao:timesync
 random@1.0.10
 promise@0.8.8
 ground:db@2.0.0-alpha.2
+ejson
