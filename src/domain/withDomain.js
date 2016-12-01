@@ -20,10 +20,18 @@ export const withDomain = ({
         this.domain = createDomain(this.props)
       }
 
+      componentDidMount() {
+        if (this.domain && typeof this.domain.componentDidMount === 'function') {
+          this.domain.componentDidMount()
+        }
+      }
+
       componentWillUpdate(nextProps) {
         if (shouldRecreateDomain(this.props, nextProps)) {
           this.stop()
           this.domain = createDomain(nextProps)
+        } else if (this.domain && typeof this.domain.update === 'function') {
+          this.domain.update(nextProps)
         }
       }
 
