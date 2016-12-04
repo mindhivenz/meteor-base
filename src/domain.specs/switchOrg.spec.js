@@ -1,11 +1,11 @@
 import { initModules } from '@mindhive/di'
 import { appContext } from '@mindhive/di/test'
 import { mockServerContext } from '../test/serverContext'
-import { MockMethodInvocation } from '../test/mocks/apiRegistry'
+import { MockMethodInvocation } from '../test/mocks/mockApiRegistry'
 import { notAuthorizedErrorMatch } from '../test/mocks/error'
 import { onlyAuditEntry, auditEntries, resetRolesCollection } from '../test/fixture'
 
-import mockMeteorCoreModuleFactory from '../test/mocks/meteorCoreModuleFactory'
+import mockMeteorCoreModuleFactory from '../test/mocks/mockMeteorCoreModuleFactory'
 import auditModule from '../server/auditModule'
 import apiContextAuditModule from '../server/apiContextAuditModule'
 import apiContextAuthModule from '../universal/apiContextAuthModule'

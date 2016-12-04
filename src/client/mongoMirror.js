@@ -15,6 +15,9 @@ const readySubscription = {
   ready: () => true,
 }
 
+const groundCollectionName = groundCollection =>
+  groundCollection.storage._config.name
+
 export class MongoMirror {
 
   // Automatically pump data from a Mongo cursor to a Mobx array or map
@@ -130,7 +133,7 @@ export class MongoMirror {
     viewSelector = {},
     observableArray,
     observableMap,
-    context = `mirror:${publicationName}`,
+    context = `mirror:subscription:${publicationName}->domain`,
   }) {
     const result = observable({
       loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready method
@@ -160,7 +163,7 @@ export class MongoMirror {
     focusedView,
     viewSelector = {},
     groundCollection,
-    context = `mirror:${publicationName}`,
+    context = `mirror:subscription:${publicationName}->offline:${groundCollectionName(groundCollection)}`,
   }) {
     return this._autorunWhenViewerInfoAvailableForFocusedViews(() => {
       const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
@@ -175,6 +178,21 @@ export class MongoMirror {
     })
   }
 
+  offlineToDomain({
+    groundCollection,
+    observableArray,
+    observableMap,
+    context = `mirror:offline:${groundCollectionName(groundCollection)}->domain`,
+  }) {
+    this.cursorToDomain({
+      actionPrefix: context,
+      observableArray,
+      observableMap,
+      mongoCursor: groundCollection.find(),
+      endless: true,
+    })
+  }
+
   subscriptionToDomainCachedOffline({
     publicationName,
     subscriptionArgs,
@@ -184,12 +202,10 @@ export class MongoMirror {
     observableArray,
     observableMap,
   }) {
-    this.cursorToDomain({
-      actionPrefix: `mirror:(offline)${publicationName}->domain`,
+    this.offlineToDomain({
+      groundCollection,
       observableArray,
       observableMap,
-      mongoCursor: groundCollection.find(),
-      endless: true,
     })
     this.subscriptionToOffline({
       publicationName,

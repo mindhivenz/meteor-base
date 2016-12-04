@@ -4,7 +4,7 @@ import { mockAppContext } from '@mindhive/di/test'
 
 import { sinon, should } from '../mocha'
 
-import { MockApiRegistry } from '../test/mocks/apiRegistry'
+import { MockApiRegistry } from '../test/mocks/mockApiRegistry'
 
 import apiContextViewerModule from './apiContextViewerModule'
 
