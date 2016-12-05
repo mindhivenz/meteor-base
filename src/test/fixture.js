@@ -1,11 +1,11 @@
-import { appContext } from '@mindhive/di/test'
+import { app } from '@mindhive/di'
 
 import { TestMongo } from './mocks/testMongo'
 
 
 export const auditEntries = () =>
   // Assume (since it's in Minimongo) that find() order matches insertion order
-  appContext.AuditEntries.find().fetch()
+  app().AuditEntries.find().fetch()
 
 export const lastAuditEntry = () => {
   const entries = auditEntries()
@@ -20,7 +20,7 @@ export const onlyAuditEntry = () => {
 }
 
 export const userHasPassword = (user, password) =>
-  ! appContext.Accounts._checkPassword(user, password).error
+  ! app().Accounts._checkPassword(user, password).error
 
 export const resetRolesCollection = () => {
   global.Meteor.roles = new TestMongo.Collection('roles')

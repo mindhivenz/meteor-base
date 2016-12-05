@@ -17,7 +17,7 @@ const composeFunc = (asyncFunc) =>
   }
 
 /*
- asyncFunc: (appContext, pushProps, ownProps)
+ asyncFunc: (app, pushProps, ownProps)
 
  Call pushProps with the props to push to the child component.
  You must call pushProps when asyncFunc is first called.

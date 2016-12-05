@@ -1,5 +1,5 @@
 import some from '@mindhive/some'
-import { mockAppContext, appContext } from '@mindhive/di/test'
+import { mockAppContext, app } from '@mindhive/di'
 
 import { sinon } from './mocha'
 import { initMeteorModules } from './init'
@@ -18,18 +18,18 @@ describe('initMeteorModules', () => {
 
   it('should not init if Meteor not started',
     mockAppContext(() => {
-      appContext.should.be.empty
+      app().should.be.empty
       initMeteorModules([])
-      appContext.should.be.empty
+      app().should.be.empty
     })
   )
 
   it('should init once started and add core module',
     mockAppContext(() => {
-      appContext.should.be.empty
+      app().should.be.empty
       initMeteorModules([])
       global.Meteor.startup.yield()
-      appContext.should.have.property('Meteor')
+      app().should.have.property('Meteor')
     })
   )
 
@@ -41,7 +41,7 @@ describe('initMeteorModules', () => {
         }),
       ])
       global.Meteor.startup.yield()
-      appContext.should.have.property('someContext')
+      app().should.have.property('someContext')
     })
   )
 
@@ -58,8 +58,8 @@ describe('initMeteorModules', () => {
           secondContext: some.object(),
         }),
       ])
-      appContext.should.have.property('firstContext')
-      appContext.should.have.property('secondContext')
+      app().should.have.property('firstContext')
+      app().should.have.property('secondContext')
     })
   )
 

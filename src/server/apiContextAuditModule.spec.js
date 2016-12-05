@@ -1,5 +1,5 @@
 import some from '@mindhive/some'
-import { mockAppContext, appContext } from '@mindhive/di/test'
+import { mockAppContext, app } from '@mindhive/di'
 
 import { sinon } from '../mocha'
 
@@ -63,20 +63,20 @@ describe('apiContextAuditModule', () => {
       viewer: () => viewer,
       connection: some.object(),
     }
-    appContext.apiRegistry.mockEnhance(result)
+    app().apiRegistry.mockEnhance(result)
     return result
   }
 
   const whenError = (apiContext) =>
-    appContext.apiRegistry._errorEvent(apiContext, error)
+    app().apiRegistry._errorEvent(apiContext, error)
 
   it('should call audit.log on error',
-    mockAppContext(modules, () => {
+    mockAppContext(modules, ({ audit }) => {
       const viewer = some.object()
-      apiContextAuditModule(appContext)
+      apiContextAuditModule(app())
       const apiContext = givenApiContext(viewer)
       whenError(apiContext)
-      appContext.audit.log.should.have.been.calledWith(
+      audit.log.should.have.been.calledWith(
         apiContext.connection,
         apiContext.apiName,
         viewer,
@@ -92,11 +92,11 @@ describe('apiContextAuditModule', () => {
   )
 
   it('should handle no viewer',
-    mockAppContext(modules, () => {
-      apiContextAuditModule(appContext)
+    mockAppContext(modules, ({ audit }) => {
+      apiContextAuditModule(app())
       const apiContext = givenApiContext(null)
       whenError(apiContext)
-      appContext.audit.log.should.have.been.calledWith(
+      audit.log.should.have.been.calledWith(
         apiContext.connection,
         apiContext.apiName,
         null,
@@ -105,12 +105,12 @@ describe('apiContextAuditModule', () => {
   )
 
   it('should not call audit.log when NOT_AUTHORIZED error',
-    mockAppContext(modules, () => {
-      apiContextAuditModule(appContext)
+    mockAppContext(modules, ({ audit }) => {
+      apiContextAuditModule(app())
       error = notAuthorizedError()
       const apiContext = givenApiContext(null)
       whenError(apiContext)
-      appContext.audit.log.should.not.have.been.called
+      audit.log.should.not.have.been.called
     })
   )
 

@@ -6,7 +6,7 @@ import { MockMongoMirror } from './mockMongoMirror'
 
 const possiblyRunTimerFuncInFiber = timer =>
   (func, timeout) => {
-    const wasInFiber = require('fibers').current
+    const wasInFiber = require('fibers').current  // eslint-disable-line global-require
     return timer(
       () => {
         if (wasInFiber) {

@@ -1,5 +1,4 @@
-import { initModules } from '@mindhive/di'
-import { appContext } from '@mindhive/di/test'
+import { initModules, app } from '@mindhive/di'
 import { mockServerContext } from '../test/serverContext'
 import { MockMethodInvocation } from '../test/mocks/mockApiRegistry'
 import { notAuthorizedErrorMatch } from '../test/mocks/error'
@@ -43,7 +42,7 @@ describe('switchOrgModule', () => {
   describe('switchOrg.orgs.selectionList', () => {
 
     const whenCalled = () =>
-      appContext.apiRegistry.call(
+      app().apiRegistry.call(
         'switchOrg.orgs.selectionList',
         new MockMethodInvocation({ viewer }),
       )
@@ -81,7 +80,7 @@ describe('switchOrgModule', () => {
   describe('switchOrg.viewer.switch', () => {
 
     const whenCalled = (orgId) =>
-      appContext.apiRegistry.call(
+      app().apiRegistry.call(
         'switchOrg.viewer.switch',
         new MockMethodInvocation({ viewer }),
         { orgId },

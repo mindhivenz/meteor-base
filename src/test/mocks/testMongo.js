@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 
-import { appContext } from '@mindhive/di/test'
-import { initModules } from '@mindhive/di'
+import { app, initModules } from '@mindhive/di'
 
 
 export const TestMongo = {}
@@ -45,7 +44,8 @@ if (global.Mongo) {
   TestMongo.Collection = class extends global.Mongo.Collection {
 
     constructor(name) {
-      const useRealMongo = appContext.realMongoCollectionNames && appContext.realMongoCollectionNames.includes(name)
+      const { realMongoCollectionNames } = app()
+      const useRealMongo = realMongoCollectionNames && realMongoCollectionNames.includes(name)
       if (useRealMongo) {
         super(name, { _suppressSameNameError: true })
         this.remove({})
@@ -57,7 +57,8 @@ if (global.Mongo) {
     }
 
     _ensureIndex(keys, options) {
-      const isClient = appContext.Meteor && ! appContext.Meteor.isServer
+      const { Meteor } = app()
+      const isClient = Meteor && ! Meteor.isServer
       if (isClient) {
         // MiniMongo will throw an exception
         super._ensureIndex(keys, options)
