@@ -131,6 +131,11 @@ export class FocusedView {
     return this.collection.find(this.selector(apiContext, selector, 'find'), options)
   }
 
+  findForUpdate(apiContext, selector, options) {
+    this._updateFirewall(apiContext)
+    return this.collection.find(this.selector(apiContext, selector, 'update'), options)
+  }
+
   loadOne(apiContext, selector, options) {
     this._firewall(apiContext)
     const doc = this.collection.findOne(this.selector(apiContext, selector, 'loadOne'), options)

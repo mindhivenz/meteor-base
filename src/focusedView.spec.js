@@ -149,7 +149,7 @@ describe('focusedView', () => {
 
   describe('find', () => {
 
-    it('should call find with built selector', () => {
+    it('should call find with findSelector', () => {
       givenFindSelector()
       Collection.find.returns(expectedDoc)
       const actual = focusedViewer.find(apiContext, selector, options)
@@ -164,6 +164,38 @@ describe('focusedView', () => {
       })
       should.throw(() => {
         focusedViewer.find(apiContext, selector, options)
+      }, reason)
+    })
+
+  })
+
+  describe('findForUpdate', () => {
+
+    it('should call find with updateSelector', () => {
+      givenUpdateSelector()
+      Collection.find.returns(expectedDoc)
+      const actual = focusedViewer.findForUpdate(apiContext, selector, options)
+      actual.should.equal(expectedDoc)
+      Collection.find.should.have.been.calledWith(builtSelector('update'), options)
+    })
+
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.findForUpdate(apiContext, selector, options)
+      }, reason)
+    })
+
+    it('should throw if update firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        updateFirewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.findForUpdate(apiContext, selector, options)
       }, reason)
     })
 
