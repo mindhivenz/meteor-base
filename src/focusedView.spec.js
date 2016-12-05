@@ -303,6 +303,55 @@ describe('focusedView', () => {
 
   })
 
+  describe('loadOneForUpdate', () => {
+
+    it('should call findOne with built selector', () => {
+      givenFindSelector()
+      Collection.findOne.returns(expectedDoc)
+      const actual = focusedViewer.loadOneForUpdate(apiContext, selector, options)
+      actual.should.equal(expectedDoc)
+      Collection.findOne.should.have.been.calledWith(builtSelector('update'), options)
+    })
+
+    it('should throw if update firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        updateFirewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.loadOneForUpdate(apiContext, selector, options)
+      }, reason)
+    })
+
+    it('should throw if firewall does', () => {
+      const reason = some.string()
+      givenFocusedViewer({
+        firewall(ac) { ac.accessDenied(reason) },
+      })
+      should.throw(() => {
+        focusedViewer.loadOneForUpdate(apiContext, selector, options)
+      }, reason)
+    })
+
+    it('should accessDenied if no matching doc', () => {
+      givenFindSelector()
+      Collection.findOne.returns(null)
+      should.throw(() => {
+        focusedViewer.loadOneForUpdate(apiContext, selector, options)
+      })
+      apiContext.accessDenied.should.have.been.calledWith(
+        'loadOneForUpdate found nothing',
+        {
+          collection: Collection,
+          data: {
+            selector,
+          },
+        }
+      )
+    })
+
+  })
+
   describe('insert', () => {
 
     it('should call insert and return doc with _id and any SimpleSchema changes, leaving original untouched', () => {

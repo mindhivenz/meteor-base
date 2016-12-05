@@ -65,7 +65,7 @@ export class FocusedView {
     }
   }
 
-  _reportAccessDeniedForNotFound(apiContext, selector, operation) {
+  _reportAccessDeniedForNotFound(apiContext, selector, operation, selectorOperation = operation) {
 
     const selectorAsFieldsOptions = (s) => {
       const result = {}
@@ -76,7 +76,7 @@ export class FocusedView {
     }
 
     const selectorId = typeof selector._id === 'string' ? selector._id : undefined
-    const focusSelector = this._focusSelector(apiContext, operation)
+    const focusSelector = this._focusSelector(apiContext, selectorOperation)
     const withoutFocusDoc = focusSelector && this.collection.findOne(selector, selectorAsFieldsOptions(focusSelector))
     if (withoutFocusDoc) {
       apiContext.accessDenied(`${operation} doc is out of focus`, {
@@ -141,6 +141,15 @@ export class FocusedView {
     const doc = this.collection.findOne(this.selector(apiContext, selector, 'loadOne'), options)
     if (! doc) {
       this._reportAccessDeniedForNotFound(apiContext, selector, 'loadOne')
+    }
+    return doc
+  }
+
+  loadOneForUpdate(apiContext, selector, options) {
+    this._updateFirewall(apiContext)
+    const doc = this.collection.findOne(this.selector(apiContext, selector, 'update'), options)
+    if (! doc) {
+      this._reportAccessDeniedForNotFound(apiContext, selector, 'loadOneForUpdate', 'update')
     }
     return doc
   }
