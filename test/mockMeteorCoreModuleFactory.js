@@ -1,2 +1,2 @@
 
-module.exports = require('../dist/test/mocks/meteorCoreModuleFactory')
+module.exports = require('../dist/test/mocks/mockMeteorCoreModuleFactory')

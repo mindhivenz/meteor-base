@@ -1,5 +1,3 @@
-var di = require('@mindhive/di')
-
 var init = require('./dist/init')
 var error = require('./dist/error')
 var focusedView = require('./dist/focusedView')
@@ -7,7 +5,6 @@ var roles = require('./dist/roles')
 var check = require('./dist/check')
 
 module.exports = {
-  app: di.app,
   initMeteorModules: init.initMeteorModules,
   ClientError: error.ClientError,
   NOT_AUTHORIZED: error.NOT_AUTHORIZED,

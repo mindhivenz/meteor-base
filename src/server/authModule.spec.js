@@ -1,5 +1,4 @@
-import { initModules } from '@mindhive/di'
-import { mockAppContext, appContext } from '@mindhive/di/test'
+import { initModules, mockAppContext, app } from '@mindhive/di'
 import some from '@mindhive/some'
 
 import { sinon } from '../mocha'
@@ -44,7 +43,7 @@ describe('authModule', () => {
     })
 
     const whenCalledBack = () => {
-      const callback = appContext.Accounts.validateLoginAttempt.firstCall.args[0]
+      const callback = app().Accounts.validateLoginAttempt.firstCall.args[0]
       return callback({
         connection,
         user,
@@ -55,10 +54,10 @@ describe('authModule', () => {
     }
 
     it('should return true and log an auditEntry when login success',
-      mockAppContext(modules, () => {
+      mockAppContext(modules, ({ audit }) => {
         const canLogIn = whenCalledBack()
         canLogIn.should.equal(true)
-        appContext.audit.log.should.have.been.calledWith(
+        audit.log.should.have.been.calledWith(
           connection,
           `call:${methodName}`,
           user,
@@ -74,33 +73,33 @@ describe('authModule', () => {
     )
 
     it('should log in audit generic context if no methodName provided',
-      mockAppContext(modules, () => {
+      mockAppContext(modules, ({ audit }) => {
         methodName = null
         whenCalledBack()
-        const logArgs = appContext.audit.log.firstCall.args
+        const logArgs = audit.log.firstCall.args
         logArgs[1].should.equal('callback:validateAndAuditLogins')
       })
     )
 
     it('should log an auditEntry when login failure',
-      mockAppContext(modules, () => {
+      mockAppContext(modules, ({ audit }) => {
         const errorMessage = some.string()
         error = new Error(errorMessage)
         user = null
         whenCalledBack()
-        const logEntry = appContext.audit.log.firstCall.args[3]
+        const logEntry = audit.log.firstCall.args[3]
         logEntry.action.should.equal('Login failure')
         logEntry.data.errorMessage.should.contain(errorMessage)
       })
     )
 
     it('should return false and log an auditEntry when users is disabled',
-      mockAppContext(modules, () => {
+      mockAppContext(modules, ({ audit }) => {
         error = null
         user.disabled = true
         const canLogIn = whenCalledBack()
         canLogIn.should.equal(false)
-        const logEntry = appContext.audit.log.firstCall.args[3]
+        const logEntry = audit.log.firstCall.args[3]
         logEntry.should.have.properties({
           action: 'Login denied: user disabled',
           data: {
@@ -115,7 +114,7 @@ describe('authModule', () => {
   describe('onLogout', () => {
 
     const whenCalledBack = () => {
-      const callback = appContext.Accounts.onLogout.firstCall.args[0]
+      const callback = app().Accounts.onLogout.firstCall.args[0]
       return callback({
         connection,
         user,
@@ -123,9 +122,9 @@ describe('authModule', () => {
     }
 
     it('should log an auditEntry',
-      mockAppContext(modules, () => {
+      mockAppContext(modules, ({ audit }) => {
         whenCalledBack()
-        appContext.audit.log.should.have.been.calledWith(
+        audit.log.should.have.been.calledWith(
           connection,
           'callback:onLogout',
           user,

@@ -1,6 +1,3 @@
-var di = require('@mindhive/di')
-var test = require('@mindhive/di/test')
-
 var mockMeteorCoreModule = require('../dist/test/mocks/meteorCoreModule')
 var serverContext = require('../dist/test/serverContext')
 var testMongo = require('../dist/test/mocks/testMongo')
@@ -10,9 +7,6 @@ var error = require('../dist/test/mocks/error')
 var fixture = require('../dist/test/fixture')
 
 module.exports = {
-  initModules: di.initModules,
-  appContext: test.appContext,
-  mockAppContext: test.mockAppContext,
   mockServerContext: serverContext.mockServerContext,
   mockMeteorCoreModule: mockMeteorCoreModule.default,
   TestMongo: testMongo.TestMongo,

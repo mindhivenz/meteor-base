@@ -34,6 +34,10 @@ class AwaitDocs {
       )
     )
   }
+
+  reset() {
+    this.processedIds = []
+  }
 }
 
 export class MockMongoMirror {
@@ -105,18 +109,30 @@ export class MockMongoMirror {
 
   subscriptionToOffline = sinon.spy()
 
-  subscriptionToDomainCachedOffline = ({
-    publicationName,
+  offlineToDomain = ({
     groundCollection,
     observableArray,
     observableMap,
+    context = `mirror:offline:${groundCollection._name}->domain`,
   }) => {
     this.cursorToDomain({
-      actionPrefix: `mirror:(offline)${publicationName}->domain`,
+      actionPrefix: context,
       observableArray,
       observableMap,
       mongoCursor: groundCollection.find(),
       endless: true,
+    })
+  }
+
+  subscriptionToDomainCachedOffline = ({
+    groundCollection,
+    observableArray,
+    observableMap,
+  }) => {
+    this.offlineToDomain({
+      groundCollection,
+      observableArray,
+      observableMap,
     })
   }
 
@@ -130,6 +146,12 @@ export class MockMongoMirror {
 
   removed(...docsOrIds) {
     return this.awaitRemoved.awaitAll(docsOrIds)
+  }
+
+  resetAwaitDocs() {
+    [this.awaitAdded, this.awaitRemoved, this.awaitUpdated].forEach(a => {
+      a.reset()
+    })
   }
 
 }

@@ -1,5 +1,5 @@
 import some from '@mindhive/some'
-import { appContext } from '@mindhive/di/test'
+import { app } from '@mindhive/di'
 
 import { sinon, should } from './mocha'
 import { ApiRegistry } from './apiRegistry'
@@ -66,13 +66,13 @@ describe('ApiRegistry', () => {
       Meteor.methods.should.not.have.been.called
     })
 
-    it('should pass the appContext, call context, and args to the method function', () => {
+    it('should pass the app, call context, and args to the method function', () => {
       Meteor.isServer = some.bool()
       const someMethodFunc = sinon.spy()
       apiRegistry.method('someMethod', someMethodFunc)
       const args = some.array()
       callWrappedSomeMethod(...args)
-      someMethodFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
+      someMethodFunc.should.have.been.calledWith(app(), thisInCall, ...args)
     })
 
     it('should bubble error out to Meteor', () => {
@@ -183,13 +183,13 @@ describe('ApiRegistry', () => {
       Meteor.publish.should.not.have.been.called
     })
 
-    it('should pass the appContext, and args to the function', () => {
+    it('should pass the app, and args to the function', () => {
       Meteor.isServer = true
       const args = some.array()
       const publicationFunc = sinon.spy()
       apiRegistry.publication('somePub', publicationFunc)
       callWrappedSomePub(...args)
-      publicationFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
+      publicationFunc.should.have.been.calledWith(app(), thisInCall, ...args)
     })
 
     describe('call context', () => {
@@ -255,7 +255,7 @@ describe('ApiRegistry', () => {
     const callWrappedCompositeSomePub = (...args) =>
       Meteor.publishComposite.getCall(0).args[1].call(thisInCall, ...args)
 
-    it('should pass publicationName and pass the appContext, and args to function', () => {
+    it('should pass publicationName and pass the app, and args to function', () => {
       Meteor.isServer = true
       thisInCall.unblock = sinon.spy()
       const args = some.array()
@@ -264,7 +264,7 @@ describe('ApiRegistry', () => {
       apiRegistry.publicationComposite(publicationName, publicationFunc)
       Meteor.publishComposite.should.have.been.calledWith(publicationName)
       callWrappedCompositeSomePub(...args)
-      publicationFunc.should.have.been.calledWith(appContext, thisInCall, ...args)
+      publicationFunc.should.have.been.calledWith(app(), thisInCall, ...args)
       thisInCall.unblock.should.have.been.calledOnce
     })
 
