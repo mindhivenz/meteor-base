@@ -25,7 +25,7 @@ export const withDomain = ({
           this.stop()
           this.domain = createDomain(nextProps)
         } else if (this.domain && typeof this.domain.update === 'function') {
-          this.domain.update(nextProps)
+          this.domain.update(...mapPropsToArgsArray(nextProps))
         }
       }
 
