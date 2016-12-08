@@ -9,12 +9,14 @@
 ### Meteor package peer dependencies (optional)
 
 1. `FocusedView`: `meteor add ejson`
-1. `backdoorModule`: `meteor add xolvio:backdoor`
-1. `SimpleSchema`: `meteor add aldeed:collection2`
-2. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
-3. client `timeModule`: `meteor add mizzao:timesync`
-4. `hasRole`: `meteor add alanning:roles`
-5. offline: `meteor add ground:db@2.0.0-rc.6` 
+2. `backdoorModule`: `meteor add xolvio:backdoor`
+3. `SimpleSchema`: `meteor add aldeed:collection2`
+4. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
+5. client `timeModule`: `meteor add mizzao:timesync`
+6. `hasRole`: `meteor add alanning:roles`
+7. `offlineModule`: `meteor add ground:db@2.0.0-rc.6`
+8. `appStoreDomain`: `meteor add cordova:cordova-plugin-device` and 
+ 	`meteor add cordova:cordova-plugin-app-version`
 
 ## How to use this
  
