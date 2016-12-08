@@ -36,6 +36,17 @@ class AppStoreDomain {
     }
   }
 
+  @computed get storeName() {
+    switch (device.platform) {
+      case 'Android': return 'GooglePlay'
+      case 'iOS': return 'AppStore'
+      default: {
+        console.warn('Returning null storeName un unsupported platform')
+        return null
+      }
+    }
+  }
+
   @computed get storeUrl() {
     switch (device.platform) {
       case 'Android': {
