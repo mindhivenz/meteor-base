@@ -7,10 +7,6 @@ import { app } from '@mindhive/di'
 
 /* eslint-disable no-console */
 
-const device = global.device
-const getAppVersion = global.cordova.getAppVersion
-const WebAppLocalServer = global.WebAppLocalServer
-
 class AppStoreDomain {
 
   @observable packageName
@@ -18,17 +14,17 @@ class AppStoreDomain {
 
   constructor() {
     if (app().Meteor.isCordova) {
-      if (! device) {
+      if (! global.device) {
         throw new Error('You need to install the cordova:cordova-plugin-device')
       }
-      if (! getAppVersion) {
+      if (! global.cordova.getAppVersion) {
         throw new Error('You need to install the cordova:cordova-plugin-app-version')
       }
-      getAppVersion.getPackageName()
+      global.cordova.getAppVersion.getPackageName()
         .then((packageName) => {
           runInAction('set packageName', () => { this.packageName = packageName })
         })
-      WebAppLocalServer.onError((e) => {
+      global.WebAppLocalServer.onError((e) => {
         if (String(e).includes('Cordova platform or versions changed')) {
           runInAction('set needsUpdate', () => { this.needsUpdate = true })
         }
@@ -37,7 +33,7 @@ class AppStoreDomain {
   }
 
   @computed get storeName() {
-    switch (device.platform) {
+    switch (global.platform) {
       case 'Android': return 'GooglePlay'
       case 'iOS': return 'AppStore'
       default: {
@@ -48,7 +44,7 @@ class AppStoreDomain {
   }
 
   @computed get storeUrl() {
-    switch (device.platform) {
+    switch (global.device.platform) {
       case 'Android': {
         if (! this.packageName) {
           console.warn('Returning null storeUrl as packageName not retrieved yet')
