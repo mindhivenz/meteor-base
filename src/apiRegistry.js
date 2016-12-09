@@ -53,21 +53,28 @@ export class ApiRegistry {
     }
   }
 
-  _publication(meteorPublishFunc, publicationName, func) {
+  _publication(meteorPublishFunc, publicationName, funcOrOptions) {
     if (this.Meteor.isServer) {
+      const options = typeof funcOrOptions === 'function' ?
+        { server: funcOrOptions }
+        : funcOrOptions
+      const {
+        server,
+        autoPublish = false,
+      } = options
       const self = this
       const wrapper = function wrapper(...args) {
         const subscription = this
         self.enhanceApiContext(subscription, `pub:${publicationName}`)
         subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
         try {
-          return func(app(), subscription, ...args)
+          return server(app(), subscription, ...args)
         } catch (e) {
           self._errorEvent(subscription, e)
           throw e
         }
       }
-      meteorPublishFunc(publicationName, wrapper)
+      meteorPublishFunc(autoPublish ? null : publicationName, wrapper)
     }
   }
 

@@ -52,10 +52,13 @@ export class MockApiRegistry extends ApiRegistry {
     this.methodFuncs.set(methodName, serverFunc)
   }
 
-  publication(publicationName, func) {
+  publication(publicationName, funcOrOptions) {
     if (this.publicationFuncs.has(publicationName)) {
       throw new ReferenceError(`More than one publication with the name "${publicationName}"`)
     }
+    const func = typeof funcOrOptions === 'function' ?
+      funcOrOptions
+      : funcOrOptions.server
     this.publicationFuncs.set(publicationName, func)
   }
 

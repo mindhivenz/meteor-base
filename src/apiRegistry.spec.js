@@ -170,11 +170,21 @@ describe('ApiRegistry', () => {
     const callWrappedSomePub = (...args) =>
       Meteor.publish.getCall(0).args[1].call(thisInCall, ...args)
 
-    it('should call Meteor.publish with recordSet name', () => {
+    it('should call Meteor.publish with publication name', () => {
       Meteor.isServer = true
       apiRegistry.publication('somePub', sinon.spy())
       Meteor.publish.should.have.been.calledOnce
       Meteor.publish.should.have.been.calledWith('somePub')
+    })
+
+    it('should call Meteor.publish with null when autoPublish', () => {
+      Meteor.isServer = true
+      apiRegistry.publication('somePub', {
+        autoPublish: true,
+        server: sinon.spy(),
+      })
+      Meteor.publish.should.have.been.calledOnce
+      Meteor.publish.should.have.been.calledWith(null)
     })
 
     it('should not call Meteor.publish when not on server', () => {
@@ -268,6 +278,14 @@ describe('ApiRegistry', () => {
       thisInCall.unblock.should.have.been.calledOnce
     })
 
+    it('should pass null publicationName when autoPublish', () => {
+      Meteor.isServer = true
+      apiRegistry.publicationComposite('somePub', {
+        autoPublish: true,
+        server: sinon.spy(),
+      })
+      Meteor.publishComposite.should.have.been.calledWith(null)
+    })
 
     describe('call context', () => {
 
