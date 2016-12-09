@@ -85,9 +85,13 @@ export const linkViewerDomainToSubscription = (viewerDomain, subscription = 'vie
 
   const updateFromServer = (user) => {
     viewerDomain.updateFromServer(user)
-    const offlineState = {}
-    viewerDomain.buildOfflineState(offlineState)
-    storage.write(VIEWER_STATE_PATH, offlineState)
+    if (user) {
+      const offlineState = {}
+      viewerDomain.buildOfflineState(offlineState)
+      storage.write(VIEWER_STATE_PATH, offlineState)
+    } else {
+      storage.write(VIEWER_STATE_PATH, null)
+    }
   }
 
   const readOfflineState = () =>
