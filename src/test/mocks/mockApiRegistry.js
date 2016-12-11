@@ -1,16 +1,20 @@
 import { app } from '@mindhive/di'
 import some from '@mindhive/some'
+import assert from 'assert'
 
-import { ApiRegistry } from '../../apiRegistry'
+import { ApiRegistry } from '../../server/apiRegistry'
+import { parseRequestUrl } from '../../server/httpContext'
 
 
 export class MockApiContext {
 
-  constructor({
-    viewer,
-    userId = viewer && viewer._id,
-    connection = MockApiContext.mockConnection(),
-  }) {
+  constructor(
+    {
+      viewer,
+      userId = viewer && viewer._id,
+      connection = MockApiContext.mockConnection(),
+    } = {},
+  ) {
     this.userId = userId
     this.connection = connection
   }
@@ -27,20 +31,26 @@ export class MockApiContext {
 }
 
 export class MockMethodInvocation extends MockApiContext {
-
-  constructor(options) {
-    super(options)
-    this.isSimulation = false
-  }
+  isSimulation = false
 }
 
 export class MockSubscription extends MockApiContext {
 }
 
-export class MockApiRegistry extends ApiRegistry {
+export class MockHttpContext extends MockApiContext {
+}
 
+export class MockApiRegistry extends ApiRegistry {
   methodFuncs = new Map()
   publicationFuncs = new Map()
+  httpFuncs = []
+
+  constructor() {
+    super(
+      { isServer: true },
+      {},
+    )
+  }
 
   method(methodName, funcOrOptions) {
     if (this.methodFuncs.has(methodName)) {
@@ -52,7 +62,7 @@ export class MockApiRegistry extends ApiRegistry {
     this.methodFuncs.set(methodName, serverFunc)
   }
 
-  publication(publicationName, funcOrOptions) {
+  _publication(meteorPublishFunc, publicationName, funcOrOptions) {
     if (this.publicationFuncs.has(publicationName)) {
       throw new ReferenceError(`More than one publication with the name "${publicationName}"`)
     }
@@ -62,12 +72,8 @@ export class MockApiRegistry extends ApiRegistry {
     this.publicationFuncs.set(publicationName, func)
   }
 
-  publicationComposite(...args) {
-    this.publication(...args)
-  }
-
-  apiContextEnhancer(objOrFunc) {
-    this.enhancer.registerEnhancement(objOrFunc)
+  http(path, func) {
+    this.httpFuncs.push({ path, func })
   }
 
   mockEnhance(apiContext, includeInApiName = '') {
@@ -126,5 +132,30 @@ export class MockApiRegistry extends ApiRegistry {
       })
     }
     return result
+  }
+
+  // See https://github.com/howardabrams/node-mocks-http#createrequest
+  // You have to add node-mocks-http to your own project to use this method (lazy required)
+  httpRequest(requestOptions, context = new MockHttpContext()) {
+    const httpMocks = require('node-mocks-http')  // eslint-disable-line global-require
+    const { req, res } = httpMocks.createMocks(requestOptions, {})
+    const pathname = parseRequestUrl(req).pathname
+    // Match Meteor's logic: https://docs.meteor.com/packages/webapp.html
+    const httpFunc = this.httpFuncs.find(({ path }) =>
+      pathname === path
+      || pathname.startsWith(`${path}/`)
+      || pathname.startsWith(`${path}.`)
+    )
+    if (! httpFunc) {
+      throw new Error(`No matching HTTP path ${pathname}, searched: ${this.httpFuncs.map(h => h.path)}`)
+    }
+    this.mockEnhance(context, pathname)
+    try {
+      httpFunc.func(app(), context, req, res)
+    } catch (e) {
+      assert.equal(res.headersSent, false, `Must not have written to the response if throwing an exception: ${e}`)
+      throw e
+    }
+    return res
   }
 }

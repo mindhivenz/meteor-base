@@ -3,12 +3,12 @@ import { app } from '@mindhive/di'
 
 export class Api {
 
-  meteorCall = (
+  meteorCall(
     methodName,
     args,
     { notifyViewerPending = true, ...meteorOptions } = {},
     callback,
-  ) => {
+  ) {
     const { Meteor, connectionDomain } = app()
     let connectionCallDisposer
     if (connectionDomain && notifyViewerPending) {
@@ -25,8 +25,8 @@ export class Api {
   }
 
   // Returns a promise resolved or rejected based on the server result
-  call = (methodName, args, options) =>
-    new Promise((resolve, reject) => {
+  call(methodName, args, options) {
+    return new Promise((resolve, reject) => {
       this.meteorCall(methodName, args, options, (error, result) => {
         if (error) {
           reject(error)
@@ -35,11 +35,12 @@ export class Api {
         }
       })
     })
+  }
 
   // Use this when you know the call will definitely work on the server, so client will immediately carry on.
   // Will return the result of the client simulation method (if any).
-  optimisticCall = (methodName, args, options) =>
-    this.meteorCall(methodName, args, options, (error) => {
+  optimisticCall(methodName, args, options) {
+    return this.meteorCall(methodName, args, options, (error) => {
       if (error) {
         // No need to messageDomain.error here, as should have been done on the server
         app().messageDomain.show(
@@ -48,4 +49,5 @@ export class Api {
         )
       }
     })
+  }
 }

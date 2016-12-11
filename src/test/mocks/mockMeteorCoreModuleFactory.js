@@ -35,6 +35,7 @@ export default (
       Meteor,
       Random,
       Accounts,
+      EJSON,
     } = global
     Accounts.users = new TestMongo.Collection('users')
     Meteor.users = Accounts.users
@@ -62,6 +63,7 @@ export default (
       apiRegistry: new MockApiRegistry(),
       Accounts,
       Random,
+      EJSON,
     }
     if (isClient) {
       Object.assign(result, {

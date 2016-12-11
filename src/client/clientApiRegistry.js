@@ -1,9 +1,9 @@
 import { app } from '@mindhive/di'
 
-import { Enhancer } from './enhancer'
+import { Enhancer } from '../enhancer'
 
 
-export class ApiRegistry {
+export class ClientApiRegistry {
 
   enhancer = new Enhancer()
   errorCallbacks = []
@@ -53,41 +53,16 @@ export class ApiRegistry {
     }
   }
 
-  _publication(meteorPublishFunc, publicationName, funcOrOptions) {
-    if (this.Meteor.isServer) {
-      const options = typeof funcOrOptions === 'function' ?
-        { server: funcOrOptions }
-        : funcOrOptions
-      const {
-        server,
-        autoPublish = false,
-      } = options
-      const self = this
-      const wrapper = function wrapper(...args) {
-        const subscription = this
-        self.enhanceApiContext(subscription, `pub:${publicationName}`)
-        subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
-        try {
-          return server(app(), subscription, ...args)
-        } catch (e) {
-          self._errorEvent(subscription, e)
-          throw e
-        }
-      }
-      meteorPublishFunc(autoPublish ? null : publicationName, wrapper)
-    }
-  }
-
   _errorEvent(apiContext, e) {
     this.errorCallbacks.forEach(cb => cb(apiContext, e))
   }
 
-  publication(publicationName, func) {
-    this._publication(this.Meteor.publish, publicationName, func)
+  publication() {
+    // NoOp on client
   }
 
-  publicationComposite(publicationName, func) {
-    this._publication(this.Meteor.publishComposite, publicationName, func)
+  publicationComposite() {
+    // NoOp on client
   }
 
   apiContextEnhancer(objOrFunc) {

@@ -22,6 +22,7 @@ describe('meteorCoreModule', () => {
       'Accounts',
       'apiRegistry',
       'Random',
+      'EJSON',
     ])
   })
 })

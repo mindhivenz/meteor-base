@@ -15,7 +15,7 @@ export const lastAuditEntry = () => {
 
 export const onlyAuditEntry = () => {
   const entries = auditEntries()
-  entries.should.have.length(1)
+  entries.should.have.lengthOf(1)
   return entries[0]
 }
 

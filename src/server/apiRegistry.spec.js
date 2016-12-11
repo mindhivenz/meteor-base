@@ -1,7 +1,7 @@
 import some from '@mindhive/some'
 import { app } from '@mindhive/di'
 
-import { sinon, should } from './mocha'
+import { sinon, should } from '../mocha'
 import { ApiRegistry } from './apiRegistry'
 
 
@@ -171,14 +171,12 @@ describe('ApiRegistry', () => {
       Meteor.publish.getCall(0).args[1].call(thisInCall, ...args)
 
     it('should call Meteor.publish with publication name', () => {
-      Meteor.isServer = true
       apiRegistry.publication('somePub', sinon.spy())
       Meteor.publish.should.have.been.calledOnce
       Meteor.publish.should.have.been.calledWith('somePub')
     })
 
     it('should call Meteor.publish with null when autoPublish', () => {
-      Meteor.isServer = true
       apiRegistry.publication('somePub', {
         autoPublish: true,
         server: sinon.spy(),
@@ -187,14 +185,7 @@ describe('ApiRegistry', () => {
       Meteor.publish.should.have.been.calledWith(null)
     })
 
-    it('should not call Meteor.publish when not on server', () => {
-      Meteor.isServer = false
-      apiRegistry.publication('somePub', sinon.spy())
-      Meteor.publish.should.not.have.been.called
-    })
-
     it('should pass the app, and args to the function', () => {
-      Meteor.isServer = true
       const args = some.array()
       const publicationFunc = sinon.spy()
       apiRegistry.publication('somePub', publicationFunc)
@@ -205,14 +196,12 @@ describe('ApiRegistry', () => {
     describe('call context', () => {
 
       it('should call unblock() always', () => {
-        Meteor.isServer = true
         apiRegistry.publication('somePub', sinon.spy())
         callWrappedSomePub()
         thisInCall.unblock.should.have.been.calledOnce
       })
 
       it('should enhance', () => {
-        Meteor.isServer = true
         apiRegistry.publication('somePub', (passAppContext, subscription) => {
           subscription.someEnhancement()
         })
@@ -225,7 +214,6 @@ describe('ApiRegistry', () => {
       })
 
       it('should add the apiName', () => {
-        Meteor.isServer = true
         apiRegistry.publication('somePub', sinon.spy())
         callWrappedSomePub()
         thisInCall.apiName.should.equal('pub:somePub')
@@ -236,7 +224,6 @@ describe('ApiRegistry', () => {
     describe('onError', () => {
 
       it('should call onError when an exception bubbles out of func', () => {
-        Meteor.isServer = true
         const expectedError = new Error()
         const errorHandler = sinon.spy()
         apiRegistry.onError(errorHandler)
@@ -266,7 +253,6 @@ describe('ApiRegistry', () => {
       Meteor.publishComposite.getCall(0).args[1].call(thisInCall, ...args)
 
     it('should pass publicationName and pass the app, and args to function', () => {
-      Meteor.isServer = true
       thisInCall.unblock = sinon.spy()
       const args = some.array()
       const publicationFunc = sinon.spy()
@@ -279,7 +265,6 @@ describe('ApiRegistry', () => {
     })
 
     it('should pass null publicationName when autoPublish', () => {
-      Meteor.isServer = true
       apiRegistry.publicationComposite('somePub', {
         autoPublish: true,
         server: sinon.spy(),
@@ -290,7 +275,6 @@ describe('ApiRegistry', () => {
     describe('call context', () => {
 
       it('should enhance', () => {
-        Meteor.isServer = true
         apiRegistry.publicationComposite('somePub', (passAppContext, subscription) => {
           subscription.someEnhancement()
         })
@@ -314,7 +298,6 @@ describe('ApiRegistry', () => {
     describe('onError', () => {
 
       it('should call onError when an exception bubbles out of func', () => {
-        Meteor.isServer = true
         const expectedError = new Error()
         const errorHandler = sinon.spy()
         apiRegistry.onError(errorHandler)
@@ -328,6 +311,29 @@ describe('ApiRegistry', () => {
         errorHandler.should.have.been.calledWith(thisInCall, expectedError)
       })
 
+    })
+
+  })
+
+  describe('http', () => {
+
+    const path = '/some/path'
+
+    it('should call WebApp.connectHandlers', () => {
+      const WebApp = {
+        connectHandlers: {
+          use: sinon.spy(),
+        },
+      }
+      apiRegistry = new ApiRegistry(Meteor, WebApp)
+      apiRegistry.http(path, sinon.spy())
+      WebApp.connectHandlers.use.should.have.been.calledWith(path)
+    })
+
+    it('should throw if WebApp does not exist', () => {
+      should.throw(() => {
+        apiRegistry.http(path, sinon.spy())
+      }, /meteor add webapp/)
     })
 
   })

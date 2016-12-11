@@ -112,7 +112,7 @@ describe('switchOrgModule', () => {
         viewer = Factory.create('superUser')
         whenCalled(viewer.orgId)
         Users.findOne(viewer._id).should.deep.equal(viewer)
-        auditEntries().should.have.length(0)
+        auditEntries().should.have.lengthOf(0)
       })
     )
 

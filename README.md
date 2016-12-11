@@ -30,8 +30,9 @@ This package also makes Meteor core services available in the appContext:
  
 - `Meteor`
 - `Mongo`: Meteor's Mongo, or in testing it is our own `TestMongo` (see below)
-- `Random`
 - `Accounts`: with appropriate internal data reset each test
+- `Random`
+- `EJSON`
 - `Users`: Meteor's 'users' Mongo collection (`TestMongo` in testing)
 - `apiRegistry`: see below
 
@@ -59,7 +60,7 @@ Uses in memory MiniMongo instead of real Mongo collections to increase test spee
 An [example domain test](https://github.com/mindhivenz/todos-basis-webapp/blob/master/tests/specs/domain/tasks.spec.js).
 
 - Use `mockServerContext` of `@mindhvie/meteor/test` to initialise modules in test
-	- Most likely you'll want to import and pass `@mindhvie/meteor/test/mockMeteorCoreModule`
+	- Most likely you'll want to import and pass `@mindhvie/meteor/test/mockMeteorCoreModuleFactory`
 	  as the first module into `mockServerContext`
 	- This also sets up a fiber so Meteor code can be run in your tests  
 - From the returned context get the mock `apiRegistry` which can `call` and `subscribe` to methods and publications
