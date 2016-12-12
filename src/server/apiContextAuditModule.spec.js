@@ -9,10 +9,21 @@ import { MockApiRegistry } from '../test/mocks/mockApiRegistry'
 import apiContextAuditModule, { UnhandledExceptionReporter } from './apiContextAuditModule'
 
 
+const modules = () => ({
+  Meteor: {
+    isDevelopment: false,
+  },
+  audit: {
+    log: sinon.spy(),
+  },
+  apiRegistry: new MockApiRegistry(),
+})
+
+let error
+
 describe('UnhandledExceptionReporter', () => {
 
   let apiContext
-  let error
   let unhandledExceptionReporter
 
   beforeEach(() => {
@@ -23,35 +34,30 @@ describe('UnhandledExceptionReporter', () => {
     unhandledExceptionReporter = new UnhandledExceptionReporter()
   })
 
-  it('should call apiContext.auditLog correctly', () => {
-    unhandledExceptionReporter.onError(apiContext, error)
-    apiContext.auditLog.should.have.been.calledWith({
-      action: 'Unhandled exception',
-      data: {
-        exception: String(error),
-        stack: error.stack,
-      },
+  it('should call apiContext.auditLog correctly',
+    mockAppContext(modules, () => {
+      unhandledExceptionReporter.onError(apiContext, error)
+      apiContext.auditLog.should.have.been.calledWith({
+        action: 'Unhandled exception',
+        data: {
+          exception: String(error),
+          stack: error.stack,
+        },
+      })
     })
-  })
+  )
 
-  it('should not call apiContext.auditLog when filtered', () => {
-    unhandledExceptionReporter.registerHandledErrorFilter(e => e === error)
-    unhandledExceptionReporter.onError(apiContext, error)
-    apiContext.auditLog.should.not.have.been.called
-  })
+  it('should not call apiContext.auditLog when filtered',
+    mockAppContext(modules, () => {
+      unhandledExceptionReporter.registerHandledErrorFilter(e => e === error)
+      unhandledExceptionReporter.onError(apiContext, error)
+      apiContext.auditLog.should.not.have.been.called
+    })
+  )
 
 })
 
 describe('apiContextAuditModule', () => {
-
-  const modules = () => ({
-    audit: {
-      log: sinon.spy(),
-    },
-    apiRegistry: new MockApiRegistry(),
-  })
-
-  let error
 
   beforeEach(() => {
     error = new Error(some.string())

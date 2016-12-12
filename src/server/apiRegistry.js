@@ -52,6 +52,7 @@ export class ApiRegistry extends ClientApiRegistry {
         context.auth()
         func(app(), context, req, res)
       } catch (e) {
+        console.warn('Translating unhandled exception into HTTP 500', e)  // eslint-disable-line no-console
         this._errorEvent(context, e)
         if (res.headersSent) {
           console.warn('Failed to send HTTP error as headers already written')  // eslint-disable-line no-console

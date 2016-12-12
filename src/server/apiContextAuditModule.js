@@ -8,6 +8,10 @@ export class UnhandledExceptionReporter {
   handledFilters = []
 
   onError = (apiContext, e) => {
+    const { Meteor } = app()
+    if (Meteor.isDevelopment) {
+      console.warn(e)  // eslint-disable-line no-console
+    }
     if (! this.handledFilters.some(f => f(e))) {
       const entry = {
         action: 'Unhandled exception',
