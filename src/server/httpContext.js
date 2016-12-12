@@ -27,8 +27,16 @@ export class HttpContext {
       token = this._parsedUrl.query[HTTP_LOGIN_TOKEN_QUERY_PARAM]
     }
     if (token) {
-      const loginHandlerResult = Accounts._runLoginHandlers(this, { resume: token })
-      Accounts._attemptLogin(this, 'httpAuth', [], loginHandlerResult)
+      try {
+        const loginHandlerResult = Accounts._runLoginHandlers(this, { resume: token })
+        Accounts._attemptLogin(this, this.apiName, [], loginHandlerResult)
+      } catch (e) {
+        // No need to log when 403 because our authModule will be called with the result by Accounts
+        // So when 403 treat as not logged in and leave up to handler to deal with
+        if (e.error !== 403) {
+          throw e
+        }
+      }
     }
   }
 
