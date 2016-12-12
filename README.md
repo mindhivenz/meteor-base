@@ -15,8 +15,9 @@
 5. client `timeModule`: `meteor add mizzao:timesync`
 6. `hasRole`: `meteor add alanning:roles`
 7. `offlineModule`: `meteor add ground:db@2.0.0-rc.6`
-8. `appStoreDomain`: `meteor add cordova:cordova-plugin-device` and 
- 	`meteor add cordova:cordova-plugin-app-version`
+8. `appStoreDomain`: `meteor add cordova:cordova-plugin-device`,  
+ 	`meteor add cordova:cordova-plugin-appinfo` and
+ 	`meteor add cordova:cordova-plugin-market`
 
 ## How to use this
  

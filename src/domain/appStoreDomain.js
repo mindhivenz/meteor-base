@@ -9,7 +9,7 @@ import { app } from '@mindhive/di'
 
 class AppStoreDomain {
 
-  @observable packageName
+  packageName
   @observable needsUpdate = false
 
   constructor() {
@@ -17,13 +17,13 @@ class AppStoreDomain {
       if (! global.device) {
         throw new Error('You need to install the cordova:cordova-plugin-device')
       }
-      if (! global.cordova.getAppVersion) {
-        throw new Error('You need to install the cordova:cordova-plugin-app-version')
+      if (! global.navigator.appInfo) {
+        throw new Error('You need to install the cordova:cordova-plugin-appinfo')
       }
-      global.cordova.getAppVersion.getPackageName()
-        .then((packageName) => {
-          runInAction('set packageName', () => { this.packageName = packageName })
-        })
+      if (! global.cordova || ! global.cordova.plugins || ! global.cordova.plugins.market) {
+        throw new Error('You need to install the cordova:cordova-plugin-market')
+      }
+      this.packageName = global.navigator.appInfo.identifier
       global.WebAppLocalServer.onError((e) => {
         if (String(e).includes('Cordova platform or versions changed')) {
           runInAction('set needsUpdate', () => { this.needsUpdate = true })
@@ -33,29 +33,21 @@ class AppStoreDomain {
   }
 
   @computed get storeName() {
-    switch (global.platform) {
+    switch (global.device.platform) {
       case 'Android': return 'GooglePlay'
       case 'iOS': return 'AppStore'
       default: {
-        console.warn('Returning null storeName un unsupported platform')
-        return null
+        console.warn('Returning generic storeName on unsupported platform')
+        return 'app store'
       }
     }
   }
 
-  @computed get storeUrl() {
-    switch (global.device.platform) {
-      case 'Android': {
-        if (! this.packageName) {
-          console.warn('Returning null storeUrl as packageName not retrieved yet')
-          return null
-        }
-        return `https://play.google.com/store/apps/details?id=${this.packageName}`
-      }
-      default: {
-        console.warn('Returning null storeUrl un unsupported platform')
-        return null
-      }
+  openInMarket() {
+    if (global.device.platform === 'Android') {
+      global.cordova.plugins.market.open(this.packageName)
+    } else {
+      console.warn('Cannot open market on unsupported platform')
     }
   }
 }
