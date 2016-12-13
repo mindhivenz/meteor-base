@@ -7,6 +7,9 @@ import { app } from '@mindhive/di'
 
 /* eslint-disable no-console */
 
+const NEEDS_UPDATE_ERROR_MESSAGE = 'Skipping downloading new version because the Cordova platform version' +
+  ' or plugin versions have changed and are potentially incompatible'
+
 class AppStoreDomain {
 
   packageName
@@ -25,8 +28,8 @@ class AppStoreDomain {
       }
       this.packageName = global.navigator.appInfo.identifier
       global.WebAppLocalServer.onError((e) => {
-        if (String(e).includes('Cordova platform or versions changed')) {
-          runInAction('set needsUpdate', () => { this.needsUpdate = true })
+        if (String(e).includes(NEEDS_UPDATE_ERROR_MESSAGE)) {
+          runInAction('needsUpdate', () => { this.needsUpdate = true })
         }
       })
     }
