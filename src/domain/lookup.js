@@ -2,7 +2,7 @@ import { observable, asMap, asReference, computed } from 'mobx'
 import { app } from '@mindhive/di'
 
 
-export class Lookup {
+export class LookupDoc {
 
   constructor(domain, id) {
     this._domain = domain
@@ -11,6 +11,10 @@ export class Lookup {
 
   @computed get _doc() {  // Dereference the observable as late as possible
     return this.id && this._domain.idMap.get(this.id)
+  }
+
+  @computed get _fallbackValue() {
+    return `[${typeof this._id === 'string' ? this._id.substr(-5) : '?'}]`
   }
 }
 
