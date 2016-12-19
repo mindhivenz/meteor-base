@@ -1,4 +1,7 @@
-import { autorun as mobxAutorun } from 'mobx'
+import {
+  autorun as mobxAutorun,
+  untracked as mobxUntracked,
+} from 'mobx'
 
 // Based on https://github.com/meteor-space/tracker-mobx-autorun
 
@@ -30,6 +33,10 @@ export class Tracker {
         mobxDisposer()
       },
     }
+  }
+
+  untracked(func) {
+    return meteorTracker.nonreactive(() => mobxUntracked(func))
   }
 
 }
