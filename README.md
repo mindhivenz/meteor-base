@@ -8,25 +8,26 @@
 
 ### Meteor package peer dependencies (optional)
 
-NPM peer dependencies are specified in `package.json`. Meteor ones are here:
-
 1. `FocusedView`: `meteor add ejson`
 2. `backdoorModule`: `meteor add xolvio:backdoor`
 3. `SimpleSchema`: `meteor add aldeed:collection2`
 4. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
 5. client `timeModule`: `meteor add mizzao:timesync`
 6. `hasRole`: `meteor add alanning:roles`
-7. `offlineModule`: `meteor add ground:db@2.0.0-rc.7`
+7. `offlineModule`: `meteor add ground:db@2.0.0-rc.6`
 8. `appStoreDomain`: `meteor add cordova:cordova-plugin-device`,  
  	`meteor add cordova:cordova-plugin-appinfo` and
  	`meteor add cordova:cordova-plugin-market`
 
+## How to use this
+ 
+- See our [example webapp](https://github.com/mindhivenz/todos-basis-webapp)
+
 ## Dependency injection 
 
-See our [`@mindhive/di` package](https://github.com/mindhivenz/di-js).
+See our [DI package](https://github.com/mindhivenz/di-js).
 
-This package also makes Meteor core services available in the appContext through 
-`initMeteorModules` (instead of `initModules` from `@mindhive/di`):
+This package also makes Meteor core services available in the appContext:
  
 - `Meteor`
 - `Mongo`: Meteor's Mongo, or in testing it is our own `TestMongo` (see below)
@@ -38,9 +39,9 @@ This package also makes Meteor core services available in the appContext through
 
 ...and only on the client:
 
-- `api`: how to call methods on the server 
 - `Tracker`: like Meteor's Tracker but will react to both Meteor *and Mobx* reactive changes
-- `storage`: HTML5 localStorage (we choose this over other storage mechanisms because Meteor also uses it)
+- `api`: how to call methods on the server 
+- `storage`: HTML5 localStorage
 - `mongoMirror`: high level mirroring of publications to Mobx domains and offline
 
 ## ApiRegistry
@@ -54,3 +55,14 @@ inject `apiRegistry`. This has a cleaner callback (no use of `this`), calls
 Uses in memory MiniMongo instead of real Mongo collections to increase test speed.
  But this can be override with `withRealMongoCollection` for cases where you need
  to use functions not available in MiniMongo. 
+
+## Domain tests
+
+An [example domain test](https://github.com/mindhivenz/todos-basis-webapp/blob/master/tests/specs/domain/tasks.spec.js).
+
+- Use `mockServerContext` of `@mindhvie/meteor/test` to initialise modules in test
+	- Most likely you'll want to import and pass `@mindhvie/meteor/test/mockMeteorCoreModuleFactory`
+	  as the first module into `mockServerContext`
+	- This also sets up a fiber so Meteor code can be run in your tests  
+- From the returned context get the mock `apiRegistry` which can `call` and `subscribe` to methods and publications
+  in the modules being tested

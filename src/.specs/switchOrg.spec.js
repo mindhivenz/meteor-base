@@ -22,7 +22,7 @@ describe('switchOrgModule', () => {
 
   const modules = () =>
     initModules([
-      mockMeteorCoreModuleFactory({ isServer: true }),
+      mockMeteorCoreModuleFactory(),
       auditModule,
       apiContextAuthModule,
       apiContextViewerModule,

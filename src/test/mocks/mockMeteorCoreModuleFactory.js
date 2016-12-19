@@ -1,11 +1,11 @@
-import { TestMongo } from './testMongo'
+import { TestMongo, resetTestGroundCollections } from './testMongo'
 import { MockApiRegistry } from './mockApiRegistry'
 import { MockTracker } from './mockTracker'
 import { MockMongoMirror } from './mockMongoMirror'
 
 
 const possiblyRunTimerFuncInFiber = timer =>
-  (func, timeout) => {
+  (func, timeout = 0) => {
     const wasInFiber = require('fibers').current  // eslint-disable-line global-require
     return timer(
       () => {
@@ -52,7 +52,8 @@ export default (
         isServer,
         isCordova,
         wrapAsync: Meteor.wrapAsync,
-        defer: func => Meteor.setTimeout(func, 0),
+        defer: possiblyRunTimerFuncInFiber(setTimeout),
+        startup: possiblyRunTimerFuncInFiber(setTimeout),
         setTimeout: possiblyRunTimerFuncInFiber(setTimeout),
         clearTimeout,
         setInterval: possiblyRunTimerFuncInFiber(setInterval),
@@ -66,6 +67,7 @@ export default (
       EJSON,
     }
     if (isClient) {
+      resetTestGroundCollections()
       Object.assign(result, {
         Tracker: new MockTracker(),
         mongoMirror: new MockMongoMirror(),

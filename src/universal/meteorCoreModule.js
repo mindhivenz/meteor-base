@@ -15,7 +15,7 @@ export default () => {
   if (Meteor.isServer) {
     // REVISIT: Until Meteor on Node 6.6, we need to do this ourselves
     process.on('unhandledRejection', (reason) => {
-      console.error('Unhandled promise rejection', reason)  // eslint-disable-line no-console
+      console.error('Unhandled promise rejection', reason.stack || reason)  // eslint-disable-line no-console
     })
   }
   const result = {

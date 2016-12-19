@@ -5,3 +5,4 @@
 .babelrc
 .meteor-portable
 /harness.meteor/
+/src/.specs/

@@ -27,16 +27,16 @@ export class ProgressiveBackoff {
 
   sleep() {
     const { Random, clock } = app()
-    const delayMs = this.currentMs + (this.collisionAvoidanceMaxRandomMs * Random.fraction())
-    this.currentMs = delayMs * this.retryMultiplier
-    if (this.maxMs && this.currentMs > this.maxMs) {
-      this.currentMs = this.maxMs
+    const delayMs = this.baseDelayMs + (this.collisionAvoidanceMaxRandomMs * Random.fraction())
+    this.baseDelayMs = delayMs * this.retryMultiplier
+    if (this.maxMs && this.baseDelayMs > this.maxMs) {
+      this.baseDelayMs = this.maxMs
     }
     return clock.sleep(delayMs)
   }
 
   reset() {
-    this.currentMs = this.initialMs
+    this.baseDelayMs = this.initialMs
   }
 }
 

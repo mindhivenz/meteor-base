@@ -3,6 +3,12 @@
 import { app, initModules } from '@mindhive/di'
 
 
+const testGroundCollections = new Map()
+
+export const resetTestGroundCollections = () => {
+  testGroundCollections.clear()
+}
+
 export const TestMongo = {}
 export const TestGround = {}
 
@@ -80,12 +86,27 @@ if (global.Mongo) {
 
     TestGround.Collection = class extends global.Mongo.Collection {
 
-      constructor() {
+      constructor(name) {
         super(NAME_TO_CAUSE_MINIMONGO)
+        // REVISIT: why can't this be before the super()?
+        const existingCollection = testGroundCollections.get(name)
+        if (existingCollection) {
+          return existingCollection
+        }
+        testGroundCollections.set(name, this)
       }
 
       attachSchema() {
         throw new Error("Can't attach schemas to GroundDB collections")
+      }
+
+      once(eventName, cb) {
+        if (eventName === 'loaded') {
+          // Simulate it being delayed
+          setTimeout(cb, 0)
+        } else {
+          throw new ReferenceError(`Not implemented yet event ${eventName}`)
+        }
       }
     }
   }
