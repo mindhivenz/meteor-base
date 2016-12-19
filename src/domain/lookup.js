@@ -30,7 +30,7 @@ export class LookupDomain {
     return this.subscription.loading
   }
 
-  get = idOrDoc => new this.LookupClass(this, typeof idOrDoc === 'string' ? idOrDoc : idOrDoc._id)
+  get = idOrDoc => new this.LookupClass(this, idOrDoc && (typeof idOrDoc === 'string' ? idOrDoc : idOrDoc._id))
 
   map = (...args) => this.idMap.values().map(...args)
 
