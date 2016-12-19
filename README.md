@@ -14,7 +14,7 @@
 4. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
 5. client `timeModule`: `meteor add mizzao:timesync`
 6. `hasRole`: `meteor add alanning:roles`
-7. `offlineModule`: `meteor add ground:db@2.0.0-rc.6`
+7. `offlineModule`: `meteor add ground:db@2.0.0-rc.7`
 8. `appStoreDomain`: `meteor add cordova:cordova-plugin-device`,  
  	`meteor add cordova:cordova-plugin-appinfo` and
  	`meteor add cordova:cordova-plugin-market`
