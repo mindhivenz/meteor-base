@@ -45,7 +45,13 @@ export class FocusedView {
     if (! operation.startsWith('find') && ! operation.startsWith('load') && this.viewSpec.updateSelector) {
       return this.viewSpec.updateSelector(apiContext.viewer())
     }
-    return this.viewSpec.findSelector && this.viewSpec.findSelector(apiContext.viewer())
+    if (this.viewSpec.findSelector) {
+      if (operation === 'find' && ! apiContext.isAuthenticated()) {
+        return { _id: null }
+      }
+      return this.viewSpec.findSelector(apiContext.viewer())
+    }
+    return null
   }
 
   selector(apiContext, selector, operation = 'find') {

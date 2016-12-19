@@ -5,6 +5,8 @@ import { sinon } from './mocha'
 import { initMeteorModules } from './init'
 
 
+const originalMeteor = global.Meteor
+
 describe('initMeteorModules', () => {
 
   beforeEach(() => {
@@ -13,7 +15,7 @@ describe('initMeteorModules', () => {
   })
 
   afterEach(() => {
-    delete global.Meteor
+    global.Meteor = originalMeteor
   })
 
   it('should not init if Meteor not started',

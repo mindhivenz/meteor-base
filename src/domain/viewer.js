@@ -13,7 +13,7 @@ const VIEWER_STATE_PATH = 'viewerState'
 // Expects viewer data to be auto published (i.e. null publicationName)
 export class ViewerDomain {
   @observable loading = true
-  // Use atReference because we don't update the internals, only this reference,
+  // Use asReference because we don't update the internals, only the reference,
   // and makes user pure JS (avoiding issues with Roles package thinking user.roles is not an array)
   @observable user = asReference(null)
   @observable isAuthenticatedLive = false
@@ -24,41 +24,41 @@ export class ViewerDomain {
       Users,
       Tracker,
       storage,
-      connectionDomain,
-      offlineEnabled,
     } = app()
-
-    const readOfflineState = () =>
-      storage.read(VIEWER_STATE_PATH)
-
+    let firstRun = true
     Tracker.autorun(() => {
-      if (offlineEnabled && this.loading && connectionDomain.connectionDown) {
-        const offlineState = readOfflineState()
-        if (offlineState) {
-          this._updateFromOfflineState(offlineState)
-        }
-      } else if (Meteor.userId()) {
-        const user = Users.findOne(Meteor.userId())
+      const userId = Meteor.userId()
+      if (userId) {
+        const user = Users.findOne(userId)
         if (user) {
           this._updateFromServer(user)
-        } else if (this.loading) {
-          const offlineState = readOfflineState()
-          if (offlineState && offlineState.user && offlineState.user._id === Meteor.userId()) {
+        } else if (firstRun) {
+          const offlineState = storage.read(VIEWER_STATE_PATH)
+          if (offlineState && offlineState.user && offlineState.user._id === userId) {
+            // Assume user hasn't changed so we can work offline, and get a head start even if online
             this._updateFromOfflineState(offlineState)
           }
+          // OK to leave all other state as-is, because initialised values are correct (we're firstRun)
         } else {
-          // waiting for publication to be ready, leave state in place (inconsistency with Meteor.userId for a bit)
+          this._waitingForViewerSubscription()
         }
       } else {
         this._updateFromServer(null)
       }
+      firstRun = false
     })
+  }
+
+  @action _waitingForViewerSubscription() {
+    this.isAuthenticatedLive = false
+    this.loading = true
+    this._applyFromServer(null)
   }
 
   @action _updateFromServer(user) {
     const { storage } = app()
-    this._applyFromServer(user)
     this.isAuthenticatedLive = !! user
+    this._applyFromServer(user)
     this.loading = false
     if (user) {
       const offlineState = {}

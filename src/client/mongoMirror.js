@@ -116,15 +116,6 @@ export class MongoMirror {
     }
   }
 
-  _autorunWhenViewerInfoAvailableForFocusedViews(func) {
-    return app().Tracker.autorun(() => {
-      // Also useful to give other subscriptions a head start
-      if (app().viewerDomain.isAuthenticatedLive) {
-        func()
-      }
-    })
-  }
-
   // What it says on the can, returns handle with stop() (from autorun) and observable property loading
   subscriptionToDomain({
     publicationName,
@@ -138,22 +129,22 @@ export class MongoMirror {
     const result = observable({
       loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready method
     })
-    const autorunHandle = this._autorunWhenViewerInfoAvailableForFocusedViews(() => {
+    const autorunHandle = app().Tracker.autorun(() => {
       const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
-      this.cursorToDomain({
-        actionPrefix: context,
-        observableArray,
-        observableMap,
-        subscription,
-        mongoCursor: focusedView.find(new LocalContext(context), viewSelector),
-      })
       if (subscription.ready()) {
+        this.cursorToDomain({
+          actionPrefix: context,
+          observableArray,
+          observableMap,
+          subscription,
+          mongoCursor: focusedView.find(new LocalContext(context), viewSelector),
+        })
         runInAction(`${context}: ready`, () => {
           result.loading = false
         })
       }
     })
-    result.stop = autorunHandle.stop  // Copy stop across
+    result.stop = autorunHandle.stop  // Copy stop across, intentionally after making it observable so it's not computed
     return result
   }
 
@@ -165,7 +156,7 @@ export class MongoMirror {
     groundCollection,
     context = `mirror:subscription:${publicationName}->offline:${groundCollectionName(groundCollection)}`,
   }) {
-    return this._autorunWhenViewerInfoAvailableForFocusedViews(() => {
+    return app().Tracker.autorun(() => {
       const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
       if (subscription.ready()) {
         const orgProfilesCursor = focusedView.find(

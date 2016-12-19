@@ -54,7 +54,7 @@ export class MockApiRegistry extends ApiRegistry {
 
   method(methodName, funcOrOptions) {
     if (this.methodFuncs.has(methodName)) {
-      throw new ReferenceError(`More than one method with the name "${methodName}"`)
+      throw new Error(`More than one method with the name "${methodName}"`)
     }
     const serverFunc = typeof funcOrOptions === 'function' ?
       funcOrOptions
@@ -64,7 +64,7 @@ export class MockApiRegistry extends ApiRegistry {
 
   _publication(meteorPublishFunc, publicationName, funcOrOptions) {
     if (this.publicationFuncs.has(publicationName)) {
-      throw new ReferenceError(`More than one publication with the name "${publicationName}"`)
+      throw new Error(`More than one publication with the name "${publicationName}"`)
     }
     const func = typeof funcOrOptions === 'function' ?
       funcOrOptions
@@ -84,7 +84,7 @@ export class MockApiRegistry extends ApiRegistry {
   call(methodName, methodInvocation = new MockMethodInvocation(), ...args) {
     const func = this.methodFuncs.get(methodName)
     if (! func) {
-      throw new ReferenceError(`Unknown method name "${methodName}"`)
+      throw new Error(`Unknown method name "${methodName}"`)
     }
     this.mockEnhance(methodInvocation, methodName)
     return func(app(), methodInvocation, ...args)
@@ -93,7 +93,7 @@ export class MockApiRegistry extends ApiRegistry {
   _subscribeCursor(publicationName, subscription, ...args) {
     const func = this.publicationFuncs.get(publicationName)
     if (! func) {
-      throw new ReferenceError(`Unknown publication "${publicationName}"`)
+      throw new Error(`Unknown publication "${publicationName}"`)
     }
     this.mockEnhance(subscription, publicationName)
     return func(app(), subscription, ...args)

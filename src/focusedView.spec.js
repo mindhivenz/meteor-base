@@ -16,6 +16,7 @@ describe('focusedView', () => {
   let options
   let modifier
   let expectedId
+  let expectedCursor
   let expectedDoc
   let viewer
   let apiContext
@@ -37,6 +38,7 @@ describe('focusedView', () => {
     selector = someSelector()
     viewSelector = someSelector()
     expectedId = some.string()
+    expectedCursor = {}
     expectedDoc = {
       ...some.object(),
       _id: expectedId,
@@ -45,10 +47,15 @@ describe('focusedView', () => {
     modifier = some.object()
     viewer = some.object()
     apiContext = {
-      viewer: () => viewer,
+      isAuthenticated: () => !! viewer,
+      viewer: () => viewer || apiContext.accessDenied('Not logged in'),
       accessDenied: sinon.spy(r => { throw new Error(r) }),
     }
   })
+
+  const givenNotLoggedIn = () => {
+    viewer = null
+  }
 
   const givenFocusedViewer = (viewSpec) => {
     focusedViewer = new FocusedView(Collection, viewSpec)
@@ -151,10 +158,17 @@ describe('focusedView', () => {
 
     it('should call find with findSelector', () => {
       givenFindSelector()
-      Collection.find.returns(expectedDoc)
+      Collection.find.returns(expectedCursor)
       const actual = focusedViewer.find(apiContext, selector, options)
-      actual.should.equal(expectedDoc)
+      actual.should.equal(expectedCursor)
       Collection.find.should.have.been.calledWith(builtSelector('find'), options)
+    })
+
+    it('should perform empty search if not logged in', () => {
+      givenNotLoggedIn()
+      givenFindSelector()
+      focusedViewer.find(apiContext, selector, options)
+      Collection.find.firstCall.args[0].should.have.properties({ _id: null })
     })
 
     it('should throw if firewall does', () => {
@@ -173,10 +187,25 @@ describe('focusedView', () => {
 
     it('should call find with updateSelector', () => {
       givenUpdateSelector()
-      Collection.find.returns(expectedDoc)
+      Collection.find.returns(expectedCursor)
       const actual = focusedViewer.findForUpdate(apiContext, selector, options)
-      actual.should.equal(expectedDoc)
+      actual.should.equal(expectedCursor)
       Collection.find.should.have.been.calledWith(builtSelector('update'), options)
+    })
+
+    it('should throw if findSelector and not logged in', () => {
+      givenNotLoggedIn()
+      givenFindSelector()
+      should.throw(() => {
+        focusedViewer.findForUpdate(apiContext, selector, options)
+      }, /Not logged in/)
+    })
+
+    it('should not throw if no findSelector and not logged in', () => {
+      givenNotLoggedIn()
+      givenFocusedViewer()
+      Collection.find.returns(expectedCursor)
+      focusedViewer.findForUpdate(apiContext, selector, options)
     })
 
     it('should throw if firewall does', () => {
@@ -209,6 +238,21 @@ describe('focusedView', () => {
       const actual = focusedViewer.loadOne(apiContext, selector, options)
       actual.should.equal(expectedDoc)
       Collection.findOne.should.have.been.calledWith(builtSelector('loadOne'), options)
+    })
+
+    it('should throw if findSelector and not logged in', () => {
+      givenNotLoggedIn()
+      givenFindSelector()
+      should.throw(() => {
+        focusedViewer.loadOne(apiContext, selector, options)
+      }, /Not logged in/)
+    })
+
+    it('should not throw if no findSelector and not logged in', () => {
+      givenNotLoggedIn()
+      givenFocusedViewer()
+      Collection.findOne.returns(expectedDoc)
+      focusedViewer.loadOne(apiContext, selector, options)
     })
 
     it('should throw if firewall does', () => {
@@ -311,6 +355,21 @@ describe('focusedView', () => {
       const actual = focusedViewer.loadOneForUpdate(apiContext, selector, options)
       actual.should.equal(expectedDoc)
       Collection.findOne.should.have.been.calledWith(builtSelector('update'), options)
+    })
+
+    it('should throw if findSelector and not logged in', () => {
+      givenNotLoggedIn()
+      givenFindSelector()
+      should.throw(() => {
+        focusedViewer.loadOneForUpdate(apiContext, selector, options)
+      }, /Not logged in/)
+    })
+
+    it('should not throw if no findSelector and not logged in', () => {
+      givenNotLoggedIn()
+      givenFocusedViewer()
+      Collection.findOne.returns(expectedDoc)
+      focusedViewer.loadOneForUpdate(apiContext, selector, options)
     })
 
     it('should throw if update firewall does', () => {

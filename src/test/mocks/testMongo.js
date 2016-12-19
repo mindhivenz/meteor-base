@@ -105,7 +105,7 @@ if (global.Mongo) {
           // Simulate it being delayed
           setTimeout(cb, 0)
         } else {
-          throw new ReferenceError(`Not implemented yet event ${eventName}`)
+          throw new Error(`Not implemented yet event ${eventName}`)
         }
       }
     }

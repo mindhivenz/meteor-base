@@ -7,11 +7,10 @@ export const viewerEnhancer = (Users) => ({
       this.accessDenied('Not authenticated / logged in')
     }
     if (this.cachedViewerForUserId !== this.userId) {
-      this.cachedViewerForUserId = this.userId
-      this.cachedViewer = Users.findOne(this.userId)
-      if (this.cachedViewer.disabled) {
-        this.accessDenied('User is disabled')
-      }
+      this._cacheViewer(Users.findOne(this.userId))
+    }
+    if (this.cachedViewer.disabled) {
+      this.accessDenied('User is disabled')
     }
     return this.cachedViewer
   },
@@ -19,6 +18,15 @@ export const viewerEnhancer = (Users) => ({
   isAuthenticated() {
     return !! this.userId
   },
+
+  _cacheViewer(user) {
+    if (! user) {
+      throw new Error('Attempt to cache non-existent user for viewer')
+    }
+    this.cachedViewerForUserId = this.userId
+    this.cachedViewer = user
+  },
+
 })
 
 export default ({ apiRegistry, Users }) => {

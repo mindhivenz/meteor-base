@@ -1,14 +1,14 @@
 import { app } from '@mindhive/di'
-import { untracked } from 'mobx'
 
 
 export class LocalContext {
 
   constructor(contextName) {
-    this.userId = untracked(() => {
-      const { viewerDomain } = app()
-      return viewerDomain.user && viewerDomain.user._id
-    })
+    const { viewerDomain } = app()
+    this.userId = viewerDomain.user && viewerDomain.user._id
     app().apiRegistry.enhanceApiContext(this, `local:${contextName}`)
+    if (viewerDomain.user && typeof this._cacheViewer === 'function') {
+      this._cacheViewer(viewerDomain.user)
+    }
   }
 }
