@@ -76,8 +76,8 @@ export class MockApiRegistry extends ApiRegistry {
     this.httpFuncs.push({ path, func })
   }
 
-  mockEnhance(apiContext, includeInApiName = '') {
-    this.enhancer.enhance(apiContext)
+  enhanceApiContext(apiContext, includeInApiName = '') {
+    this.enhancer.enhance(apiContext, { enhancePrototypes: false })
     apiContext.apiName = some.unique.string('apiName') + includeInApiName
   }
 
@@ -86,7 +86,7 @@ export class MockApiRegistry extends ApiRegistry {
     if (! func) {
       throw new Error(`Unknown method name "${methodName}"`)
     }
-    this.mockEnhance(methodInvocation, methodName)
+    this.enhanceApiContext(methodInvocation, methodName)
     return func(app(), methodInvocation, ...args)
   }
 
@@ -95,7 +95,7 @@ export class MockApiRegistry extends ApiRegistry {
     if (! func) {
       throw new Error(`Unknown publication "${publicationName}"`)
     }
-    this.mockEnhance(subscription, publicationName)
+    this.enhanceApiContext(subscription, publicationName)
     return func(app(), subscription, ...args)
   }
 
@@ -149,7 +149,7 @@ export class MockApiRegistry extends ApiRegistry {
     if (! httpFunc) {
       throw new Error(`No matching HTTP path ${pathname}, searched: ${this.httpFuncs.map(h => h.path)}`)
     }
-    this.mockEnhance(context, pathname)
+    this.enhanceApiContext(context, pathname)
     try {
       httpFunc.func(app(), context, req, res)
     } catch (e) {

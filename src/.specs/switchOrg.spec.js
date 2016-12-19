@@ -8,7 +8,7 @@ import mockMeteorCoreModuleFactory from '../test/mocks/mockMeteorCoreModuleFacto
 import auditModule from '../server/auditModule'
 import apiContextAuditModule from '../server/apiContextAuditModule'
 import apiContextAuthModule from '../universal/apiContextAuthModule'
-import apiContextViewerModule from '../universal/apiContextViewerModule'
+import apiContextViewerModule from '../server/apiContextViewerModule'
 import rolesModule from '../universal/rolesModule'
 import mockOrgsModule from './fixture/mockOrgsModule'
 import factoriesModule from './fixture/factoriesModule'

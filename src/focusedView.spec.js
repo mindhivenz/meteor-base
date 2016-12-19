@@ -47,7 +47,7 @@ describe('focusedView', () => {
     modifier = some.object()
     viewer = some.object()
     apiContext = {
-      isAuthenticated: () => !! viewer,
+      get isAuthenticated() { return !! viewer },
       viewer: () => viewer || apiContext.accessDenied('Not logged in'),
       accessDenied: sinon.spy(r => { throw new Error(r) }),
     }

@@ -65,11 +65,11 @@ describe('apiContextAuditModule', () => {
 
   const givenApiContext = (viewer) => {
     const result = {
-      isAuthenticated: () => !! viewer,
+      get isAuthenticated() { return !! viewer },
       viewer: () => viewer,
       connection: some.object(),
     }
-    app().apiRegistry.mockEnhance(result)
+    app().apiRegistry.enhanceApiContext(result)
     return result
   }
 

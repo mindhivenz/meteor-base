@@ -46,7 +46,7 @@ export class FocusedView {
       return this.viewSpec.updateSelector(apiContext.viewer())
     }
     if (this.viewSpec.findSelector) {
-      if (operation === 'find' && ! apiContext.isAuthenticated()) {
+      if (operation === 'find' && ! apiContext.isAuthenticated) {
         return { _id: null }
       }
       return this.viewSpec.findSelector(apiContext.viewer())

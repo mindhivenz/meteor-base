@@ -38,7 +38,7 @@ const registerApi = (apiRegistry) => {
       app().audit.log(
         this.connection,
         this.apiName,
-        (this.isAuthenticated && this.isAuthenticated()) ? this.viewer() : null,
+        this.isAuthenticated ? this.viewer() : null,
         entry,
       )
     },

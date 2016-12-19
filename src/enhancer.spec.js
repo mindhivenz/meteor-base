@@ -46,23 +46,29 @@ describe('Enhancer', () => {
     newTargetInstance.should.have.property('someFunc', someFunc)
   })
 
-  it('should only enhance once', () => {
+  it('should only enhance with assignment once', () => {
     function SomePrototype() {
       this.somePrototypeProperty = some.primitive()
     }
     const enhancer = new Enhancer()
-    const target = new SomePrototype()
+    const target1 = new SomePrototype()
+    const target2 = new SomePrototype()
     const someProperty = some.object()
-    const enhancerFunc = sinon.spy()
+    const enhancerObj = {
+      ...some.object(),
+      enhanceTrue: true,
+    }
     const someFunc = sinon.spy()
     enhancer.registerEnhancement({
       someProperty,
       someFunc,
     })
-    enhancer.registerEnhancement(enhancerFunc)
-    enhancer.enhance(Object.getPrototypeOf(target))
-    enhancer.enhance(Object.getPrototypeOf(target))
-    enhancerFunc.should.have.been.calledOnce
+    enhancer.registerEnhancement(enhancerObj)
+    enhancer.enhance(target1)
+    SomePrototype.prototype.enhanceTrue.should.equal(true)
+    SomePrototype.prototype.enhanceTrue = false
+    enhancer.enhance(target2)
+    target2.enhanceTrue.should.equal(false)
   })
 
   it("should throw if enhancement registered after use because prototype won't be enhanced again", () => {
@@ -97,15 +103,30 @@ describe('Enhancer', () => {
 
   it('should enhance with functions in order registered', () => {
     const enhancer = new Enhancer()
-    const someNewProperty = some.primitive()
     const someFinalProperty = some.primitive()
     enhancer.registerEnhancement(obj => {
-      obj.someProperty = someNewProperty
+      obj.someProperty = some.primitive()
     })
     enhancer.registerEnhancement(obj => {
       obj.someProperty = someFinalProperty
     })
     const target = some.object()
+    enhancer.enhance(target)
+    target.should.have.property('someProperty', someFinalProperty)
+  })
+
+  it('should functions should apply to instance, objects to prototype', () => {
+    function SomePrototype() {
+    }
+    const enhancer = new Enhancer()
+    const someFinalProperty = some.primitive()
+    enhancer.registerEnhancement({
+      someProperty: some.primitive(),
+    })
+    enhancer.registerEnhancement(obj => {
+      obj.someProperty = someFinalProperty
+    })
+    const target = new SomePrototype()
     enhancer.enhance(target)
     target.should.have.property('someProperty', someFinalProperty)
   })

@@ -15,14 +15,21 @@ describe('apiContextViewer', () => {
   let user
 
   beforeEach(() => {
+
+    const CreateWithUniquePrototype = () =>
+      Object.create(() => {})
+
     user = some.object()
     Users = {
       findOne: sinon.spy(() => user),
     }
-    apiContext = {
-      userId: some.string(),
-      accessDenied: sinon.spy(r => { throw new Error(r) }),
-    }
+    apiContext = Object.assign(
+      new CreateWithUniquePrototype(),
+      {
+        userId: some.string(),
+        accessDenied: sinon.spy(r => { throw new Error(r) }),
+      },
+    )
   })
 
   const modules = () =>
@@ -33,7 +40,7 @@ describe('apiContextViewer', () => {
       }),
       apiContextViewerModule,
       ({ apiRegistry }) => {
-        apiRegistry.mockEnhance(apiContext)
+        apiRegistry.enhanceApiContext(apiContext)
       },
     ])
 
@@ -92,14 +99,15 @@ describe('apiContextViewer', () => {
 
     it('should return true when userId',
       mockAppContext(modules, () => {
-        apiContext.isAuthenticated().should.equal(true)
+        console.log(apiContext.userId)
+        apiContext.isAuthenticated.should.equal(true)
       })
     )
 
     it('should return false when no userId',
       mockAppContext(modules, () => {
         apiContext.userId = null
-        apiContext.isAuthenticated().should.equal(false)
+        apiContext.isAuthenticated.should.equal(false)
       })
     )
 
