@@ -14,7 +14,47 @@ export class LookupDoc {
   }
 
   @computed get _fallbackValue() {
-    return `[${typeof this._id === 'string' ? this._id.substr(-5) : '?'}]`
+    return `[${typeof this.id === 'string' ? this.id.substr(-5) : '?'}]`
+  }
+}
+
+class ExtendedLookupDomain {
+
+  constructor(domain, ids) {
+    this.domain = domain
+    this.ids = ids
+  }
+
+  get loading() {
+    return this.domain.loading
+  }
+
+  get(idOrDoc) {
+    return this.domain.get(idOrDoc)
+  }
+
+  get size() {
+    return this.domain.size + this._missingIds.length
+  }
+
+  @computed get _missingIds() {
+    return this.ids.filter(id => id && ! this.domain.idMap.has(id))
+  }
+
+  @computed get _missing() {
+    return this._missingIds.map(id => this.get(id))
+  }
+
+  @computed get all() {
+    return this.domain.all.concat(this._missing)
+  }
+
+  map(mapper) {
+    return this.all.map(mapper)
+  }
+
+  filterKnown(predicate) {
+    return this.domain.filter(predicate).concat(this._missing)
   }
 }
 
@@ -34,17 +74,33 @@ export class LookupDomain {
     return this.subscription.loading
   }
 
-  get = idOrDoc => new this.LookupClass(this, idOrDoc && (typeof idOrDoc === 'string' ? idOrDoc : idOrDoc._id))
-
-  map = (...args) => this.idMap.values().map(...args)
-
-  filter = (...args) => this.idMap.values().filter(...args)
+  get(idOrDoc) {
+    const id = (idOrDoc && (typeof idOrDoc === 'string' ? idOrDoc : idOrDoc._id)) || null
+    return new this.LookupClass(this, id)
+  }
 
   get size() {
     return this.idMap.size
+  }
+
+  @computed get all() {
+    return this.idMap.keys().map(id => this.get(id))
+  }
+
+  map(mapper) {
+    return this.all.map(mapper)
+  }
+
+  filter(predicate) {
+    return this.all.filter(predicate)
+  }
+
+  ensureContains(...ids) {
+    return new ExtendedLookupDomain(this, ids)
   }
 
   stop = () => {
     this.subscription.stop()
   }
 }
+
