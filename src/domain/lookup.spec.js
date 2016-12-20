@@ -119,14 +119,14 @@ describe('LookupDomain', () => {
 
   })
 
-  describe('size', () => {
+  describe('length', () => {
 
     it('should return count added',
       mockAppContext(modules, async () => {
         const domain = givenLookupDomain()
         const docs = some.arrayOf(givenSubscriptionAdded)
 
-        domain.size.should.equal(docs.length)
+        domain.length.should.equal(docs.length)
       })
     )
 
@@ -241,7 +241,7 @@ describe('LookupDomain', () => {
         actual.get(existingDoc).should.be.an.instanceOf(SomeLookup)
         actual.get(expectedId).should.have.properties({ id: expectedId })
         actual.get(expectedId).should.be.an.instanceOf(SomeLookup)
-        actual.size.should.equal(2)
+        actual.length.should.equal(2)
         actual.all.should.have.properties([
           { id: existingDoc._id },
           { id: expectedId },
@@ -259,7 +259,7 @@ describe('LookupDomain', () => {
         actual.loading.should.equal(subscription.loading)
         actual.get(existingDoc).should.have.properties({ id: existingDoc._id })
         actual.get(existingDoc).should.be.an.instanceOf(SomeLookup)
-        actual.size.should.equal(1)
+        actual.length.should.equal(1)
         actual.all.should.have.properties([
           { id: existingDoc._id },
         ])

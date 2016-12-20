@@ -33,8 +33,8 @@ class ExtendedLookupDomain {
     return this.domain.get(idOrDoc)
   }
 
-  get size() {
-    return this.domain.size + this._missingIds.length
+  get length() {
+    return this.domain.length + this._missingIds.length
   }
 
   @computed get _missingIds() {
@@ -79,7 +79,7 @@ export class LookupDomain {
     return new this.LookupClass(this, id)
   }
 
-  get size() {
+  get length() {
     return this.idMap.size
   }
 
