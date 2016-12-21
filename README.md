@@ -12,7 +12,7 @@
 2. `backdoorModule`: `meteor add xolvio:backdoor`
 3. `SimpleSchema`: `meteor add aldeed:collection2`
 4. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
-5. client `timeModule`: `meteor add mizzao:timesync`
+5. client `timeModule`: `meteor add mizzao:timesync` (optional, will default to local machine time otherwise)
 6. `hasRole`: `meteor add alanning:roles`
 7. `offlineModule`: `meteor add ground:db@2.0.0-rc.7`
 8. `appStoreDomain`: `meteor add cordova:cordova-plugin-device`,  

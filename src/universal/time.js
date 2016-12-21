@@ -8,6 +8,7 @@ export const extendClock = (clock) => {
         app().Meteor.setTimeout(resolve, milliseconds)
       )
   }
+  return clock
 }
 
 export class ProgressiveBackoff {

@@ -1,12 +1,9 @@
 import { extendClock, ProgressiveBackoff } from '../universal/time'
 
 
-const clock = () =>
-  new Date()
-
-extendClock(clock)
+const clock = () => new Date()
 
 export default () => ({
-  clock,
+  clock: extendClock(clock),
   ProgressiveBackoff,
 })

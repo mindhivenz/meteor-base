@@ -1,28 +1,20 @@
-import { TimeSync } from 'meteor/mizzao:timesync'
-
 import { extendClock, ProgressiveBackoff } from '../universal/time'
 
-/* eslint-disable no-console */
 
-let warnedOfEarlyCall = false
+const TimeSync = global.TimeSync
 
-const clock = () => {
-  const serverTime = TimeSync.serverTime()
+const localClock = () => new Date()
+
+const serverSyncClock = () => {
+  const serverTime = global.Tracker.nonreactive(() => TimeSync.serverTime())
   if (! serverTime) {
-    if (! warnedOfEarlyCall) {
-      (console.trace || console.warn)(
-        'clock() called before time synced with server, defaulting to browser/client time'
-      )
-      warnedOfEarlyCall = true
-    }
-    return new Date()
+    console.warn('clock() called before time synced with server, defaulting to browser/client time')  // eslint-disable-line no-console
+    return localClock()
   }
   return new Date(serverTime)
 }
 
-extendClock(clock)
-
 export default () => ({
-  clock,
+  clock: extendClock(TimeSync ? serverSyncClock : localClock),
   ProgressiveBackoff,
 })
