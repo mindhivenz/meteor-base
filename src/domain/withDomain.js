@@ -13,6 +13,7 @@ export const withDomain = ({
   Component =>
     class DomainProvider extends React.Component {
 
+      static displayName = domainClass.name
       domain
 
       componentWillMount() {
