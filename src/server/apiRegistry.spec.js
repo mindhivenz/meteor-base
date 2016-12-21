@@ -23,8 +23,8 @@ describe('ApiRegistry', () => {
 
   describe('method', () => {
 
-    const callWrappedSomeMethod = (...args) =>
-      Meteor.methods.getCall(0).args[0].someMethod.call(thisInCall, ...args)
+    const callWrappedSomeMethod = args =>
+      Meteor.methods.getCall(0).args[0].someMethod.call(thisInCall, args)
 
     beforeEach(() => {
       Meteor.methods = sinon.spy()
@@ -70,9 +70,9 @@ describe('ApiRegistry', () => {
       Meteor.isServer = some.bool()
       const someMethodFunc = sinon.spy()
       apiRegistry.method('someMethod', someMethodFunc)
-      const args = some.array()
-      callWrappedSomeMethod(...args)
-      someMethodFunc.should.have.been.calledWith(app(), thisInCall, ...args)
+      const args = some.object()
+      callWrappedSomeMethod(args)
+      someMethodFunc.should.have.been.calledWith(app(), thisInCall, args)
     })
 
     it('should bubble error out to Meteor', () => {
@@ -127,14 +127,16 @@ describe('ApiRegistry', () => {
         thisInCall.someEnhancement.should.equal(someFunc)
       })
 
-      it('should add the apiName', () => {
+      it('should add the apiName and callArgs', () => {
         Meteor.isServer = some.bool()
+        const expectedArgs = some.object()
         apiRegistry.method(
           'someMethod',
           sinon.spy(),
         )
-        callWrappedSomeMethod()
+        callWrappedSomeMethod(expectedArgs)
         thisInCall.apiName.should.equal('call:someMethod')
+        thisInCall.callArgs.should.equal(expectedArgs)
       })
 
     })
@@ -167,8 +169,8 @@ describe('ApiRegistry', () => {
       thisInCall.unblock = sinon.spy()
     })
 
-    const callWrappedSomePub = (...args) =>
-      Meteor.publish.getCall(0).args[1].call(thisInCall, ...args)
+    const callWrappedSomePub = args =>
+      Meteor.publish.getCall(0).args[1].call(thisInCall, args)
 
     it('should call Meteor.publish with publication name', () => {
       apiRegistry.publication('somePub', sinon.spy())
@@ -189,8 +191,8 @@ describe('ApiRegistry', () => {
       const args = some.array()
       const publicationFunc = sinon.spy()
       apiRegistry.publication('somePub', publicationFunc)
-      callWrappedSomePub(...args)
-      publicationFunc.should.have.been.calledWith(app(), thisInCall, ...args)
+      callWrappedSomePub(args)
+      publicationFunc.should.have.been.calledWith(app(), thisInCall, args)
     })
 
     describe('call context', () => {
@@ -213,10 +215,12 @@ describe('ApiRegistry', () => {
         someFunc.should.have.been.called
       })
 
-      it('should add the apiName', () => {
+      it('should add the apiName and callArgs', () => {
         apiRegistry.publication('somePub', sinon.spy())
-        callWrappedSomePub()
+        const expectedArgs = some.object()
+        callWrappedSomePub(expectedArgs)
         thisInCall.apiName.should.equal('pub:somePub')
+        thisInCall.callArgs.should.equal(expectedArgs)
       })
 
     })
@@ -249,8 +253,8 @@ describe('ApiRegistry', () => {
       thisInCall.unblock = sinon.spy()
     })
 
-    const callWrappedCompositeSomePub = (...args) =>
-      Meteor.publishComposite.getCall(0).args[1].call(thisInCall, ...args)
+    const callWrappedCompositeSomePub = args =>
+      Meteor.publishComposite.getCall(0).args[1].call(thisInCall, args)
 
     it('should pass publicationName and pass the app, and args to function', () => {
       thisInCall.unblock = sinon.spy()
@@ -259,8 +263,8 @@ describe('ApiRegistry', () => {
       const publicationName = some.unique.string()
       apiRegistry.publicationComposite(publicationName, publicationFunc)
       Meteor.publishComposite.should.have.been.calledWith(publicationName)
-      callWrappedCompositeSomePub(...args)
-      publicationFunc.should.have.been.calledWith(app(), thisInCall, ...args)
+      callWrappedCompositeSomePub(args)
+      publicationFunc.should.have.been.calledWith(app(), thisInCall, args)
       thisInCall.unblock.should.have.been.calledOnce
     })
 
@@ -286,11 +290,13 @@ describe('ApiRegistry', () => {
         someFunc.should.have.been.called
       })
 
-      it('should add the apiName', () => {
+      it('should add the apiName and callArgs', () => {
         Meteor.isServer = true
         apiRegistry.publicationComposite('somePub', sinon.spy())
-        callWrappedCompositeSomePub()
+        const expectedArgs = some.object()
+        callWrappedCompositeSomePub(expectedArgs)
         thisInCall.apiName.should.equal('pub:somePub')
+        thisInCall.callArgs.should.equal(expectedArgs)
       })
 
     })

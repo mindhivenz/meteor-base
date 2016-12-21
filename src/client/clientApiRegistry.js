@@ -33,14 +33,14 @@ export class ClientApiRegistry {
     const func = self.Meteor.isServer ? server : clientSimulation
 
     if (func) {
-      const wrapper = function wrapper(...args) {
+      const wrapper = function wrapper(args) {
         const methodInvocation = this
-        self.enhanceApiContext(methodInvocation, `call:${methodName}`)
+        self.enhanceApiContext(methodInvocation, `call:${methodName}`, args)
         if (self.Meteor.isServer && runInParallel) {
           methodInvocation.unblock()
         }
         try {
-          return func(app(), methodInvocation, ...args)
+          return func(app(), methodInvocation, args)
         } catch (e) {
           self._errorEvent(methodInvocation, e)
           throw e
@@ -69,8 +69,9 @@ export class ClientApiRegistry {
     this.enhancer.registerEnhancement(objOrFunc)
   }
 
-  enhanceApiContext(instance, apiName) {
-    instance.apiName = apiName
-    this.enhancer.enhance(instance)
+  enhanceApiContext(apiContext, apiName, callArgs) {
+    apiContext.apiName = apiName
+    apiContext.callArgs = callArgs
+    this.enhancer.enhance(apiContext)
   }
 }

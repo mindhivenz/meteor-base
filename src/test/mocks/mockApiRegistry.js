@@ -76,39 +76,40 @@ export class MockApiRegistry extends ApiRegistry {
     this.httpFuncs.push({ path, func })
   }
 
-  enhanceApiContext(apiContext, includeInApiName = '') {
-    this.enhancer.enhance(apiContext, { enhancePrototypes: false })
+  enhanceApiContext(apiContext, includeInApiName = '', callArgs) {
     apiContext.apiName = some.unique.string('apiName') + includeInApiName
+    apiContext.callArgs = callArgs
+    this.enhancer.enhance(apiContext, { enhancePrototypes: false })
   }
 
-  call(methodName, methodInvocation = new MockMethodInvocation(), ...args) {
+  call(methodName, methodInvocation = new MockMethodInvocation(), args) {
     const func = this.methodFuncs.get(methodName)
     if (! func) {
       throw new Error(`Unknown method name "${methodName}"`)
     }
-    this.enhanceApiContext(methodInvocation, methodName)
-    return func(app(), methodInvocation, ...args)
+    this.enhanceApiContext(methodInvocation, methodName, args)
+    return func(app(), methodInvocation, args)
   }
 
-  _subscribeCursor(publicationName, subscription, ...args) {
+  _subscribeCursor(publicationName, subscription, args) {
     const func = this.publicationFuncs.get(publicationName)
     if (! func) {
       throw new Error(`Unknown publication "${publicationName}"`)
     }
-    this.enhanceApiContext(subscription, publicationName)
-    return func(app(), subscription, ...args)
+    this.enhanceApiContext(subscription, publicationName, args)
+    return func(app(), subscription, args)
   }
 
-  subscribe(publicationName, subscription = new MockSubscription(), ...args) {
-    const cursor = this._subscribeCursor(publicationName, subscription, ...args)
+  subscribe(publicationName, subscription = new MockSubscription(), args) {
+    const cursor = this._subscribeCursor(publicationName, subscription, args)
     if (typeof cursor.fetch !== 'function') {
       throw new TypeError('Have you called subscribe when you meant subscribeComposite?')
     }
     return cursor.fetch()
   }
 
-  subscribeComposite(publicationName, subscription = new MockSubscription(), ...args) {
-    const tree = this._subscribeCursor(publicationName, subscription, ...args)
+  subscribeComposite(publicationName, subscription = new MockSubscription(), args) {
+    const tree = this._subscribeCursor(publicationName, subscription, args)
     if (typeof tree.fetch === 'function') {
       throw new TypeError('Have you called subscribeComposite when you meant subscribe?')
     }

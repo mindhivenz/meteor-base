@@ -20,12 +20,12 @@ export class ApiRegistry extends ClientApiRegistry {
       autoPublish = false,
     } = options
     const self = this
-    const wrapper = function wrapper(...args) {
+    const wrapper = function wrapper(args) {
       const subscription = this
-      self.enhanceApiContext(subscription, `pub:${publicationName}`)
+      self.enhanceApiContext(subscription, `pub:${publicationName}`, args)
       subscription.unblock()  // meteorhacks:unblock, see https://github.com/meteor/meteor/issues/853
       try {
-        return server(app(), subscription, ...args)
+        return server(app(), subscription, args)
       } catch (e) {
         self._errorEvent(subscription, e)
         throw e

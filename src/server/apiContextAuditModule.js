@@ -11,17 +11,19 @@ export class UnhandledExceptionReporter {
     const { Meteor } = app()
     const errorHandled = this.handledFilters.some(f => f(e))
     if (Meteor.isDevelopment) {
-      console.warn(errorHandled ? 'Handled:' : 'UNHANDLED:', e)  // eslint-disable-line no-console
+      if (errorHandled) {
+        console.log('Handled:', e)  // eslint-disable-line no-console
+      } else {
+        console.error('UNHANDLED:', e)  // eslint-disable-line no-console
+      }
     }
     if (! errorHandled) {
       const entry = {
         action: 'Unhandled exception',
         data: {
-          exception: String(e),
+          callArgs: apiContext.callArgs,
+          exception: e.stack || String(e),
         },
-      }
-      if (e.stack) {
-        entry.data.stack = e.stack
       }
       apiContext.auditLog(entry)
     }

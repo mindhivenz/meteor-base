@@ -28,6 +28,7 @@ describe('UnhandledExceptionReporter', () => {
 
   beforeEach(() => {
     apiContext = {
+      callArgs: some.object(),
       auditLog: sinon.spy(),
     }
     error = new Error(some.string())
@@ -40,10 +41,18 @@ describe('UnhandledExceptionReporter', () => {
       apiContext.auditLog.should.have.been.calledWith({
         action: 'Unhandled exception',
         data: {
-          exception: String(error),
-          stack: error.stack,
+          exception: error.stack,
+          callArgs: apiContext.callArgs,
         },
       })
+    })
+  )
+
+  it('should use string form of error if not stack trace',
+    mockAppContext(modules, () => {
+      error = some.string()
+      unhandledExceptionReporter.onError(apiContext, error)
+      apiContext.auditLog.firstCall.args[0].data.exception.should.equal(error)
     })
   )
 
@@ -69,7 +78,7 @@ describe('apiContextAuditModule', () => {
       viewer: () => viewer,
       connection: some.object(),
     }
-    app().apiRegistry.enhanceApiContext(result)
+    app().apiRegistry.enhanceApiContext(result, some.string(), some.object())
     return result
   }
 
@@ -89,8 +98,8 @@ describe('apiContextAuditModule', () => {
         {
           action: 'Unhandled exception',
           data: {
-            exception: String(error),
-            stack: error.stack,
+            exception: error.stack,
+            callArgs: apiContext.callArgs,
           },
         }
       )
