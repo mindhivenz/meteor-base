@@ -1,5 +1,6 @@
 import React from 'react'
 import shallowEqual from 'shallowequal'
+import { autorun } from 'mobx'
 
 
 export const withDomain = ({
@@ -14,18 +15,17 @@ export const withDomain = ({
     class DomainProvider extends React.Component {
 
       static displayName = domainClass.name
-      domain
 
       componentWillMount() {
-        this.domain = createDomain(this.props)
+        this._createDomain(this.props)
       }
 
-      componentWillUpdate(nextProps) {
+      componentWillReceiveProps(nextProps) {
         if (shouldRecreateDomain(this.props, nextProps)) {
           this.stop()
-          this.domain = createDomain(nextProps)
-        } else if (this.domain && typeof this.domain.update === 'function') {
-          this.domain.update(nextProps)
+          this._createDomain(nextProps)
+        } else if (this.state.domain && typeof this.state.domain.update === 'function') {
+          this.state.domain.update(nextProps)
         }
       }
 
@@ -33,14 +33,29 @@ export const withDomain = ({
         this.stop()
       }
 
-      stop() {
-        if (this.domain && typeof this.domain.stop === 'function') {
-          this.domain.stop()
+      _createDomain(props) {
+        if (this.state && this.state.domain != null) {
+          throw new Error('Expect domain to be uninitialized here')
         }
-        this.domain = null
+        if (this.autorunDisposer != null) {
+          throw new Error('Expect no existing autorun here')
+        }
+        this.autorunDisposer = autorun(`DomainProvider creating ${domainClass.name}`, () => {
+          this.setState({ domain: createDomain(props) })
+        })
+      }
+
+      stop() {
+        if (this.autorunDisposer) {
+          this.autorunDisposer()
+        }
+        if (this.state.domain && typeof this.state.domain.stop === 'function') {
+          this.state.domain.stop()
+        }
+        this.setState({ domain: null })
       }
 
       render() {
-        return React.createElement(Component, { ...this.props, [propName]: this.domain })
+        return React.createElement(Component, { ...this.props, [propName]: this.state.domain })
       }
     }
