@@ -4,12 +4,11 @@ import shallowEqual from 'shallowequal'
 
 export const withDomain = ({
   domainClass,
-  mapPropsToArg,
-  mapPropsToArgsArray = props => mapPropsToArg ? [mapPropsToArg(props)] : [],
-  createDomain = props => new domainClass(...mapPropsToArgsArray(props)),  // eslint-disable-line new-cap
+  mapPropsToArgs = props => ({}),                                  // eslint-disable-line no-unused-vars
+  createDomain = props => new domainClass(mapPropsToArgs(props)),  // eslint-disable-line new-cap
   propName = 'domain',
   shouldRecreateDomain = (currentProps, nextProps) =>
-    ! shallowEqual(mapPropsToArgsArray(currentProps), mapPropsToArgsArray(nextProps)),
+    ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)),
 }) =>
   Component =>
     class DomainProvider extends React.Component {
@@ -31,13 +30,13 @@ export const withDomain = ({
 
       componentWillUnmount() {
         this.stop()
-        this.domain = null
       }
 
       stop() {
         if (this.domain && typeof this.domain.stop === 'function') {
           this.domain.stop()
         }
+        this.domain = null
       }
 
       render() {

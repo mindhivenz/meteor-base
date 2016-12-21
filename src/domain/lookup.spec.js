@@ -11,14 +11,17 @@ describe('LookupDomain', () => {
   let mongoMirror
   let subscription
 
-  const modules = () => {
+  beforeEach(() => {
     subscription = {
-      loading: some.bool(),
+      loading: false,
       stop: sinon.spy(),
     }
     mongoMirror = {
       subscriptionToDomain: sinon.spy(() => subscription),
     }
+  })
+
+  const modules = () => {
     initModules([
       () => ({
         mongoMirror,
@@ -52,9 +55,11 @@ describe('LookupDomain', () => {
 
     it('should return same from subscription',
       mockAppContext(modules, async () => {
+        const expected = some.bool()
+        subscription.loading = expected
         const domain = givenLookupDomain()
 
-        domain.loading.should.equal(subscription.loading)
+        domain.loading.should.equal(expected)
       })
     )
 
@@ -70,7 +75,7 @@ describe('LookupDomain', () => {
         const actualLookup = domain.get(doc)
 
         actualLookup.should.have.properties({
-          id: doc._id,
+          _id: doc._id,
         })
         actualLookup.should.be.an.instanceof(SomeLookup)
       })
@@ -84,7 +89,7 @@ describe('LookupDomain', () => {
         const actualLookup = domain.get(doc._id)
 
         actualLookup.should.have.properties({
-          id: doc._id,
+          _id: doc._id,
         })
         actualLookup.should.be.an.instanceof(SomeLookup)
       })
@@ -98,7 +103,7 @@ describe('LookupDomain', () => {
         const actualLookup = domain.get(id)
 
         actualLookup.should.have.properties({
-          id,
+          _id: id,
         })
         actualLookup.should.be.an.instanceof(SomeLookup)
       })
@@ -111,7 +116,7 @@ describe('LookupDomain', () => {
         const actualLookup = domain.get(some.nullOrUndefined())
 
         actualLookup.should.have.properties({
-          id: null,
+          _id: null,
         })
         actualLookup.should.be.an.instanceof(SomeLookup)
       })
@@ -140,7 +145,7 @@ describe('LookupDomain', () => {
         const domain = new LookupDomain(SomeLookup, some.object())
         const docs = some.arrayOf(givenSubscriptionAdded)
 
-        domain.all.should.have.properties(docs.map(d => ({ id: d._id })))
+        domain.all.should.have.properties(docs.map(d => ({ _id: d._id })))
         domain.all.every(d => d.should.be.an.instanceOf(SomeLookup))
       })
     )
@@ -158,9 +163,9 @@ describe('LookupDomain', () => {
         domain.map(mapper)
 
         mapper.should.have.been.calledTwice
-        mapper.firstCall.args[0].id.should.equal(docs[0]._id)
+        mapper.firstCall.args[0]._id.should.equal(docs[0]._id)
         mapper.firstCall.args[0].should.be.an.instanceOf(SomeLookup)
-        mapper.secondCall.args[0].id.should.equal(docs[1]._id)
+        mapper.secondCall.args[0]._id.should.equal(docs[1]._id)
         mapper.secondCall.args[0].should.be.an.instanceOf(SomeLookup)
       })
     )
@@ -179,9 +184,9 @@ describe('LookupDomain', () => {
 
         actual.should.have.lengthOf(2)
         predicate.should.have.been.calledTwice
-        predicate.firstCall.args[0].id.should.equal(docs[0]._id)
+        predicate.firstCall.args[0]._id.should.equal(docs[0]._id)
         predicate.firstCall.args[0].should.be.an.instanceOf(SomeLookup)
-        predicate.secondCall.args[0].id.should.equal(docs[1]._id)
+        predicate.secondCall.args[0]._id.should.equal(docs[1]._id)
         predicate.secondCall.args[0].should.be.an.instanceOf(SomeLookup)
       })
     )
@@ -201,7 +206,7 @@ describe('LookupDomain', () => {
 
   })
 
-  describe('_fallbackValue', () => {
+  describe('substituteLabel', () => {
 
     it('should return last 5 chars of ID in brackets',
       mockAppContext(modules, async () => {
@@ -210,7 +215,7 @@ describe('LookupDomain', () => {
         const id = '1a2b3c4d'
         const actualLookup = domain.get(id)
 
-        actualLookup._fallbackValue.should.equal('[b3c4d]')
+        actualLookup.substituteLabel.should.equal('[b3c4d]')
       })
     )
 
@@ -220,13 +225,28 @@ describe('LookupDomain', () => {
         const domain = new LookupDomain(SomeLookup, some.object())
         const actualLookup = domain.get(some.nullOrUndefined())
 
-        actualLookup._fallbackValue.should.equal('[?]')
+        actualLookup.substituteLabel.should.equal('[?]')
+      })
+    )
+
+    it('should return ellipsis when domain loading',
+      mockAppContext(modules, async () => {
+        class SomeLookup extends LookupDoc {}
+        subscription.loading = true
+        const domain = new LookupDomain(SomeLookup, some.object())
+        const actualLookup = domain.get(some.string())
+
+        actualLookup.substituteLabel.should.equal('…')
       })
     )
 
   })
 
   describe('ensureContains', () => {
+
+    beforeEach(() => {
+      subscription.loading = some.bool()
+    })
 
     it('should duck-type LookupDomain with extra value when not in domain list',
       mockAppContext(modules, async () => {
@@ -237,14 +257,14 @@ describe('LookupDomain', () => {
         const actual = domain.ensureContains(expectedId)
 
         actual.loading.should.equal(subscription.loading)
-        actual.get(existingDoc).should.have.properties({ id: existingDoc._id })
+        actual.get(existingDoc).should.have.properties({ _id: existingDoc._id })
         actual.get(existingDoc).should.be.an.instanceOf(SomeLookup)
-        actual.get(expectedId).should.have.properties({ id: expectedId })
+        actual.get(expectedId).should.have.properties({ _id: expectedId })
         actual.get(expectedId).should.be.an.instanceOf(SomeLookup)
         actual.length.should.equal(2)
         actual.all.should.have.properties([
-          { id: existingDoc._id },
-          { id: expectedId },
+          { _id: existingDoc._id },
+          { _id: expectedId },
         ])
       })
     )
@@ -257,11 +277,11 @@ describe('LookupDomain', () => {
         const actual = domain.ensureContains(existingDoc._id)
 
         actual.loading.should.equal(subscription.loading)
-        actual.get(existingDoc).should.have.properties({ id: existingDoc._id })
+        actual.get(existingDoc).should.have.properties({ _id: existingDoc._id })
         actual.get(existingDoc).should.be.an.instanceOf(SomeLookup)
         actual.length.should.equal(1)
         actual.all.should.have.properties([
-          { id: existingDoc._id },
+          { _id: existingDoc._id },
         ])
       })
     )
@@ -275,11 +295,10 @@ describe('LookupDomain', () => {
         const expectedId2 = some.string()
         const actual = domain.ensureContains(expectedId1, expectedId2)
 
-        actual.loading.should.equal(subscription.loading)
         actual.all.should.have.properties([
-          { id: existingDoc._id },
-          { id: expectedId1 },
-          { id: expectedId2 },
+          { _id: existingDoc._id },
+          { _id: expectedId1 },
+          { _id: expectedId2 },
         ])
       })
     )
@@ -292,10 +311,9 @@ describe('LookupDomain', () => {
         const expectedId = some.string()
         const actual = domain.ensureContains(some.nullOrUndefined(), expectedId)
 
-        actual.loading.should.equal(subscription.loading)
         actual.all.should.have.properties([
-          { id: existingDoc._id },
-          { id: expectedId },
+          { _id: existingDoc._id },
+          { _id: expectedId },
         ])
       })
     )
@@ -313,7 +331,7 @@ describe('LookupDomain', () => {
 
           actual.should.have.lengthOf(2)
           predicate.should.have.been.calledOnce
-          predicate.firstCall.args[0].id.should.equal(existingDoc._id)
+          predicate.firstCall.args[0]._id.should.equal(existingDoc._id)
           predicate.firstCall.args[0].should.be.an.instanceOf(SomeLookup)
         })
       )

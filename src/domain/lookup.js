@@ -6,15 +6,15 @@ export class LookupDoc {
 
   constructor(domain, id) {
     this._domain = domain
-    this.id = id
+    this._id = id
   }
 
   @computed get _doc() {  // Dereference the observable as late as possible
-    return this.id && this._domain.idMap.get(this.id)
+    return this._id && this._domain.idMap.get(this._id)
   }
 
-  @computed get _fallbackValue() {
-    return `[${typeof this.id === 'string' ? this.id.substr(-5) : '?'}]`
+  @computed get substituteLabel() {
+    return this._domain.loading ? '…' : `[${typeof this._id === 'string' ? this._id.substr(-5) : '?'}]`
   }
 }
 
