@@ -12,9 +12,9 @@ export class UnhandledExceptionReporter {
     const errorHandled = this.handledFilters.some(f => f(e))
     if (Meteor.isDevelopment) {
       if (errorHandled) {
-        console.log('Handled:', e)  // eslint-disable-line no-console
+        console.log('handled:', apiContext.apiName, e)  // eslint-disable-line no-console
       } else {
-        console.error('UNHANDLED:', e)  // eslint-disable-line no-console
+        console.error('UNHANDLED:', apiContext.apiName, e)  // eslint-disable-line no-console
       }
     }
     if (! errorHandled) {
