@@ -4,7 +4,6 @@ import {
   runInAction,
   toJS,
 } from 'mobx'
-import { app } from '@mindhive/di'
 
 import { meteorTracker } from './tracker'
 import { LocalContext } from './localContext'
@@ -116,6 +115,35 @@ export class MongoMirror {
     }
   }
 
+  _subscriptionTo(
+    {
+      publicationName,
+      subscriptionArgs,
+      focusedView,
+      viewSelector = {},
+      context,
+    },
+    withCursor,
+  ) {
+    const result = observable({
+      loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready method
+    })
+    const autorunHandle = meteorTracker.autorun(() => {
+      const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
+      if (subscription.ready()) {
+        withCursor(
+          focusedView.find(new LocalContext(context), viewSelector),
+          subscription,
+        )
+        runInAction(`${context}: ready`, () => {
+          result.loading = false
+        })
+      }
+    })
+    result.stop = () => autorunHandle.stop()  // Intentionally after making it observable so it's not computed
+    return result
+  }
+
   // What it says on the can, returns handle with stop() (from autorun) and observable property loading
   subscriptionToDomain({
     publicationName,
@@ -126,12 +154,15 @@ export class MongoMirror {
     observableMap,
     context = `mirror:subscription:${publicationName}->domain`,
   }) {
-    const result = observable({
-      loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready method
-    })
-    const autorunHandle = app().Tracker.autorun(() => {
-      const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
-      if (subscription.ready()) {
+    return this._subscriptionTo(
+      {
+        publicationName,
+        subscriptionArgs,
+        focusedView,
+        viewSelector,
+        context,
+      },
+      (cursor, subscription) => {
         this.cursorToDomain({
           actionPrefix: context,
           observableArray,
@@ -139,13 +170,8 @@ export class MongoMirror {
           subscription,
           mongoCursor: focusedView.find(new LocalContext(context), viewSelector),
         })
-        runInAction(`${context}: ready`, () => {
-          result.loading = false
-        })
       }
-    })
-    result.stop = autorunHandle.stop  // Copy stop across, intentionally after making it observable so it's not computed
-    return result
+    )
   }
 
   subscriptionToOffline({
@@ -156,17 +182,19 @@ export class MongoMirror {
     groundCollection,
     context = `mirror:subscription:${publicationName}->offline:${groundCollectionName(groundCollection)}`,
   }) {
-    return app().Tracker.autorun(() => {
-      const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
-      if (subscription.ready()) {
-        const orgProfilesCursor = focusedView.find(
-          new LocalContext(context),
-          viewSelector,
-        )
-        groundCollection.keep(orgProfilesCursor)
-        groundCollection.observeSource(orgProfilesCursor)
+    return this._subscriptionTo(
+      {
+        publicationName,
+        subscriptionArgs,
+        focusedView,
+        viewSelector,
+        context,
+      },
+      (cursor) => {
+        groundCollection.keep(cursor)
+        groundCollection.observeSource(cursor)
       }
-    })
+    )
   }
 
   offlineToDomain({
