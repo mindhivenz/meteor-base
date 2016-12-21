@@ -3,11 +3,14 @@ import shallowEqual from 'shallowequal'
 import { autorun } from 'mobx'
 
 
+const classNameAsVarName = (className) =>
+  className && className.substr(0, 1).toLowerCase() + className.substr(1)
+
 export const withDomain = ({
   domainClass,
   mapPropsToArgs = props => ({}),                                  // eslint-disable-line no-unused-vars
   createDomain = props => new domainClass(mapPropsToArgs(props)),  // eslint-disable-line new-cap
-  propName = 'domain',
+  propName = classNameAsVarName(domainClass.name) || 'domain',
   shouldRecreateDomain = (currentProps, nextProps) =>
     ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)),
 }) =>
@@ -24,8 +27,6 @@ export const withDomain = ({
         if (shouldRecreateDomain(this.props, nextProps)) {
           this.stop()
           this._createDomain(nextProps)
-        } else if (this.state.domain && typeof this.state.domain.update === 'function') {
-          this.state.domain.update(nextProps)
         }
       }
 
@@ -40,7 +41,7 @@ export const withDomain = ({
         if (this.autorunDisposer != null) {
           throw new Error('Expect no existing autorun here')
         }
-        this.autorunDisposer = autorun(`DomainProvider creating ${domainClass.name}`, () => {
+        this.autorunDisposer = autorun(`withDomain creating ${domainClass.name}`, () => {
           this.setState({ domain: createDomain(props) })
         })
       }
