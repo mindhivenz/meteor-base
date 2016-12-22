@@ -49,11 +49,14 @@ export const withDomain = ({
       stop() {
         if (this.autorunDisposer) {
           this.autorunDisposer()
+          this.autorunDisposer = null
         }
-        if (this.state.domain && typeof this.state.domain.stop === 'function') {
-          this.state.domain.stop()
+        if (this.state.domain) {
+          if (typeof this.state.domain.stop === 'function') {
+            this.state.domain.stop()
+          }
+          this.setState({ domain: null })
         }
-        this.setState({ domain: null })
       }
 
       render() {
