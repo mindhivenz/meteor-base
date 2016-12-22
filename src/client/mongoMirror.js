@@ -220,6 +220,7 @@ export class MongoMirror {
     groundCollection,
     observable,
   }) {
+    // REVISIT: this will have 3 copies in memory (groundCollection._collection, focusedView.collection, observable)
     this.offlineToDomain({
       groundCollection,
       observable,
