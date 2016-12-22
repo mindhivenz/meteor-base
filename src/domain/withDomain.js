@@ -1,65 +1,55 @@
 import React from 'react'
-import shallowEqual from 'shallowequal'
 import { autorun } from 'mobx'
+import { observer } from 'mobx-react'
 
 
 const classNameAsVarName = (className) =>
   className && className.substr(0, 1).toLowerCase() + className.substr(1)
 
-export const withDomain = ({
+const withDomainOptions = ({
   domainClass,
-  mapPropsToArgs = props => ({}),                                  // eslint-disable-line no-unused-vars
+  mapPropsToArgs = props => props,                                 // eslint-disable-line no-unused-vars
   createDomain = props => new domainClass(mapPropsToArgs(props)),  // eslint-disable-line new-cap
   propName = classNameAsVarName(domainClass.name) || 'domain',
-  shouldRecreateDomain = (currentProps, nextProps) =>
-    ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)),
+  updateDomain = (domain, props) => { if (typeof domain.update === 'function') domain.update(props) },
+  stopDomain = (domain) => { if (typeof domain.stop === 'function') domain.stop() },
 }) =>
   Component =>
-    class DomainProvider extends React.Component {
+    observer(class extends React.Component {
 
       static displayName = domainClass.name
 
-      componentWillMount() {
-        this._createDomain(this.props)
-      }
-
-      componentWillReceiveProps(nextProps) {
-        if (shouldRecreateDomain(this.props, nextProps)) {
-          this.stop()
-          this._createDomain(nextProps)
-        }
+      constructor(props) {
+        super(props)
+        let inConstructor = true
+        this.autorunCreateDisposer = autorun(`withDomain creating ${domainClass.name}`, () => {
+          const newState = { domain: createDomain(this.props) }
+          if (inConstructor) {
+            this.state = newState
+          } else {
+            this.setState(newState)
+          }
+        })
+        inConstructor = false
       }
 
       componentWillUnmount() {
-        this.stop()
-      }
-
-      _createDomain(props) {
-        if (this.state && this.state.domain != null) {
-          throw new Error('Expect domain to be uninitialized here')
-        }
-        if (this.autorunDisposer != null) {
-          throw new Error('Expect no existing autorun here')
-        }
-        this.autorunDisposer = autorun(`withDomain creating ${domainClass.name}`, () => {
-          this.setState({ domain: createDomain(props) })
-        })
-      }
-
-      stop() {
-        if (this.autorunDisposer) {
-          this.autorunDisposer()
-          this.autorunDisposer = null
+        if (this.autorunCreateDisposer) {
+          this.autorunCreateDisposer()
+          this.autorunCreateDisposer = null
         }
         if (this.state.domain) {
-          if (typeof this.state.domain.stop === 'function') {
-            this.state.domain.stop()
-          }
-          this.setState({ domain: null })
+          stopDomain(this.state.domain)
         }
       }
 
       render() {
+        updateDomain(this.state.domain, this.props)  // REVISIT: Could get tricky and do this in it's own autorun like creation, but usually render() will match prop changes anyway
         return React.createElement(Component, { ...this.props, [propName]: this.state.domain })
       }
-    }
+    })
+
+export const withDomain = classOrOptions =>
+  typeof classOrOptions === 'function' ?
+    withDomainOptions({ domainClass: classOrOptions })
+    : withDomainOptions(classOrOptions)

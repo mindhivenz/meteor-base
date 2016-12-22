@@ -1,10 +1,13 @@
 import {
   action,
-  observable,
+  observable as mobxObservable,
+  isObservableArray,
+  isObservableMap,
   runInAction,
   toJS,
+  ValueMode,
 } from 'mobx'
-
+import { app } from '@mindhive/di'
 import { meteorTracker } from './tracker'
 import { LocalContext } from './localContext'
 
@@ -12,6 +15,15 @@ import { LocalContext } from './localContext'
 
 const readySubscription = {
   ready: () => true,
+}
+
+const observableName = (observable) => {
+  if (isObservableMap(observable)) {
+    return observable.name
+  } else if (isObservableArray(observable)) {
+    return observable.$mobx.atom.name
+  }
+  return 'observable'
 }
 
 const groundCollectionName = groundCollection =>
@@ -22,10 +34,9 @@ export class MongoMirror {
   // Automatically pump data from a Mongo cursor to a Mobx array or map
   // See subscriptionToDomain for something more high level
   cursorToDomain({
-    actionPrefix,
+    context = 'cursorToDomain',
     mongoCursor,
-    observableArray,  // Should be declared as: array = asFlat([])
-    observableMap,    // Should be declared as: map = asMap([], asReference)
+    observable,  // Should be declared as: array = asFlat([]), or map = asMap([], asReference)
     subscription = readySubscription,  // Pass subscription handle if from a subscription
     endless = false,
   }) {
@@ -42,60 +53,60 @@ export class MongoMirror {
           'If that is what you intended then specify endless.')
       }
     }
-    if (observableArray) {
-      if (subscription.ready()) {
+    if (subscription.ready()) {
+      if (isObservableArray(observable)) {
+        if (app().Meteor.isDevelopment && observable.$mobx.mode !== ValueMode.Reference) {
+          console.warn('observable array does not appear to be using asFlat')  // eslint-disable-line no-console
+        }
         meteorTracker.nonreactive(() => {
-          runInAction(`${actionPrefix}: initial fetch`, () => {
-            observableArray.replace(mongoCursor.fetch())
+          runInAction(`${context}: initial fetch`, () => {
+            observable.replace(mongoCursor.fetch())
           })
         })
         mongoCursor.observe({
           _suppress_initial: true,  // suppresses addedAt callback for documents initially fetched
-          addedAt: action(`${actionPrefix}: document added`, (doc, index) => {
-            observableArray.splice(index, 0, doc)
+          addedAt: action(`${context}: document added`, (doc, index) => {
+            observable.splice(index, 0, doc)
           }),
-          removedAt: action(`${actionPrefix}: document removed`, (doc, index) => {
-            observableArray.splice(index, 1)
+          removedAt: action(`${context}: document removed`, (doc, index) => {
+            observable.splice(index, 1)
           }),
-          changedAt: action(`${actionPrefix}: document changed`, (doc, oldDoc, index) => {
+          changedAt: action(`${context}: document changed`, (doc, oldDoc, index) => {
             // REVISIT: if existing value isObservable we could be more efficient here and just assign top level fields
             // Probably using extendObservable but also handling fields disappearing
             // Or use observeChanges instead so we just get fields
-            observableArray[index] = doc
+            observable[index] = doc
           }),
-          movedTo: action(`${actionPrefix}: document moved`, (doc, fromIndex, toIndex) => {
-            observableArray.splice(fromIndex, 1)
-            observableArray.splice(toIndex, 0, doc)
+          movedTo: action(`${context}: document moved`, (doc, fromIndex, toIndex) => {
+            observable.splice(fromIndex, 1)
+            observable.splice(toIndex, 0, doc)
           }),
         })
-      } else {
-        runInAction(`${actionPrefix}: initialized`, () => {
-          observableArray.clear()
-        })
-      }
-    }
-    if (observableMap) {
-      if (subscription.ready()) {
+      } else if (isObservableMap(observable)) {
+        if (app().Meteor.isDevelopment && observable._valueMode !== ValueMode.Reference) {
+          console.warn('observable map does not appear to be using asReference')  // eslint-disable-line no-console
+        }
         meteorTracker.nonreactive(() => {
-          runInAction(`${actionPrefix}: initial fetch`, () => {
-            observableMap.clear()
+          runInAction(`${context}: initial fetch`, () => {
+            observable.clear()
             mongoCursor.fetch().forEach((doc) => {
-              observableMap.set(doc._id, doc)
+              observable.set(doc._id, doc)
             })
           })
         })
         mongoCursor.observeChanges({  // More efficient than observe()
           _suppress_initial: true,  // suppresses addedAt callback for documents initially fetched
-          added: action(`${actionPrefix}: document added`, (id, doc) => {
-            observableMap.set(id, doc)
+          added: action(`${context}: document added`, (id, doc) => {
+            const completeDoc = doc._id ? doc : { _id: id, ...doc }
+            observable.set(id, completeDoc)
           }),
-          removed: action(`${actionPrefix}: document removed`, (id) => {
-            observableMap.delete(id)
+          removed: action(`${context}: document removed`, (id) => {
+            observable.delete(id)
           }),
-          changed: action(`${actionPrefix}: document changed`, (id, fields) => {
+          changed: action(`${context}: document changed`, (id, fields) => {
             // REVISIT: if existing value isObservable we could be more efficient here and just assign new fields
             // Probably using extendObservable but also handling fields disappearing (undefined in fields)
-            const doc = toJS(observableMap.get(id) || {}, false)  // If was observable, toJS clones
+            const doc = toJS(observable.get(id) || {}, false)  // If was observable, toJS clones
             // Doesn't matter we may be overwriting existing object here as toJS detached it from Mobx
             Object.entries(fields).forEach(([k, v]) => {
               if (v === undefined) {
@@ -104,43 +115,42 @@ export class MongoMirror {
                 doc[k] = v
               }
             })
-            observableMap.set(id, doc)
+            observable.set(id, doc)
           }),
         })
       } else {
-        runInAction(`${actionPrefix}: initialized`, () => {
-          observableMap.clear()
-        })
+        throw new Error('observable appears to be neither observable array or map')
       }
+    } else {
+      runInAction(`${context}: initialized`, () => {
+        observable.clear()
+      })
     }
   }
 
-  _subscriptionTo(
-    {
-      publicationName,
-      subscriptionArgs,
-      focusedView,
-      viewSelector = {},
-      context,
-    },
-    withCursor,
-  ) {
-    const result = observable({
-      loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready method
+  subscribe({
+    publicationName,
+    subscriptionArgs,
+    context = `subscription:${publicationName}`,
+    onReady,
+  }) {
+    const result = mobxObservable({
+      loading: true,  // Don't call it ready to avoid confusion with Meteor subscription ready which is a method
     })
     const autorunHandle = meteorTracker.autorun(() => {
       const subscription = Meteor.subscribe(publicationName, subscriptionArgs)
       if (subscription.ready()) {
-        withCursor(
-          focusedView.find(new LocalContext(context), viewSelector),
-          subscription,
-        )
+        if (onReady) {
+          onReady(subscription)
+        }
         runInAction(`${context}: ready`, () => {
           result.loading = false
         })
       }
     })
-    result.stop = () => autorunHandle.stop()  // Intentionally after making it observable so it's not computed
+    result.stop = () => {     // intentionally set after making result observable so that this is not computed
+      autorunHandle.stop()
+    }
     return result
   }
 
@@ -150,28 +160,22 @@ export class MongoMirror {
     subscriptionArgs,
     focusedView,
     viewSelector = {},
-    observableArray,
-    observableMap,
-    context = `mirror:subscription:${publicationName}->domain`,
+    observable,
+    context = `subscription:${publicationName}->${observableName(observable)}`,
   }) {
-    return this._subscriptionTo(
-      {
-        publicationName,
-        subscriptionArgs,
-        focusedView,
-        viewSelector,
-        context,
-      },
-      (cursor, subscription) => {
+    return this.subscribe({
+      publicationName,
+      subscriptionArgs,
+      context,
+      onReady: (subscription) => {
         this.cursorToDomain({
-          actionPrefix: context,
-          observableArray,
-          observableMap,
+          context,
+          observable,
           subscription,
           mongoCursor: focusedView.find(new LocalContext(context), viewSelector),
         })
-      }
-    )
+      },
+    })
   }
 
   subscriptionToOffline({
@@ -180,33 +184,29 @@ export class MongoMirror {
     focusedView,
     viewSelector = {},
     groundCollection,
-    context = `mirror:subscription:${publicationName}->offline:${groundCollectionName(groundCollection)}`,
+    context = `subscription:${publicationName}->offline:${groundCollectionName(groundCollection)}`,
   }) {
-    return this._subscriptionTo(
-      {
-        publicationName,
-        subscriptionArgs,
-        focusedView,
-        viewSelector,
-        context,
-      },
-      (cursor) => {
+    // REVISIT: this could be more efficient and not go through minimongo
+    return this.subscribe({
+      publicationName,
+      subscriptionArgs,
+      context,
+      onReady: () => {
+        const cursor = focusedView.find(new LocalContext(context), viewSelector)
         groundCollection.keep(cursor)
         groundCollection.observeSource(cursor)
-      }
-    )
+      },
+    })
   }
 
   offlineToDomain({
     groundCollection,
-    observableArray,
-    observableMap,
-    context = `mirror:offline:${groundCollectionName(groundCollection)}->domain`,
+    observable,
+    context = `offline:${groundCollectionName(groundCollection)}->${observableName(observable)}`,
   }) {
     this.cursorToDomain({
-      actionPrefix: context,
-      observableArray,
-      observableMap,
+      context,
+      observable,
       mongoCursor: groundCollection.find(),
       endless: true,
     })
@@ -218,15 +218,13 @@ export class MongoMirror {
     focusedView,
     viewSelector = {},
     groundCollection,
-    observableArray,
-    observableMap,
+    observable,
   }) {
     this.offlineToDomain({
       groundCollection,
-      observableArray,
-      observableMap,
+      observable,
     })
-    this.subscriptionToOffline({
+    return this.subscriptionToOffline({
       publicationName,
       subscriptionArgs,
       focusedView,

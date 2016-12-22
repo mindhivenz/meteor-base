@@ -30,7 +30,7 @@ describe('LookupDomain', () => {
   }
 
   const givenSubscriptionAdded = (doc = { _id: some.string() }) => {
-    mongoMirror.subscriptionToDomain.firstCall.args[0].observableMap.set(doc._id, doc)
+    mongoMirror.subscriptionToDomain.firstCall.args[0].observable.set(doc._id, doc)
     return doc
   }
 
