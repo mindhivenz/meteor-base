@@ -17,7 +17,7 @@ describe('LookupDomain', () => {
       stop: sinon.spy(),
     }
     mongoMirror = {
-      subscriptionToDomain: sinon.spy(() => subscription),
+      subscriptionToObservable: sinon.spy(() => subscription),
     }
   })
 
@@ -30,7 +30,7 @@ describe('LookupDomain', () => {
   }
 
   const givenSubscriptionAdded = (doc = { _id: some.string() }) => {
-    mongoMirror.subscriptionToDomain.firstCall.args[0].observable.set(doc._id, doc)
+    mongoMirror.subscriptionToObservable.firstCall.args[0].observableMap.set(doc._id, doc)
     return doc
   }
 
@@ -38,13 +38,13 @@ describe('LookupDomain', () => {
 
   describe('constructor', () => {
 
-    it('should call subscriptionToDomain correctly',
+    it('should call subscriptionToObservable correctly',
       mockAppContext(modules, async () => {
         const subscriptionOptions = some.object()
         const domain = new LookupDomain(LookupDoc, subscriptionOptions)
         const expectedDoc = givenSubscriptionAdded()
 
-        mongoMirror.subscriptionToDomain.firstCall.args[0].should.have.properties(subscriptionOptions)
+        mongoMirror.subscriptionToObservable.firstCall.args[0].should.have.properties(subscriptionOptions)
         domain.idMap.entries().should.deep.equal([[expectedDoc._id, expectedDoc]])
       })
     )

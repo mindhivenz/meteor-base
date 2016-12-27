@@ -1,12 +1,9 @@
 import {
-  toJS,
-  observable as mobxObservable,
-  isObservableArray,
-  isObservableMap,
+  observable,
   asReference,
-  ValueMode,
 } from 'mobx'
 import sinon from 'sinon'
+import { checkViewOptions, checkObservableModes } from '../../client/mongoMirror'
 
 
 const docId = (docOrId) =>
@@ -14,12 +11,12 @@ const docId = (docOrId) =>
 
 class AwaitDocs {
 
-  processedIds = []
+  processedIds = new Set()
   awaits = []
 
   process(docOrId) {
     const id = docId(docOrId)
-    this.processedIds.push(id)
+    this.processedIds.add(id)
     this.awaits.forEach(a => {
       if (a.id === id) {
         a.resolve()
@@ -30,7 +27,7 @@ class AwaitDocs {
   awaitAll(docsOrIds) {
     return Promise.all(docsOrIds
       .map(docId)
-      .filter(id => ! this.processedIds.includes(id))
+      .filter(id => ! this.processedIds.has(id))
       .map(id =>
         new Promise((resolve) => {
           this.awaits.push({
@@ -43,7 +40,7 @@ class AwaitDocs {
   }
 
   reset() {
-    this.processedIds = []
+    this.processedIds.clear()
   }
 }
 
@@ -53,102 +50,112 @@ export class MockMongoMirror {
   awaitUpdated = new AwaitDocs()
   awaitRemoved = new AwaitDocs()
 
-  cursorToDomain({
-    observable,
+  cursorToObservable({
+    observableArray,
+    observableMap,
     mongoCursor,
   }) {
-    if (isObservableArray(observable)) {
-      if (observable.$mobx.mode !== ValueMode.Reference) {
-        console.warn('observable array does not appear to be using asFlat')  // eslint-disable-line no-console
-      }
-      observable.replace(mongoCursor.fetch())
+    checkObservableModes({ observableArray, observableMap })
+    const initialFetch = mongoCursor.fetch()
+    if (observableArray) {
+      observableArray.replace(initialFetch)
+    }
+    if (observableMap) {
+      observableMap.clear()
+      initialFetch.forEach((doc) => {
+        observableMap.set(doc._id, doc)
+      })
+    }
+    if (observableArray) {
       mongoCursor.observe({
-        _suppress_initial: true,  // _suppress_initial suppresses addedAt callback for docs initially fetched
+        _suppress_initial: true,  // suppresses added(At) for documents initially fetched above
         addedAt: (doc, index) => {
-          observable.splice(index, 0, doc)
+          observableArray.splice(index, 0, doc)
+          if (observableMap) {
+            observableMap.set(doc._id, doc)
+          }
           this.awaitAdded.process(doc)
         },
         changedAt: (newDoc, oldDoc, index) => {
-          observable[index] = newDoc
+          observableArray[index] = newDoc
+          if (observableMap) {
+            observableMap.set(newDoc._id, newDoc)
+          }
           this.awaitUpdated.process(newDoc)
         },
         removedAt: (oldDoc, index) => {
-          observable.splice(index, 1)
+          observableArray.splice(index, 1)
+          if (observableMap) {
+            observableMap.delete(oldDoc._id)
+          }
           this.awaitRemoved.process(oldDoc)
         },
         movedTo: (doc, fromIndex, toIndex) => {
-          observable.splice(fromIndex, 1)
-          observable.splice(toIndex, 0, doc)
+          observableArray.splice(fromIndex, 1)
+          observableArray.splice(toIndex, 0, doc)
         },
       })
-    } else if (isObservableMap(observable)) {
-      if (observable._valueMode !== ValueMode.Reference) {
-        console.warn('observable map does not appear to be using asReference')  // eslint-disable-line no-console
-      }
-      observable.clear()
-      mongoCursor.fetch().forEach((doc) => {
-        observable.set(doc._id, doc)
-      })
-      mongoCursor.observeChanges({  // More efficient than observe()
-        _suppress_initial: true,  // suppresses addedAt callback for documents initially fetched
-        added: (id, doc) => {
-          observable.set(id, { _id: id, ...doc })
-          this.awaitAdded.process(id)
+    } else if (observableMap) {
+      mongoCursor.observe({
+        _suppress_initial: true,  // suppresses added(At) for documents initially fetched above
+        added: (doc) => {
+          observableMap.set(doc._id, doc)
+          this.awaitAdded.process(doc._id)
         },
-        removed: (id) => {
-          observable.delete(id)
-          this.awaitRemoved.process(id)
+        changed: (doc) => {
+          observableMap.set(doc._id, doc)
+          this.awaitUpdated.process(doc._id)
         },
-        changed: (id, fields) => {
-          const doc = toJS(observable.get(id) || {}, false)  // If was observable, toJS clones
-          // Doesn't matter we may be overwriting existing object here, as we know it's not observable
-          Object.entries(fields).forEach(([k, v]) => {
-            if (v === undefined) {
-              delete doc[k]
-            } else {
-              doc[k] = v
-            }
-          })
-          observable.set(id, doc)
-          this.awaitUpdated.process(id)
+        removed: (oldDoc) => {
+          observableMap.delete(oldDoc._id)
+          this.awaitRemoved.process(oldDoc._id)
         },
       })
-    } else {
-      throw new Error('observable appears to be neither observable array or map')
     }
   }
 
   subscribe() {
-    return mobxObservable({
+    return observable({
       loading: true,
       stop: asReference(sinon.spy()),
     })
   }
 
-  subscriptionToDomain = this.subscribe
+  subscriptionToObservable(options) {
+    checkViewOptions(options)
+    this.subscribe()
+  }
 
-  subscriptionToOffline = this.subscribe
+  subscriptionToOffline() {
+    this.subscribe()
+  }
 
-  offlineToDomain({
+  offlineToObservable({
     groundCollection,
-    observable,
+    observableArray,
+    observableMap,
     context = 'context',
   }) {
-    this.cursorToDomain({
+    this.cursorToObservable({
       context,
-      observable,
+      observableArray,
+      observableMap,
       mongoCursor: groundCollection.find(),
       endless: true,
     })
   }
 
-  subscriptionToDomainCachedOffline({
+  subscriptionToObservableCachedOffline({
     groundCollection,
-    observable,
+    viewOptions,
+    observableArray,
+    observableMap,
   }) {
-    this.offlineToDomain({
+    checkViewOptions({ viewOptions, observableArray })
+    this.offlineToObservable({
       groundCollection,
-      observable,
+      observableArray,
+      observableMap,
     })
   }
 

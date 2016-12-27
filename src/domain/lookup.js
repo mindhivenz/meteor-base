@@ -64,9 +64,9 @@ export class LookupDomain {
 
   constructor(LookupClass, mirrorSubscriptionOptions) {
     this.LookupClass = LookupClass
-    this.subscription = app().mongoMirror.subscriptionToDomain({
+    this.subscription = app().mongoMirror.subscriptionToObservable({
       ...mirrorSubscriptionOptions,
-      observable: this.idMap,
+      observableMap: this.idMap,
     })
   }
 
