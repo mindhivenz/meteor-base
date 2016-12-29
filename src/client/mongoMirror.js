@@ -153,7 +153,7 @@ export class MongoMirror {
     }
   }
 
-  subscribe({
+  subscriptionToLocal({
     publicationName,
     subscriptionArgs,
     context = `subscription:${publicationName}`,
@@ -191,7 +191,7 @@ export class MongoMirror {
     context = `subscription:${publicationName}->${observableName({ observableArray, observableMap })}`,
   }) {
     checkViewOptions({ viewOptions, observableArray })
-    return this.subscribe({
+    return this.subscriptionToLocal({
       publicationName,
       subscriptionArgs,
       context,
@@ -217,7 +217,7 @@ export class MongoMirror {
     context = `subscription:${publicationName}->offline:${groundCollectionName(groundCollection)}`,
   }) {
     // REVISIT: this could be more efficient and not go through minimongo
-    return this.subscribe({
+    return this.subscriptionToLocal({
       publicationName,
       subscriptionArgs,
       context,
