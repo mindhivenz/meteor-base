@@ -46,14 +46,13 @@ export default (
       Accounts._onLogoutHook.callbacks = {}
       delete Accounts._onCreateUserHook
     }
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const result = {
       Meteor: {
         isClient,
         isServer,
         isCordova,
-        isDevelopment,
-        isProduction: ! isDevelopment,
+        isDevelopment: true,
+        isProduction: false,
         wrapAsync: Meteor.wrapAsync,
         defer: possiblyRunTimerFuncInFiber(setTimeout),
         startup: possiblyRunTimerFuncInFiber(setTimeout),
