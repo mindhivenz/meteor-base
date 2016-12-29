@@ -17,7 +17,7 @@ const viewerEnhancer = {
     return viewerDomain.user
   },
 
-  get isAuthenticated() {
+  @computed get isAuthenticated() {
     return app().viewerDomain.isAuthenticated
   },
 }
