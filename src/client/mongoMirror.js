@@ -54,12 +54,19 @@ export const checkObservableModes = ({
   }
 }
 
+let uniqueNameCounter = 0
+
+const generateUniqueId = () => {
+  uniqueNameCounter += 1
+  return uniqueNameCounter
+}
+
 export class MongoMirror {
 
   // Automatically pump data from a Mongo cursor to a Mobx array or map
   // See subscriptionToObservable for something more high level
   cursorToObservable({
-    context = 'cursorToObservable',
+    context = `cursorToObservable@${generateUniqueId()}`,
     mongoCursor,
     observableArray,  // Should be declared as: @observable array = asFlat([])
     observableMap,  // Should be declared as: @observable map = asMap([], asReference)
