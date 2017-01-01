@@ -28,6 +28,7 @@ rules:
   - error
   - props: false
   no-trailing-spaces: off
+  no-lonely-if: off   # Allows us to be clearer at times
   class-methods-use-this: off
   import/named: error
   import/no-extraneous-dependencies: off
