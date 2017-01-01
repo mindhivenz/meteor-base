@@ -1,10 +1,16 @@
 import React from 'react'
 
 
-export const withDisplayName = (name, ContainerComponent, ChildComponent) => {
-  const childName = ChildComponent && (ChildComponent.displayName || ChildComponent.name)
-  ContainerComponent.displayName = childName ? `${name}(${childName})` : name
-  return ContainerComponent
+export const withDisplayName = (name, ContainerComponentOrCreator) => {
+  if (ContainerComponentOrCreator.constructor) {
+    ContainerComponentOrCreator.displayName = name
+    return ContainerComponentOrCreator
+  }
+  return (...args) => {
+    const ContainerComponent = ContainerComponentOrCreator(...args)
+    ContainerComponent.displayName = name
+    return ContainerComponent
+  }
 }
 
 export const loadingProps = () => ({
@@ -46,8 +52,7 @@ const withAsyncContainerComponentsContext = (Component) => {
 }
 
 export const errorContainer = (Component) =>
-  withDisplayName(
-    'errorContainer',
+  withDisplayName('errorContainer',
     withAsyncContainerComponentsContext(
       (
         { errors, ...props },
@@ -55,13 +60,11 @@ export const errorContainer = (Component) =>
       ) =>
         errors ? React.createElement(Error, { errors })
         : React.createElement(Component, props)
-    ),
-    Component,
+    )
   )
 
 export const asyncContainer = (Component) =>
-  withDisplayName(
-    'asyncContainer',
+  withDisplayName('asyncContainer',
     withAsyncContainerComponentsContext(
       (
         { errors, loading, ...props },
@@ -69,6 +72,5 @@ export const asyncContainer = (Component) =>
       ) =>
         errors ? React.createElement(Error, { errors })
         : (loading ? React.createElement(Loading) : React.createElement(Component, props))
-    ),
-    Component,
+    )
   )

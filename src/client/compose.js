@@ -27,11 +27,13 @@ const composeFunc = (asyncFunc) =>
  Push that data through props to handle it nicely.
  */
 export const withAsync = (asyncFunc, shouldResubscribe) =>
-  compose(
-    composeFunc(asyncFunc),
-    null,
-    null,
-    { shouldResubscribe },
+  withDisplayName('withAsync',
+    compose(
+      composeFunc(asyncFunc),
+      null,
+      null,
+      { shouldResubscribe },
+    )
   )
 
 /*
@@ -40,11 +42,13 @@ export const withAsync = (asyncFunc, shouldResubscribe) =>
  This rerun is not blocked by shouldResubscribe.
  */
 export const withMeteorReactive = (asyncFunc, shouldResubscribe) =>
-  composeWithTracker(
-    composeFunc(asyncFunc),
-    null,
-    null,
-    { shouldResubscribe },
+  withDisplayName('withMeteorReactive',
+    composeWithTracker(
+      composeFunc(asyncFunc),
+      null,
+      null,
+      { shouldResubscribe },
+    )
   )
 
 export const withApiCallResult = ({
@@ -54,7 +58,7 @@ export const withApiCallResult = ({
   overrideCallProps = () => null,
   resultToProps = (result) => ({ [propName]: result }),
 }) =>
-  withDisplayName(`withApiCallResult(${methodName})`,
+  withDisplayName(`apiCall(${methodName})`,
     withAsync(
       async (appContext, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
