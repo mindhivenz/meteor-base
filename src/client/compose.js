@@ -5,22 +5,23 @@ import { app } from '@mindhive/di'
 import { withDisplayName, loadingProps, errorProps } from './containers'
 
 
-const PushPropsNotCalled = () => {
-  console.error("You didn't call pushProps")  // eslint-disable-line no-console
-}
-
 const composeFunc = (asyncFunc) =>
   (ownProps, onData) => {
-    const pushProps = (props = {}) =>
+    let pushPropsCalled = false
+    const pushProps = (props = {}) => {
+      pushPropsCalled = true
       onData(null, props)
+    }
     asyncFunc(app(), pushProps, ownProps)
+    if (! pushPropsCalled) {
+      pushProps()
+    }
   }
 
 /*
  asyncFunc: (app, pushProps, ownProps)
 
  Call pushProps with the props to push to the child component.
- You must call pushProps when asyncFunc is first called.
 
  Note: we don't use the loading and error component of react-komposer.
  Push that data through props to handle it nicely.
@@ -28,7 +29,7 @@ const composeFunc = (asyncFunc) =>
 export const withAsync = (asyncFunc, shouldResubscribe) =>
   compose(
     composeFunc(asyncFunc),
-    PushPropsNotCalled,
+    null,
     null,
     { shouldResubscribe },
   )
@@ -41,7 +42,7 @@ export const withAsync = (asyncFunc, shouldResubscribe) =>
 export const withMeteorReactive = (asyncFunc, shouldResubscribe) =>
   composeWithTracker(
     composeFunc(asyncFunc),
-    PushPropsNotCalled,
+    null,
     null,
     { shouldResubscribe },
   )
