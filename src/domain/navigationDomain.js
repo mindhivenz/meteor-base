@@ -43,42 +43,44 @@ class NavigationDomain {
     app().browserHistory.replace(this._pathnameOrLocationToBrowserLocation(pathnameOrLocation))
   }
 
-  _relativeToAbsolutePathname(relativePathname) {
-    let pathnameAddition = relativePathname
-    if (this.location.pathname.endsWith('/')) {
-      if (relativePathname.startsWith('/')) {
-        pathnameAddition = relativePathname.substring(1)
+  _joinPaths(path1, path2) {
+    let path2Addition = path2
+    if (path1.endsWith('/')) {
+      if (path2.startsWith('/')) {
+        path2Addition = path2.substring(1)
       }
     } else {
-      if (! relativePathname.startsWith('/')) {
-        pathnameAddition = `/${relativePathname}`
+      if (! path2.startsWith('/')) {
+        path2Addition = `/${path2}`
       }
     }
-    return this.location.pathname + pathnameAddition
+    return path1 + path2Addition
   }
 
-  pushDown(relativePathnameOrLocation) {
+  // If dirCount is >= 0 then the number of directories in the URL to keep
+  // If dirCount is < 0 then the number of directories to remove
+  // Prefer specific positive numbers to avoid issues with quick double actions performing using the wrong state
+  _keepDirs(dirCount) {
+    if (dirCount === 0) {
+      return '/'
+    }
+    return this.location.pathname.split('/').slice(0, dirCount > 0 ? dirCount + 1 : dirCount).join('/')
+  }
+
+  pushDown(dirsToKeep, relativePathnameOrLocation) {
     const { pathname: relativePathname, ...locationRest } =
       this._pathnameOrLocationToBrowserLocation(relativePathnameOrLocation)
-    this.push({ pathname: this._relativeToAbsolutePathname(relativePathname), ...locationRest })
+    this.push({
+      pathname: this._joinPaths(this._keepDirs(dirsToKeep), relativePathname),
+      ...locationRest,
+    })
   }
 
-  popUp(dirCount = 1) {
+  popUp(dirs = -1) {
     const { browserHistory } = app()
     if (this.atHistoryBeginning) {
-      let popCount = dirCount
-      let resultPathname = this.location.pathname
-      while (popCount > 0) {
-        const breakIndex = resultPathname.lastIndexOf('/')
-        if (resultPathname === '/' || breakIndex === -1) {
-          console.warn('pop dirCount too large, assuming root pathname')  // eslint-disable-line no-console
-          resultPathname = '/'
-          break
-        }
-        resultPathname = breakIndex === 0 ? '/' : resultPathname.substring(0, breakIndex)
-        popCount -= 1
-      }
-      browserHistory.replace(resultPathname)  // Don't use our replace as we don't want to set our state marker so we will know we're still at the beginning
+      // Don't use our replace as we don't want to set our state marker so we will know we're still at the beginning
+      browserHistory.replace(this._keepDirs(dirs))
     } else {
       browserHistory.goBack()
     }
