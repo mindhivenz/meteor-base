@@ -5,10 +5,15 @@ const TimeSync = global.TimeSync
 
 const localClock = () => new Date()
 
+let reportedCalledBeforeTimeSynced = false
+
 const serverSyncClock = () => {
   const serverTime = global.Tracker.nonreactive(() => TimeSync.serverTime())
   if (! serverTime) {
-    console.warn('clock() called before time synced with server, defaulting to browser/client time')  // eslint-disable-line no-console
+    if (! reportedCalledBeforeTimeSynced) {
+      console.log('clock() called before time synced with server, defaulting to browser/client time')  // eslint-disable-line no-console
+      reportedCalledBeforeTimeSynced = true
+    }
     return localClock()
   }
   return new Date(serverTime)
