@@ -2,6 +2,8 @@ import React from 'react'
 import shallowEqual from 'shallowequal'
 
 
+// REVISIT: should we be reactive to observable changes used in constructor?
+
 const classNameAsVarName = (className) =>
   className && className.substr(0, 1).toLowerCase() + className.substr(1)
 

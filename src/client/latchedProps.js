@@ -21,6 +21,7 @@ export const withLatchedProps = mapPropsToProps =>
           const applyState = {}
           const mappedProps = mapPropsToProps(props)
           Object.entries(mappedProps).forEach(([k, v]) => {
+            // So old state that was applied with a non-null value will be left intact
             if (v != null) {
               applyState[k] = v
             }
