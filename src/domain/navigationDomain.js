@@ -49,10 +49,8 @@ class NavigationDomain {
       if (path2.startsWith('/')) {
         path2Addition = path2.substring(1)
       }
-    } else {
-      if (! path2.startsWith('/')) {
-        path2Addition = `/${path2}`
-      }
+    } else if (! path2.startsWith('/')) {
+      path2Addition = `/${path2}`
     }
     return path1 + path2Addition
   }

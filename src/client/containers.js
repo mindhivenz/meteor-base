@@ -1,13 +1,13 @@
 import React from 'react'
 
 
-export const withDisplayName = (name, ContainerComponentOrCreator) => {
-  if (ContainerComponentOrCreator.constructor) {
-    ContainerComponentOrCreator.displayName = name
-    return ContainerComponentOrCreator
+export const withDisplayName = (name, containerComponentOrCreator) => {
+  if (containerComponentOrCreator.constructor) {
+    containerComponentOrCreator.displayName = name
+    return containerComponentOrCreator
   }
   return (...args) => {
-    const ContainerComponent = ContainerComponentOrCreator(...args)
+    const ContainerComponent = containerComponentOrCreator(...args)
     ContainerComponent.displayName = name
     return ContainerComponent
   }
@@ -51,7 +51,7 @@ const withAsyncContainerComponentsContext = (Component) => {
   return Component
 }
 
-export const errorContainer = (Component) =>
+export const errorContainer = Component =>
   withDisplayName('errorContainer',
     withAsyncContainerComponentsContext(
       (
@@ -63,7 +63,7 @@ export const errorContainer = (Component) =>
     )
   )
 
-export const asyncContainer = (Component) =>
+export const asyncContainer = Component =>
   withDisplayName('asyncContainer',
     withAsyncContainerComponentsContext(
       (

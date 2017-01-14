@@ -82,7 +82,7 @@ describe('apiContextAuditModule', () => {
     return result
   }
 
-  const whenError = (apiContext) =>
+  const whenError = apiContext =>
     app().apiRegistry._errorEvent(apiContext, error)
 
   it('should call audit.log on error',

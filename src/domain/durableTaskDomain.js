@@ -19,7 +19,7 @@ class DurableTaskDomain {
     })
     // TODO: if multiple tabs then this should only be done in one of them! https://trello.com/c/RPK1iOX0
     DurableTasks.once('loaded', () => {
-      DurableTasks.find().forEach(t => {
+      DurableTasks.find().forEach((t) => {
         this._runTask(t, t._id)
       })
     })

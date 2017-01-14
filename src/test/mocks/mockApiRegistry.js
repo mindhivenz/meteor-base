@@ -119,12 +119,12 @@ export class MockApiRegistry extends ApiRegistry {
       children: [],
     }
     if (tree.children) {
-      tree.children.forEach(child => {
+      tree.children.forEach((child) => {
         const childResult = {
           found: new Map(),
         }
         result.children.push(childResult)
-        result.found.forEach(parentResult => {
+        result.found.forEach((parentResult) => {
           childResult.found.set(parentResult, child.find(parentResult).fetch())
         })
         if (child.children) {

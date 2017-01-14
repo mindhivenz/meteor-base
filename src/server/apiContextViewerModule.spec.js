@@ -27,7 +27,7 @@ describe('apiContextViewer', () => {
       new CreateWithUniquePrototype(),
       {
         userId: some.string(),
-        accessDenied: sinon.spy(r => { throw new Error(r) }),
+        accessDenied: sinon.spy((r) => { throw new Error(r) }),
       },
     )
   })
@@ -99,7 +99,6 @@ describe('apiContextViewer', () => {
 
     it('should return true when userId',
       mockAppContext(modules, () => {
-        console.log(apiContext.userId)
         apiContext.isAuthenticated.should.equal(true)
       })
     )

@@ -12,7 +12,7 @@ export const ClientError = global.Meteor ? global.Meteor.Error : MockMeteorError
 
 export const NOT_AUTHORIZED = 'not-authorized'
 
-export const notAuthorizedError = (details) =>
+export const notAuthorizedError = details =>
   new ClientError(
     NOT_AUTHORIZED,
     'You are not authorized',

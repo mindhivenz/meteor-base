@@ -37,7 +37,7 @@ export class FocusedView {
     this._name = collection._name
     Object.keys(viewSpec)
       .filter(k => ! VIEW_SPEC_PROPERTIES.includes(k))
-      .forEach(k => { throw new Error(`Invalid viewSpec property ${k}`) })
+      .forEach((k) => { throw new Error(`Invalid viewSpec property ${k}`) })
     this.viewSpec = viewSpec
   }
 
@@ -75,7 +75,7 @@ export class FocusedView {
 
     const selectorAsFieldsOptions = (s) => {
       const result = {}
-      Object.keys(s).forEach(k => {
+      Object.keys(s).forEach((k) => {
         result[k] = 1
       })
       return { fields: result }

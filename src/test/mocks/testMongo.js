@@ -1,5 +1,3 @@
-/* eslint-disable no-underscore-dangle */
-
 import { app, initModules } from '@mindhive/di'
 
 
@@ -14,7 +12,7 @@ export const TestGround = {}
 
 const NAME_TO_CAUSE_MINIMONGO = null
 
-const removeArrayPartsFromKey = (k) => k.split('.$').join('')
+const removeArrayPartsFromKey = k => k.split('.$').join('')
 
 const inSchema = (indexKey, schemaDoc, mustBeBlackbox = false) => {
   const schemaKey = Object.keys(schemaDoc).find(k =>
@@ -73,7 +71,7 @@ if (global.Mongo) {
       if (! schemaDoc) {
         throw new Error("Attach a schema before adding indexes so we can check they're valid")
       }
-      Object.keys(keys).forEach(k => {
+      Object.keys(keys).forEach((k) => {
         if (! inSchema(k, schemaDoc)) {
           throw new Error(`Attempt to add an index key '${k}' which is not in the schema`)
         }

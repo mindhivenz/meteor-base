@@ -1,6 +1,6 @@
 
 
-export const viewerEnhancer = (Users) => ({
+export const viewerEnhancer = Users => ({
 
   viewer() {
     if (! this.userId) {

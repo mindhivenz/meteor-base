@@ -5,7 +5,7 @@ import { app } from '@mindhive/di'
 import { withDisplayName, loadingProps, errorProps } from './containers'
 
 
-const composeFunc = (asyncFunc) =>
+const composeFunc = asyncFunc =>
   (ownProps, onData) => {
     let pushPropsCalled = false
     const pushProps = (props = {}) => {
@@ -56,7 +56,7 @@ export const withApiCallResult = ({
   methodName,
   propsToArgs = () => null,
   overrideCallProps = () => null,
-  resultToProps = (result) => ({ [propName]: result }),
+  resultToProps = result => ({ [propName]: result }),
 }) =>
   withDisplayName(`apiCall(${methodName})`,
     withAsync(

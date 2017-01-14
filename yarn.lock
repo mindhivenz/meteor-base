@@ -1039,6 +1039,22 @@ eslint-config-airbnb-base@^9.0.0:
   version "9.0.0"
   resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-9.0.0.tgz#03e135562aa6c4d0d9f1bbda96d901326bf58ad2"
 
+eslint-config-mindhive-meteor@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-mindhive-meteor/-/eslint-config-mindhive-meteor-1.0.1.tgz#b5a2a8dee194c46498c324b74d62e8e7dba63a79"
+  dependencies:
+    eslint-config-mindhive "^1.0.1"
+    eslint-import-resolver-meteor "^0.3.3"
+    eslint-plugin-import "^2.2.0"
+
+eslint-config-mindhive@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-mindhive/-/eslint-config-mindhive-1.0.1.tgz#e35c994f1d89e30d6b034164b0f36ad7e298458b"
+  dependencies:
+    babel-eslint "^7.1.0"
+    eslint-config-airbnb-base "^9.0.0"
+    eslint-plugin-import "^2.0.1"
+
 eslint-import-resolver-meteor@^0.3.3:
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/eslint-import-resolver-meteor/-/eslint-import-resolver-meteor-0.3.4.tgz#e34ba534bf995420eb4cd223302e7a5967eee539"
@@ -1061,7 +1077,7 @@ eslint-module-utils@^2.0.0:
     debug "2.2.0"
     pkg-dir "^1.0.0"
 
-eslint-plugin-import@^2.0.1:
+eslint-plugin-import@^2.0.1, eslint-plugin-import@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.2.0.tgz#72ba306fad305d67c4816348a4699a4229ac8b4e"
   dependencies:

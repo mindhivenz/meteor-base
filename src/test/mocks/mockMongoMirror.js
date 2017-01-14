@@ -3,10 +3,10 @@ import {
   asReference,
 } from 'mobx'
 import sinon from 'sinon'
-import { checkViewOptions, checkObservableModes } from '../../client/mongoMirror'
+import { checkFindOptions, checkObservableModes } from '../../client/mongoMirror'
 
 
-const docId = (docOrId) =>
+const docId = docOrId =>
   typeof docOrId === 'string' ? docOrId : docOrId._id
 
 class AwaitDocs {
@@ -17,7 +17,7 @@ class AwaitDocs {
   process(docOrId) {
     const id = docId(docOrId)
     this.processedIds.add(id)
-    this.awaits.forEach(a => {
+    this.awaits.forEach((a) => {
       if (a.id === id) {
         a.resolve()
       }
@@ -122,7 +122,7 @@ export class MockMongoMirror {
   }
 
   subscriptionToObservable(options) {
-    checkViewOptions(options)
+    checkFindOptions(options)
     this.subscribe()
   }
 
@@ -151,7 +151,7 @@ export class MockMongoMirror {
     observableArray,
     observableMap,
   }) {
-    checkViewOptions({ viewOptions, observableArray })
+    checkFindOptions({ viewOptions, observableArray })
     this.offlineToObservable({
       groundCollection,
       observableArray,
@@ -172,7 +172,7 @@ export class MockMongoMirror {
   }
 
   resetAwaitDocs() {
-    [this.awaitAdded, this.awaitRemoved, this.awaitUpdated].forEach(a => {
+    [this.awaitAdded, this.awaitRemoved, this.awaitUpdated].forEach((a) => {
       a.reset()
     })
   }

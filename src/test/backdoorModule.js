@@ -8,7 +8,7 @@ const resetDatabase = () => {
 
   collections
     .filter(col => col.collectionName !== 'system.indexes')
-    .forEach(col => {
+    .forEach((col) => {
       const syncRemove = global.Meteor.wrapAsync(col.remove, col)
       syncRemove({})
     })

@@ -3,7 +3,7 @@ import { app } from '@mindhive/di'
 
 export const extendClock = (clock) => {
   if (typeof clock.sleep === 'undefined') {
-    clock.sleep = (milliseconds) =>
+    clock.sleep = milliseconds =>
       new Promise(resolve =>
         app().Meteor.setTimeout(resolve, milliseconds)
       )

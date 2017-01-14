@@ -49,7 +49,7 @@ describe('focusedView', () => {
     apiContext = {
       get isAuthenticated() { return !! viewer },
       viewer: () => viewer || apiContext.accessDenied('Not logged in'),
-      accessDenied: sinon.spy(r => { throw new Error(r) }),
+      accessDenied: sinon.spy((r) => { throw new Error(r) }),
     }
   })
 
@@ -75,7 +75,7 @@ describe('focusedView', () => {
     })
   }
 
-  const builtSelector = (operation) =>
+  const builtSelector = operation =>
     focusedViewer.selector(apiContext, selector, operation)
 
   describe('constructor', () => {

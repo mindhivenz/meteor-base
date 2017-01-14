@@ -89,7 +89,7 @@ describe('Enhancer', () => {
     const someProperty = some.object()
     const someFunc = sinon.spy()
     const someNewProperty = some.primitive()
-    enhancer.registerEnhancement(obj => {
+    enhancer.registerEnhancement((obj) => {
       obj.someProperty = someNewProperty
     })
     enhancer.registerEnhancement({
@@ -104,10 +104,10 @@ describe('Enhancer', () => {
   it('should enhance with functions in order registered', () => {
     const enhancer = new Enhancer()
     const someFinalProperty = some.primitive()
-    enhancer.registerEnhancement(obj => {
+    enhancer.registerEnhancement((obj) => {
       obj.someProperty = some.primitive()
     })
-    enhancer.registerEnhancement(obj => {
+    enhancer.registerEnhancement((obj) => {
       obj.someProperty = someFinalProperty
     })
     const target = some.object()
@@ -123,7 +123,7 @@ describe('Enhancer', () => {
     enhancer.registerEnhancement({
       someProperty: some.primitive(),
     })
-    enhancer.registerEnhancement(obj => {
+    enhancer.registerEnhancement((obj) => {
       obj.someProperty = someFinalProperty
     })
     const target = new SomePrototype()
