@@ -1,17 +1,13 @@
 import React from 'react'
 import shallowEqual from 'shallowequal'
 
-
 // REVISIT: should we be reactive to observable changes used in constructor?
 
-const classNameAsVarName = className =>
-  className && className.substr(0, 1).toLowerCase() + className.substr(1)
-
-const withDomainOptions = ({
+export const withDomain = ({
   domainClass,
+  propName,
   mapPropsToArgs = props => undefined,                             // eslint-disable-line no-unused-vars
   createDomain = props => new domainClass(mapPropsToArgs(props)),  // eslint-disable-line new-cap
-  propName = classNameAsVarName(domainClass.name) || 'domain',
   shouldRecreateDomain = (currentProps, nextProps) =>
     ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)),
   updateDomain = (domain, props) => { if (typeof domain.update === 'function') domain.update(props) },
@@ -48,8 +44,3 @@ const withDomainOptions = ({
         return React.createElement(Component, { ...this.props, [propName]: this.domain })
       }
     }
-
-export const withDomain = classOrOptions =>
-  typeof classOrOptions === 'function' ?
-    withDomainOptions({ domainClass: classOrOptions })
-    : withDomainOptions(classOrOptions)
