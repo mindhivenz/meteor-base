@@ -8,10 +8,23 @@
   dependencies:
     babel-runtime "^6.18.0"
 
+"@mindhive/di@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@mindhive/di/-/di-4.1.1.tgz#ee7030a0b299b726ea9ac6c45d92f0bb431674bc"
+  dependencies:
+    babel-runtime "^6.18.0"
+
 "@mindhive/some@^3.0.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@mindhive/some/-/some-3.1.0.tgz#f5fbccdf7fe73b80521fadfa0c5a472c9b981c4d"
   dependencies:
+    babel-runtime "^6.18.0"
+
+"@mindhive/time@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@mindhive/time/-/time-1.0.1.tgz#ae01962f56a7e71f8ca24f791486e76ab7c5ecdf"
+  dependencies:
+    "@mindhive/di" "^4.1.1"
     babel-runtime "^6.18.0"
 
 "@mindhive/wallaby-meteor-config@^1.1.1":

@@ -1,4 +1,5 @@
-import { extendClock, ProgressiveBackoff } from '../universal/time'
+import extendClock from '@mindhive/time/extendClock'
+import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
 
 
 const TimeSync = global.TimeSync

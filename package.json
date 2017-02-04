@@ -26,6 +26,7 @@
     "meteor"
   ],
   "dependencies": {
+    "@mindhive/time": "^1.0.1",
     "babel-runtime": "^6.18.0",
     "date-fns": "^1.9.0",
     "extend-accessors": "^1.0.1",

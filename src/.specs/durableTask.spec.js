@@ -5,7 +5,8 @@ import { sinon, should, forATick } from '../mocha'
 
 import { TestGround } from '../test/mocks/testMongo'
 import mockMeteorCoreModuleFactory from '../test/mocks/mockMeteorCoreModuleFactory'
-import timeModule from '../test/mocks/mockTimeModule'
+import clockModule from '@mindhive/time/clockModule'
+import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
 import durableTaskDomainModule from '../domain/durableTaskDomain'
 
 
@@ -21,7 +22,8 @@ describe('durableTaskDomain', () => {
 
   const modules = () => initModules([
     mockMeteorCoreModuleFactory({ isClient: true }),
-    timeModule,
+    clockModule,
+    () => ({ ProgressiveBackoff }),
     ({ clock }) => {
       sinon.spy(clock, 'sleep')
       return {
