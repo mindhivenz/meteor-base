@@ -14,6 +14,13 @@
   dependencies:
     babel-runtime "^6.18.0"
 
+"@mindhive/mobx@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@mindhive/mobx/-/mobx-1.0.0.tgz#199434c8e375007afa76fafd7873f6a2fbc07367"
+  dependencies:
+    babel-runtime "^6.18.0"
+    shallowequal "^0.2.2"
+
 "@mindhive/some@^3.0.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@mindhive/some/-/some-3.1.0.tgz#f5fbccdf7fe73b80521fadfa0c5a472c9b981c4d"

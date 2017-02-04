@@ -1,9 +1,9 @@
 var lookup = require('./../dist/domain/lookup')
-var withDomain = require('./../dist/domain/withDomain')
+var withStore = require('@mindhive/mobx/withStore')
 
 module.exports = {
   LookupDoc: lookup.LookupDoc,
   LookupDomain: lookup.LookupDomain,
 
-  withDomain: withDomain.withDomain,
+  withDomain: withStore,
 }
