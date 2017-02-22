@@ -165,7 +165,6 @@ export class MongoMirror {
         disposer = onReady()
       }
       runInAction(`${context}: ready`, () => {
-        console.log(`ready ${publicationName}`)
         subscriptionHandle._ready(disposer)
       })
     })
