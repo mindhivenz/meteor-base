@@ -2,6 +2,7 @@ import {
   action,
   observable,
   runInAction,
+  isObservable,
 } from 'mobx'
 import { app } from '@mindhive/di'
 import { meteorTracker } from './tracker'
@@ -34,17 +35,19 @@ export const checkFindOptions = ({
   }
 }
 
+const isShallowReferenceEnhancer = enhancer => ! isObservable(enhancer({}))
+
 export const checkObservableModes = ({
   observableArray,
   observableMap,
 }) => {
   const { Meteor } = app()
   if (Meteor.isDevelopment) {
-    if (observableArray && observableArray.enhancer.name !== 'referenceEnhancer') {
+    if (observableArray && ! isShallowReferenceEnhancer(observableArray.$mobx.enhancer)) {
       console.warn('observableArray does not appear to be shallow, ' +  // eslint-disable-line no-console
         'declare as: @observable.shallow array = []')
     }
-    if (observableMap && observableMap.enhancer.name !== 'referenceEnhancer') {
+    if (observableMap && ! isShallowReferenceEnhancer(observableMap.enhancer)) {
       console.warn('observableMap does not appear to be shallow, ' +  // eslint-disable-line no-console
         'declare as: @observable.shallow map = new Map()')
     }
