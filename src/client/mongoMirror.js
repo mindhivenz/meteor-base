@@ -40,14 +40,14 @@ export const checkObservableModes = ({
 }) => {
   const { Meteor } = app()
   if (Meteor.isDevelopment) {
-    // if (observableArray && observableArray.$mobx.mode !== ValueMode.Reference) {
-    //   console.warn('observableArray does not appear to be using asFlat, ' +  // eslint-disable-line no-console
-    //     'declare as: @observable array = asFlat([])')
-    // }
-    // if (observableMap && observableMap._valueMode !== ValueMode.Reference) {
-    //   console.warn('observableMap does not appear to be using asReference, ' +  // eslint-disable-line no-console
-    //     'declare as: @observable map = asMap([], asReference)')
-    // }
+    if (observableArray && observableArray.enhancer.name !== 'referenceEnhancer') {
+      console.warn('observableArray does not appear to be shallow, ' +  // eslint-disable-line no-console
+        'declare as: @observable.shallow array = []')
+    }
+    if (observableMap && observableMap.enhancer.name !== 'referenceEnhancer') {
+      console.warn('observableMap does not appear to be shallow, ' +  // eslint-disable-line no-console
+        'declare as: @observable.shallow map = new Map()')
+    }
   }
 }
 
