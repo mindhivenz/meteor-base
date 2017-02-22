@@ -1,8 +1,8 @@
-import * as mobx from 'mobx'
+import { useStrict } from 'mobx'
 
 
 export default ({ Meteor }) => {
   if (! Meteor.isProduction) {
-    mobx.useStrict(true)
+    useStrict(true)
   }
 }

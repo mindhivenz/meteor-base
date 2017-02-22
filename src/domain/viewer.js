@@ -2,7 +2,6 @@ import {
   observable,
   computed,
   action,
-  asReference,
 } from 'mobx'
 import { app } from '@mindhive/di'
 import { SUPER_USER } from '../roles'
@@ -13,9 +12,9 @@ const VIEWER_STATE_PATH = 'viewerState'
 // Expects viewer data to be auto published (i.e. null publicationName)
 export class ViewerDomain {
   @observable loading = true
-  // Use asReference because we don't update the internals, only the reference,
+  // Use shallow because we don't update the internals, only the reference,
   // and makes user pure JS (avoiding issues with Roles package thinking user.roles is not an array)
-  @observable user = asReference(null)
+  @observable.ref user = null
   @observable isAuthenticatedLive = false
 
   constructor() {
@@ -100,7 +99,7 @@ export class ViewerDomain {
 }
 
 export class ViewerWithOrgDomain extends ViewerDomain {
-  @observable org = asReference(null)
+  @observable.ref org = null
 
   _applyFromServer(user) {
     super._applyFromServer(user)

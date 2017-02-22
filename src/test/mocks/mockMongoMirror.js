@@ -1,7 +1,4 @@
-import {
-  observable,
-  asReference,
-} from 'mobx'
+import { observable } from 'mobx'
 import sinon from 'sinon'
 import { checkFindOptions, checkObservableModes } from '../../client/mongoMirror'
 
@@ -117,7 +114,7 @@ export class MockMongoMirror {
   subscribe() {
     return observable({
       loading: true,
-      stop: asReference(sinon.spy()),
+      stop: sinon.spy(),
     })
   }
 

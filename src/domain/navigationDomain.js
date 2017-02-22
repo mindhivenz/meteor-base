@@ -1,4 +1,4 @@
-import { observable, action, asReference, when } from 'mobx'
+import { observable, action, when } from 'mobx'
 import { app } from '@mindhive/di'
 
 
@@ -6,7 +6,7 @@ class NavigationDomain {
 
   @observable location = {
     pathname: null,
-    state: asReference({}),  // asReference as state is not altered internally
+    state: observable.ref({}),  // ref as state is not altered internally
   }
   @observable atHistoryBeginning = true
 

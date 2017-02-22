@@ -2,7 +2,6 @@ import {
   action,
   observable,
   runInAction,
-  ValueMode,
 } from 'mobx'
 import { app } from '@mindhive/di'
 import { meteorTracker } from './tracker'
@@ -41,14 +40,14 @@ export const checkObservableModes = ({
 }) => {
   const { Meteor } = app()
   if (Meteor.isDevelopment) {
-    if (observableArray && observableArray.$mobx.mode !== ValueMode.Reference) {
-      console.warn('observableArray does not appear to be using asFlat, ' +  // eslint-disable-line no-console
-        'declare as: @observable array = asFlat([])')
-    }
-    if (observableMap && observableMap._valueMode !== ValueMode.Reference) {
-      console.warn('observableMap does not appear to be using asReference, ' +  // eslint-disable-line no-console
-        'declare as: @observable map = asMap([], asReference)')
-    }
+    // if (observableArray && observableArray.$mobx.mode !== ValueMode.Reference) {
+    //   console.warn('observableArray does not appear to be using asFlat, ' +  // eslint-disable-line no-console
+    //     'declare as: @observable array = asFlat([])')
+    // }
+    // if (observableMap && observableMap._valueMode !== ValueMode.Reference) {
+    //   console.warn('observableMap does not appear to be using asReference, ' +  // eslint-disable-line no-console
+    //     'declare as: @observable map = asMap([], asReference)')
+    // }
   }
 }
 
@@ -86,8 +85,8 @@ export class MongoMirror {
   cursorToObservable({
     context = `cursorToObservable@${generateUniqueId()}`,
     mongoCursor,
-    observableArray,  // Should be declared as: @observable array = asFlat([])
-    observableMap,  // Should be declared as: @observable map = asMap([], asReference)
+    observableArray,  // Should be declared as observable.shallow
+    observableMap,  // Should be declared as observable.shallow
   }) {
     checkObservableModes({ observableArray, observableMap })
     meteorTracker.nonreactive(() => {
@@ -166,6 +165,7 @@ export class MongoMirror {
         disposer = onReady()
       }
       runInAction(`${context}: ready`, () => {
+        console.log(`ready ${publicationName}`)
         subscriptionHandle._ready(disposer)
       })
     })

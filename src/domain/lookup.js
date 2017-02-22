@@ -1,4 +1,4 @@
-import { observable, asMap, asReference, computed } from 'mobx'
+import { observable, computed } from 'mobx'
 import { app } from '@mindhive/di'
 
 
@@ -60,7 +60,7 @@ class ExtendedLookupDomain {
 
 export class LookupDomain {
 
-  @observable idMap = asMap([], asReference)
+  @observable.shallow idMap = new Map()
 
   constructor(LookupClass, mirrorSubscriptionOptions) {
     this.LookupClass = LookupClass
