@@ -1,10 +1,10 @@
 import { initModules } from '@mindhive/di'
-import clockModule from '@mindhive/time/clockModule'
+import mockClockModule from '@mindhive/time/mockClockModule'
 import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
 
 
 export default () => {
-  initModules([clockModule])
+  initModules([mockClockModule])
   return {
     ProgressiveBackoff,
   }
