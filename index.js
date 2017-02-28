@@ -24,5 +24,4 @@ module.exports = {
    */
   check: check.check,
   Match: check.Match,
-  SimpleSchema: check.SimpleSchema,
 }

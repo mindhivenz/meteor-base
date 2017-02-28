@@ -1,4 +1,5 @@
 import { app } from '@mindhive/di'
+import SimpleSchema from 'simpl-schema'
 
 
 export const audit = {
@@ -62,8 +63,8 @@ const registerApi = (apiRegistry) => {
 export default ({ Mongo, apiRegistry }) => {
   const AuditEntries = new Mongo.Collection('auditEntries')
 
-  if (global.SimpleSchema) {
-    const AuditEntrySchema = new global.SimpleSchema({
+  if (AuditEntries.attachSchema) {
+    const AuditEntrySchema = new SimpleSchema({
       timestamp: {
         type: Date,
         autoValue() {

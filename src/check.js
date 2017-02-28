@@ -3,4 +3,3 @@
 
 export const check = global.Package && global.Package.check && global.Package.check.check
 export const Match = global.Package && global.Package.check && global.Package.check.Match
-export const SimpleSchema = global.SimpleSchema

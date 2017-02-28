@@ -10,7 +10,7 @@
 
 1. `FocusedView`: `meteor add ejson`
 2. `backdoorModule`: `meteor add xolvio:backdoor`
-3. `SimpleSchema`: `meteor add aldeed:collection2`
+3. `SimpleSchema`: `meteor add aldeed:collection2-core`
 4. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
 5. client `timeModule`: `meteor add mizzao:timesync` (optional, will default to local machine time otherwise)
 6. `hasRole`: `meteor add alanning:roles`

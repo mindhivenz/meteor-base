@@ -67,7 +67,7 @@ if (global.Mongo) {
         // MiniMongo will throw an exception
         super._ensureIndex(keys, options)
       }
-      const schemaDoc = this._c2 && this._c2._simpleSchema && this._c2._simpleSchema._schema
+      const schemaDoc = this._c2 && this._c2._simpleSchema && this._c2._simpleSchema.mergedSchema()
       if (! schemaDoc) {
         throw new Error("Attach a schema before adding indexes so we can check they're valid")
       }
