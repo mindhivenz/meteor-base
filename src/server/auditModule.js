@@ -74,12 +74,12 @@ export default ({ Mongo, apiRegistry }) => {
           return new Date()
         },
       },
-      connectionId: { type: String },
-      clientAddress: { type: String },
-      context: { type: String },
+      connectionId: String,
+      clientAddress: String,
+      context: String,
       viewerId: { type: String, optional: true },
       orgId: { type: String, optional: true },
-      action: { type: String },
+      action: String,
       collection: { type: String, optional: true },
       id: {
         type: String,

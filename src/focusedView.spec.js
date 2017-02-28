@@ -18,12 +18,18 @@ describe('focusedView', () => {
   let expectedId
   let expectedCursor
   let expectedDoc
+  let expectedDocArray
   let viewer
   let apiContext
   let focusedViewer
 
   const someSelector = () =>
     some.bool() ? some.string() : some.object()
+
+  const someDoc = () => ({
+    ...some.object(),
+    _id: expectedId,
+  })
 
   beforeEach(() => {
     collectionName = some.string()
@@ -38,11 +44,11 @@ describe('focusedView', () => {
     selector = someSelector()
     viewSelector = someSelector()
     expectedId = some.string()
-    expectedCursor = {}
-    expectedDoc = {
-      ...some.object(),
-      _id: expectedId,
+    expectedCursor = {
+      fetch: sinon.stub(),
     }
+    expectedDoc = someDoc()
+    expectedDocArray = [expectedDoc]
     options = some.object()
     modifier = some.object()
     viewer = some.object()
@@ -51,6 +57,11 @@ describe('focusedView', () => {
       viewer: () => viewer || apiContext.accessDenied('Not logged in'),
       accessDenied: sinon.spy((r) => { throw new Error(r) }),
     }
+  })
+
+  const twoLimited = passedOptions => ({
+    ...passedOptions,
+    limit: 2,
   })
 
   const givenNotLoggedIn = () => {
@@ -234,10 +245,11 @@ describe('focusedView', () => {
 
     it('should call findOne with built selector', () => {
       givenFindSelector()
-      Collection.findOne.returns(expectedDoc)
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns(expectedDocArray)
       const actual = focusedViewer.loadOne(apiContext, selector, options)
       actual.should.equal(expectedDoc)
-      Collection.findOne.should.have.been.calledWith(builtSelector('loadOne'), options)
+      Collection.find.should.have.been.calledWith(builtSelector('loadOne'), twoLimited(options))
     })
 
     it('should throw if findSelector and not logged in', () => {
@@ -251,7 +263,8 @@ describe('focusedView', () => {
     it('should not throw if no findSelector and not logged in', () => {
       givenNotLoggedIn()
       givenFocusedViewer()
-      Collection.findOne.returns(expectedDoc)
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns(expectedDocArray)
       focusedViewer.loadOne(apiContext, selector, options)
     })
 
@@ -267,7 +280,8 @@ describe('focusedView', () => {
 
     it('should accessDenied if no matching doc', () => {
       givenFindSelector()
-      Collection.findOne.returns(null)
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns([])
       should.throw(() => {
         focusedViewer.loadOne(apiContext, selector, options)
       })
@@ -285,7 +299,8 @@ describe('focusedView', () => {
     it('should accessDenied when focus was reason for not finding doc', () => {
       givenFindSelector()
       viewSelector = { a: some.primitive(), b: some.primitive() }
-      Collection.findOne.withArgs(builtSelector('loadOne')).returns(null)
+      Collection.find.withArgs(builtSelector('loadOne')).returns(expectedCursor)
+      expectedCursor.fetch.returns([])
       Collection.findOne.withArgs(selector).returns(expectedDoc)
       should.throw(() => {
         focusedViewer.loadOne(apiContext, selector, options)
@@ -307,7 +322,8 @@ describe('focusedView', () => {
     it('should accessDenied when _id passed and other passed selectors were reason for not finding doc', () => {
       givenFindSelector()
       selector = { _id: expectedId, a: some.primitive(), b: some.primitive() }
-      Collection.findOne.withArgs(builtSelector('loadOne')).returns(null)
+      Collection.find.withArgs(builtSelector('loadOne')).returns(expectedCursor)
+      expectedCursor.fetch.returns([])
       Collection.findOne.withArgs(selector).returns(null)
       Collection.findOne.withArgs(selector._id).returns(expectedDoc)
       should.throw(() => {
@@ -332,7 +348,8 @@ describe('focusedView', () => {
     it('should accessDenied when _id not found', () => {
       const wrongId = some.mongoId()
       givenFindSelector()
-      Collection.findOne.returns(null)
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns([])
       should.throw(() => {
         focusedViewer.loadOne(apiContext, { _id: wrongId }, options)
       })
@@ -345,16 +362,35 @@ describe('focusedView', () => {
       )
     })
 
+    it('should accessDenied when multiple docs found', () => {
+      givenFindSelector()
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns(some.arrayOf(someDoc, 2))
+      should.throw(() => {
+        focusedViewer.loadOne(apiContext, selector, options)
+      })
+      apiContext.accessDenied.should.have.been.calledWith(
+        'loadOne found more than one',
+        {
+          collection: Collection,
+          data: {
+            selector: builtSelector('loadOne'),
+          },
+        },
+      )
+    })
+
   })
 
   describe('loadOneForUpdate', () => {
 
     it('should call findOne with built selector', () => {
       givenFindSelector()
-      Collection.findOne.returns(expectedDoc)
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns([expectedDoc])
       const actual = focusedViewer.loadOneForUpdate(apiContext, selector, options)
       actual.should.equal(expectedDoc)
-      Collection.findOne.should.have.been.calledWith(builtSelector('update'), options)
+      Collection.find.should.have.been.calledWith(builtSelector('update'), twoLimited(options))
     })
 
     it('should throw if findSelector and not logged in', () => {
@@ -368,7 +404,8 @@ describe('focusedView', () => {
     it('should not throw if no findSelector and not logged in', () => {
       givenNotLoggedIn()
       givenFocusedViewer()
-      Collection.findOne.returns(expectedDoc)
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns([expectedDoc])
       focusedViewer.loadOneForUpdate(apiContext, selector, options)
     })
 
@@ -394,7 +431,8 @@ describe('focusedView', () => {
 
     it('should accessDenied if no matching doc', () => {
       givenFindSelector()
-      Collection.findOne.returns(null)
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns([])
       should.throw(() => {
         focusedViewer.loadOneForUpdate(apiContext, selector, options)
       })
@@ -406,6 +444,24 @@ describe('focusedView', () => {
             selector,
           },
         }
+      )
+    })
+
+    it('should accessDenied when multiple docs found', () => {
+      givenFindSelector()
+      Collection.find.returns(expectedCursor)
+      expectedCursor.fetch.returns(some.arrayOf(someDoc, 2))
+      should.throw(() => {
+        focusedViewer.loadOneForUpdate(apiContext, selector, options)
+      })
+      apiContext.accessDenied.should.have.been.calledWith(
+        'loadOneForUpdate found more than one',
+        {
+          collection: Collection,
+          data: {
+            selector: builtSelector('loadOneForUpdate'),
+          },
+        },
       )
     })
 

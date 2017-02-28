@@ -22,8 +22,8 @@
     babel-runtime "^6.18.0"
 
 "@mindhive/time@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@mindhive/time/-/time-1.0.1.tgz#ae01962f56a7e71f8ca24f791486e76ab7c5ecdf"
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@mindhive/time/-/time-1.0.2.tgz#9d6658eca3a00c0abaa4cfea48c018148637175e"
   dependencies:
     "@mindhive/di" "^4.1.1"
     babel-runtime "^6.18.0"
@@ -722,8 +722,8 @@ babel-types@^6.15.0, babel-types@^6.19.0, babel-types@^6.22.0, babel-types@^6.23
     to-fast-properties "^1.0.1"
 
 babylon@^6.11.0, babylon@^6.13.0, babylon@^6.15.0:
-  version "6.15.0"
-  resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.15.0.tgz#ba65cfa1a80e1759b0e89fb562e27dccae70348e"
+  version "6.16.1"
+  resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.16.1.tgz#30c5a22f481978a9e7f8cdfdf496b11d94b404d3"
 
 balanced-match@^0.4.1:
   version "0.4.2"
@@ -960,8 +960,8 @@ dashdash@^1.12.0:
     assert-plus "^1.0.0"
 
 date-fns@^1.9.0:
-  version "1.27.2"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.27.2.tgz#ce82f420bc028356cc661fc55c0494a56a990c9c"
+  version "1.28.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.28.0.tgz#3b12f54b66467807bb95e5930caf7bfb4170bc1a"
 
 debug@2.2.0, debug@~2.2.0:
   version "2.2.0"
@@ -1114,8 +1114,8 @@ eslint-config-mindhive-meteor@^1.0.1:
     eslint-plugin-import "^2.2.0"
 
 eslint-config-mindhive@^1.0.1:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/eslint-config-mindhive/-/eslint-config-mindhive-1.1.3.tgz#6bde42306bf00f442cfb27e0a2564d1a8064e124"
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/eslint-config-mindhive/-/eslint-config-mindhive-1.1.4.tgz#0c58e152b92bc5e0796651143b3186fd99108024"
   dependencies:
     babel-eslint "^7.1.0"
     eslint-config-airbnb-base "^9.0.0"
@@ -1159,8 +1159,8 @@ eslint-plugin-import@^2.0.1, eslint-plugin-import@^2.2.0:
     pkg-up "^1.0.0"
 
 eslint@^3.8.1:
-  version "3.16.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-3.16.0.tgz#4a468ab93618a9eb6e3f1499038b38851f828630"
+  version "3.16.1"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-3.16.1.tgz#9bc31fc7341692cf772e80607508f67d711c5609"
   dependencies:
     babel-code-frame "^6.16.0"
     chalk "^1.1.3"
@@ -1316,15 +1316,15 @@ flat-cache@^1.2.1:
     graceful-fs "^4.1.2"
     write "^0.2.1"
 
-for-in@^0.1.5:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/for-in/-/for-in-0.1.6.tgz#c9f96e89bfad18a545af5ec3ed352a1d9e5b4dc8"
+for-in@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
 
 for-own@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/for-own/-/for-own-0.1.4.tgz#0149b41a39088c7515f51ebe1c1386d45f935072"
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/for-own/-/for-own-0.1.5.tgz#5265c681a4f294dabbf17c9509b6763aa84510ce"
   dependencies:
-    for-in "^0.1.5"
+    for-in "^1.0.1"
 
 forever-agent@~0.6.1:
   version "0.6.1"
@@ -1648,8 +1648,8 @@ is-glob@^2.0.0, is-glob@^2.0.1:
     is-extglob "^1.0.0"
 
 is-my-json-valid@^2.10.0, is-my-json-valid@^2.12.4:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/is-my-json-valid/-/is-my-json-valid-2.15.0.tgz#936edda3ca3c211fd98f3b2d3e08da43f7b2915b"
+  version "2.16.0"
+  resolved "https://registry.yarnpkg.com/is-my-json-valid/-/is-my-json-valid-2.16.0.tgz#f079dd9bfdae65ee2038aae8acbc86ab109e3693"
   dependencies:
     generate-function "^2.0.0"
     generate-object-property "^1.1.0"
@@ -2111,6 +2111,10 @@ path-is-inside@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/path-is-inside/-/path-is-inside-1.0.2.tgz#365417dede44430d1c11af61027facf074bdfc53"
 
+path-parse@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.5.tgz#3c1adf871ea9cd6c9431b6ea2bd74a0ff055c4c1"
+
 pify@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
@@ -2334,8 +2338,10 @@ resolve-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-1.0.1.tgz#26cbfe935d1aeeeabb29bc3fe5aeb01e93d44226"
 
 resolve@^1.1.6:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.2.0.tgz#9589c3f2f6149d1417a40becc1663db6ec6bc26c"
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.3.2.tgz#1f0442c9e0cbb8136e87b9305f932f46c7f28235"
+  dependencies:
+    path-parse "^1.0.5"
 
 restore-cursor@^1.0.1:
   version "1.0.1"
@@ -2350,7 +2356,13 @@ right-align@^0.1.1:
   dependencies:
     align-text "^0.1.1"
 
-rimraf@2, rimraf@^2.2.8, rimraf@~2.5.1, rimraf@~2.5.4:
+rimraf@2, rimraf@^2.2.8:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.1.tgz#c2338ec643df7a1b7fe5c54fa86f57428a55f33d"
+  dependencies:
+    glob "^7.0.5"
+
+rimraf@~2.5.1, rimraf@~2.5.4:
   version "2.5.4"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.5.4.tgz#96800093cbf1a0c86bd95b4625467535c29dfa04"
   dependencies:
@@ -2607,8 +2619,8 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
 uglify-js@^2.6:
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.0.tgz#5f3b01aee2dc56cc78aa8d8fb78613a179917917"
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.1.tgz#d3ef6ea2de6c2cae6903a83cc0446be2f1e2d338"
   dependencies:
     async "~0.2.6"
     source-map "~0.5.1"
