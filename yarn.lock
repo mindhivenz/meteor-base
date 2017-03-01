@@ -21,12 +21,13 @@
   dependencies:
     babel-runtime "^6.18.0"
 
-"@mindhive/time@^1.0.1":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@mindhive/time/-/time-1.0.2.tgz#9d6658eca3a00c0abaa4cfea48c018148637175e"
+"@mindhive/time@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@mindhive/time/-/time-1.0.3.tgz#ae1e5f2c6299ed786d56f5fc6806ac634b544661"
   dependencies:
     "@mindhive/di" "^4.1.1"
     babel-runtime "^6.18.0"
+    date-fns "^1.28.0"
 
 "@mindhive/wallaby-meteor-config@^1.1.1":
   version "1.1.7"
@@ -916,7 +917,7 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-date-fns@^1.9.0:
+date-fns@^1.28.0, date-fns@^1.9.0:
   version "1.28.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.28.0.tgz#3b12f54b66467807bb95e5930caf7bfb4170bc1a"
 
