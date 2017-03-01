@@ -86,7 +86,7 @@ export default ({ Mongo, apiRegistry }) => {
         optional: true,
         custom() {
           if (this.value && ! this.field('collection').value) {
-            return 'required'
+            return SimpleSchema.ErrorTypes.REQUIRED
           }
           return null
         },
