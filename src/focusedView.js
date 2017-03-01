@@ -90,7 +90,6 @@ export class FocusedView {
           collection: this.collection,
           id: withoutFocusDoc._id,
           data: {
-            viewFocus: focusSelector,
             foundDoc: withoutFocusDoc,
           },
         })

@@ -298,7 +298,6 @@ describe('focusedView', () => {
 
     it('should accessDenied when focus was reason for not finding doc', () => {
       givenFindSelector()
-      viewSelector = { a: some.primitive(), b: some.primitive() }
       Collection.find.withArgs(builtSelector('loadOne')).returns(expectedCursor)
       expectedCursor.fetch.returns([])
       Collection.findOne.withArgs(selector).returns(expectedDoc)
@@ -311,7 +310,6 @@ describe('focusedView', () => {
           collection: Collection,
           id: expectedId,
           data: {
-            viewFocus: viewSelector,
             foundDoc: expectedDoc,
           },
         }
