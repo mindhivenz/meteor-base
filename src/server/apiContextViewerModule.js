@@ -3,9 +3,7 @@
 export const viewerEnhancer = Users => ({
 
   viewer() {
-    if (! this.userId) {
-      this.accessDenied('Not authenticated / logged in')
-    }
+    this.ensureAuthenticated()
     if (this.cachedViewerForUserId !== this.userId) {
       const user = Users.findOne(this.userId)
       if (! user) {
@@ -23,6 +21,13 @@ export const viewerEnhancer = Users => ({
   get isAuthenticated() {
     return !! this.userId
   },
+
+  ensureAuthenticated() {
+    if (! this.isAuthenticated) {
+      this.accessDenied('Not authenticated / logged in')
+    }
+  }
+
 })
 
 export default ({ apiRegistry, Users }) => {

@@ -112,4 +112,23 @@ describe('apiContextViewer', () => {
 
   })
 
+  describe('ensureAuthenticated', () => {
+
+    it('should throw when no userId',
+      mockAppContext(modules, async () => {
+        apiContext.userId = null
+        should.throw(() => {
+          apiContext.ensureAuthenticated()
+        }, /not authenticated/i)
+      })
+    )
+
+    it('should not throw when userId',
+      mockAppContext(modules, async () => {
+        apiContext.ensureAuthenticated()
+      })
+    )
+
+  })
+
 })

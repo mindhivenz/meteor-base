@@ -11,15 +11,20 @@ const viewerEnhancer = {
 
   viewer() {
     const { viewerDomain } = app()
-    if (! viewerDomain.isAuthenticated) {
-      this.accessDenied('Not authenticated / logged in')
-    }
+    this.ensureAuthenticated()
     return viewerDomain.user
   },
 
   @computed get isAuthenticated() {
     return app().viewerDomain.isAuthenticated
   },
+
+  ensureAuthenticated() {
+    if (! this.isAuthenticated) {
+      this.accessDenied('Not authenticated / logged in')
+    }
+  }
+
 }
 
 const exposeAddedPrototypeUserId = (apiContext) => {
