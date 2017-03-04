@@ -102,6 +102,9 @@ export class MockApiRegistry extends ApiRegistry {
 
   subscribe(publicationName, subscription = new MockSubscription(), args) {
     const cursor = this._subscribeCursor(publicationName, subscription, args)
+    if (! cursor) {
+      return []
+    }
     if (typeof cursor.fetch !== 'function') {
       throw new TypeError('Have you called subscribe when you meant subscribeComposite?')
     }
