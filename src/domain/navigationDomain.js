@@ -4,15 +4,15 @@ import { app } from '@mindhive/di'
 
 class NavigationDomain {
 
-  @observable location = {
+  @observable.shallow location = {
     pathname: null,
-    state: observable.ref({}),  // ref as state is not altered internally
+    state: {},
   }
-  @observable atHistoryBeginning = true
+  @observable backPathname = null
 
   constructor() {
     const { browserHistory } = app()
-    this._locationChanged(browserHistory.getCurrentLocation())  // TODO: browserHistory.location in reactRouter v4
+    this._locationChanged(browserHistory.getCurrentLocation())  // TODO: change to browserHistory.location in reactRouter v4
     browserHistory.listen((location) => {
       this._locationChanged(location)
     })
@@ -20,27 +20,50 @@ class NavigationDomain {
 
   @action _locationChanged(browserLocation) {
     this.location.pathname = browserLocation.pathname
-    this.location.state = browserLocation.state == null ? {} : browserLocation.state
-    this.atHistoryBeginning = browserLocation.state == null
+    if (browserLocation.state != null) {
+      const { _backPathname, ...userState } = browserLocation.state
+      this.location.state = userState
+      this.backPathname = _backPathname
+    } else {
+      this.location.state = browserLocation.state
+      this.backPathname = null
+    }
   }
 
   _pathnameOrLocationToBrowserLocation(pathnameOrLocation) {
-    const location = typeof pathnameOrLocation === 'string' || typeof pathnameOrLocation === 'number' ?
-      { pathname: String(pathnameOrLocation) }
-      : pathnameOrLocation
+    const location = typeof pathnameOrLocation === 'object' ? pathnameOrLocation
+      : { pathname: String(pathnameOrLocation) }
     if (location.state == null) {
-      // ensure there is always state so we know when we are at the first page in this history
+      // ensure there is always state
       location.state = {}
     }
     return location
   }
 
+  _withInternalState(location, backPathname) {
+    const result = { ...location }
+    if (backPathname != null) {
+      result.location.state._backPathname = backPathname
+    }
+    return result
+  }
+
   push(pathnameOrLocation) {
-    app().browserHistory.push(this._pathnameOrLocationToBrowserLocation(pathnameOrLocation))
+    app().browserHistory.push(
+      this._withInternalState(
+        this._pathnameOrLocationToBrowserLocation(pathnameOrLocation),
+        this.location.pathname
+      )
+    )
   }
 
   replace(pathnameOrLocation) {
-    app().browserHistory.replace(this._pathnameOrLocationToBrowserLocation(pathnameOrLocation))
+    app().browserHistory.replace(
+      this._withInternalState(
+        this._pathnameOrLocationToBrowserLocation(pathnameOrLocation),
+        this.backPathname,
+      )
+    )
   }
 
   _joinPaths(path1, path2) {
@@ -55,9 +78,6 @@ class NavigationDomain {
     return path1 + path2Addition
   }
 
-  // If dirCount is >= 0 then the number of directories in the URL to keep
-  // If dirCount is < 0 then the number of directories to remove
-  // Prefer specific positive numbers to avoid issues with quick double actions performing using the wrong state
   _keepDirs(dirCount) {
     if (dirCount === 0) {
       return '/'
@@ -74,19 +94,25 @@ class NavigationDomain {
     })
   }
 
-  popUp(dirs = -1) {
+  popTo(pathname) {
     const { browserHistory } = app()
-    if (this.atHistoryBeginning) {
-      // Don't use our replace as we don't want to set our state marker so we will know we're still at the beginning
-      browserHistory.replace(this._keepDirs(dirs))
-    } else {
+    if (this.backPathname === pathname) {
       browserHistory.goBack()
+    } else {
+      this.replace(pathname)
     }
+  }
+
+  // If dirCount is >= 0 then the number of directories in the URL to keep
+  // If dirCount is < 0 then the number of directories to remove
+  // Prefer specific positive numbers to avoid issues with quick double taps using the wrong state
+  popUp(dirs = -1) {
+    this.popTo(this._keepDirs(dirs))
   }
 
   whenNavigateAway(callback) {
     const originalPathname = this.location.pathname
-    when(
+    return when(
       () => this.location.pathname !== originalPathname,
       callback,
     )
