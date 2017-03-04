@@ -43,7 +43,7 @@ class NavigationDomain {
   _withInternalState(location, backPathname) {
     const result = { ...location }
     if (backPathname != null) {
-      result.location.state._backPathname = backPathname
+      result.state._backPathname = backPathname
     }
     return result
   }
