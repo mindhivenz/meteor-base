@@ -6,8 +6,7 @@
   "plugins": [
     "transform-es2015-modules-commonjs",
     ["transform-runtime", {
-      "polyfill": false,
-      "regenerator": true
+      "polyfill": false
     }],
     "transform-decorators-legacy",
     "transform-class-properties"
