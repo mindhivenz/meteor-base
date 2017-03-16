@@ -85,6 +85,7 @@ class NavigationDomain {
     return this.location.pathname.split('/').slice(0, dirCount > 0 ? dirCount + 1 : dirCount).join('/')
   }
 
+  // dirsToKeep of current URL and then relative from there
   pushDown(dirsToKeep, relativePathnameOrLocation) {
     const { pathname: relativePathname, ...locationRest } =
       this._pathnameOrLocationToBrowserLocation(relativePathnameOrLocation)
@@ -94,6 +95,7 @@ class NavigationDomain {
     })
   }
 
+  // If browser back button would take us to the same place, then use that, otherwise replace
   popTo(pathname) {
     const { browserHistory } = app()
     if (this.backPathname === pathname) {
@@ -103,11 +105,17 @@ class NavigationDomain {
     }
   }
 
-  // If dirCount is >= 0 then the number of directories in the URL to keep
-  // If dirCount is < 0 then the number of directories to remove
-  // Prefer specific positive numbers to avoid issues with quick double taps using the wrong state
+  // Browser back if we managed navigation to here, otherwise replace with dirs of current URL
+  // If dirs is >= 0 then the number of directories in the URL to keep
+  //    (recommended to avoid race conditions on quick double clicks)
+  // If dirs is < 0 then the number of directories to remove
   popUp(dirs = -1) {
-    this.popTo(this._keepDirs(dirs))
+    const { browserHistory } = app()
+    if (this.backPathname) {
+      browserHistory.goBack()
+    } else {
+      this.replace(this._keepDirs(dirs))
+    }
   }
 
   whenNavigateAway(callback) {
