@@ -1,11 +1,12 @@
 import React from 'react'
-
-import { withDisplayName } from './containers'
+import compose from 'recompose/compose'
+import setDisplayName from 'recompose/setDisplayName'
 
 
 // If values of mapPropsToProps null/undefined, then previous values are used
 export const withLatchedProps = mapPropsToProps =>
-  withDisplayName('withLatchedProps',
+  compose(
+    setDisplayName('withLatchedProps'),
     Component =>
       class Latched extends React.Component {
 
@@ -34,5 +35,5 @@ export const withLatchedProps = mapPropsToProps =>
         render() {
           return React.createElement(Component, { ...this.props, ...this.state })
         }
-      }
+      },
   )

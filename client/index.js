@@ -5,7 +5,6 @@ var localContext = require('../dist/client/localContext')
 var latchedProps = require('../dist/client/latchedProps')
 
 module.exports = {
-  withDisplayName: containers.withDisplayName,
   loadingProps: containers.loadingProps,
   errorProps: containers.errorProps,
   errorContainer: containers.errorContainer,

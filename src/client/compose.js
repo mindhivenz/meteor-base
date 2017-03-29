@@ -1,8 +1,9 @@
 import { compose, composeWithTracker } from 'react-komposer'
-import shallowEqual from 'shallowequal'
+import shallowEqual from 'recompose/shallowEqual'
+import setDisplayName from 'recompose/setDisplayName'
 import { app } from '@mindhive/di'
 
-import { withDisplayName, loadingProps, errorProps } from './containers'
+import { loadingProps, errorProps } from './containers'
 
 
 const composeFunc = asyncFunc =>
@@ -27,7 +28,7 @@ const composeFunc = asyncFunc =>
  Push that data through props to handle it nicely.
  */
 export const withAsync = (asyncFunc, shouldResubscribe) =>
-  withDisplayName('withAsync',
+  setDisplayName('withAsync')(
     compose(
       composeFunc(asyncFunc),
       null,
@@ -42,7 +43,7 @@ export const withAsync = (asyncFunc, shouldResubscribe) =>
  This rerun is not blocked by shouldResubscribe.
  */
 export const withMeteorReactive = (asyncFunc, shouldResubscribe) =>
-  withDisplayName('withMeteorReactive',
+  setDisplayName('withMeteorReactive')(
     composeWithTracker(
       composeFunc(asyncFunc),
       null,
@@ -58,7 +59,7 @@ export const withApiCallResult = ({
   overrideCallProps = () => null,
   resultToProps = result => ({ [propName]: result }),
 }) =>
-  withDisplayName(`apiCall(${methodName})`,
+  setDisplayName(`apiCall(${methodName})`)(
     withAsync(
       async (appContext, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
@@ -76,8 +77,8 @@ export const withApiCallResult = ({
         }
       },
       (currentProps, nextProps) =>
-      ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-      (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
+        ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
+        (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
     )
   )
 
@@ -87,7 +88,7 @@ export const connectSubscription = ({
   propsToArgs = () => null,
   overrideCallProps = () => null,
 }) =>
-  withDisplayName(`connect(${publicationName})`,
+  setDisplayName(`connect(${publicationName})`)(
     withMeteorReactive(
       ({ Meteor }, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
@@ -109,7 +110,7 @@ export const connectSubscription = ({
         }
       },
       (currentProps, nextProps) =>
-      ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-      (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
+        ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
+        (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
     )
   )

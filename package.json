@@ -32,7 +32,7 @@
     "date-fns": "^1.9.0",
     "extend-accessors": "^1.0.1",
     "react-komposer": "damonmaria/react-komposer#shouldResubscribe-option",
-    "shallowequal": "^0.2.2"
+    "recompose": "^0.22.0"
   },
   "peerDependencies": {
     "@mindhive/di": "^4.0.0",
