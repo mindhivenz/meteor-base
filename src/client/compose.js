@@ -103,8 +103,9 @@ export const connectSubscription = ({
             }
           },
         }
-        if (Meteor.subscribe(publicationName, propsToArgs(props), callbacks).ready()) {
-          pushProps(dataToProps(app(), props))
+        const args = propsToArgs(props)
+        if (Meteor.subscribe(publicationName, args, callbacks).ready()) {
+          pushProps(dataToProps(app(), args))
         } else {
           pushProps(loadingProps())
         }
