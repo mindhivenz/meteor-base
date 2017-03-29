@@ -1,6 +1,7 @@
 import React from 'react'
 import compose from 'recompose/compose'
 import setDisplayName from 'recompose/setDisplayName'
+import getContext from 'recompose/getContext'
 
 
 export const loadingProps = () => ({
@@ -34,35 +35,35 @@ export class AsyncContainerComponentsProvider extends React.Component {
     this.props.children
 }
 
-const withAsyncContainerComponentsContext = (Component) => {
-  Component.contextTypes = {
-    asyncContainerComponents: React.PropTypes.object.isRequired,
-  }
-  return Component
-}
+const withAsyncContainerComponents = getContext({
+  asyncContainerComponents: React.PropTypes.object.isRequired,
+})
 
 export const errorContainer = Component =>
   compose(
     setDisplayName('errorContainer'),
-    withAsyncContainerComponentsContext(
-      (
-        { errors, ...props },
-        { asyncContainerComponents: { Error } },
-      ) =>
-        errors ? React.createElement(Error, { errors })
-          : React.createElement(Component, props)
-    ),
+    withAsyncContainerComponents,
+  )(
+    ({
+      errors,
+      asyncContainerComponents: { Error },
+      ...props
+    }) =>
+      errors ? React.createElement(Error, { errors })
+        : React.createElement(Component, props)
   )
 
 export const asyncContainer = Component =>
   compose(
     setDisplayName('asyncContainer'),
-    withAsyncContainerComponentsContext(
-      (
-        { errors, loading, ...props },
-        { asyncContainerComponents: { Error, Loading } },
-      ) =>
-        errors ? React.createElement(Error, { errors })
+    withAsyncContainerComponents,
+  )(
+    ({
+        errors,
+        loading,
+        asyncContainerComponents: { Error, Loading },
+        ...props,
+      }) =>
+      errors ? React.createElement(Error, { errors })
         : (loading ? React.createElement(Loading) : React.createElement(Component, props))
-    ),
   )
