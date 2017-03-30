@@ -18,32 +18,35 @@ export default class SubscriptionPlusIndividualsDocStore {
   @observable individualIds = []
   @observable loading = true
 
-  constructor() {
-    const { Issues, mongoMirror } = app()
-    const baseSubscription = mongoMirror.subscriptionToObservable({
-      publicationName: 'issues.unresolved',
-      collection: Issues,
-      findSelector: {},  // everything: so we collect this subscription and the individual ones
-      findOptions: { sort: { startTimestamp: -1 } },  // Because startTimestamp doesn't change
+  constructor({
+    baseSubscription,
+    individualSubscription,
+    individualSubscriptionIdToArgs = id => ({ id }),
+    paramName = null,
+  }) {
+    const { mongoMirror } = app()
+    this.paramName = paramName
+    const baseSub = mongoMirror.subscriptionToObservable({
+      ...baseSubscription,
       observableArray: this.docs,
     })
-    this._addSubscription(baseSubscription)
+    this._addSubscription(baseSub)
     autorun('Check loading', () => {
-      if (this.loading && ! baseSubscription.loading && ! this._anySubscriptionLoading) {
+      if (this.loading && ! baseSub.loading && ! this._anySubscriptionLoading) {
         runInAction('Initial load complete', () => {
           this.loading = false
         })
       }
     })
     autorun('Ensure all individual IDs present', () => {
-      if (! baseSubscription.loading) {
+      if (! baseSub.loading) {
         const ids = new Set(this.docs.map(d => d._id))
         this.individualIds
           .filter(id => ! ids.has(id))
           .forEach((id) => {
             this._addSubscription(mongoMirror.subscriptionToLocal({
-              publicationName: 'issue',
-              subscriptionArgs: { id },
+              ...individualSubscription,
+              subscriptionArgs: individualSubscriptionIdToArgs(id),
             }))
           })
       }
@@ -60,6 +63,12 @@ export default class SubscriptionPlusIndividualsDocStore {
 
   @computed get loadingAdditional() {
     return ! this.loading && this._anySubscriptionLoading
+  }
+
+  update({ params }) {
+    if (params && this.paramName) {
+      this.ensureSelectedId(params[this.paramName])
+    }
   }
 
   ensureSelectedId(selectedId) {
