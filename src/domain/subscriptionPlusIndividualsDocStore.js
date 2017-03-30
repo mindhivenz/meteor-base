@@ -17,15 +17,16 @@ export default class SubscriptionPlusIndividualsDocStore {
   @observable subscriptions = []
   @observable individualIds = []
   @observable loading = true
+  @observable.ref selected = selectedState(null)
 
   constructor({
     baseSubscription,
     individualSubscription,
     individualSubscriptionIdToArgs = id => ({ id }),
-    paramName = null,
+    selectedParamName = null,
   }) {
     const { mongoMirror } = app()
-    this.paramName = paramName
+    this.selectedParamName = selectedParamName
     const baseSub = mongoMirror.subscriptionToObservable({
       ...baseSubscription,
       observableArray: this.docs,
@@ -53,6 +54,21 @@ export default class SubscriptionPlusIndividualsDocStore {
     })
   }
 
+  @computed get selectedDoc() {
+    return this.selected && this.selected.id && this.docs.find(d => d._id === this.selected.id)
+  }
+
+  @action setSelected(selectedId) {
+    this.selected = selectedState(selectedId)
+    this.ensureId(this.selected.id)
+  }
+
+  ensureId(id) {
+    if (id && ! this.individualIds.includes(id)) {
+      runInAction('Add new individual id', () => { this.individualIds.push(id) })
+    }
+  }
+
   @action _addSubscription(subscription) {
     this.subscriptions.push(subscription)
   }
@@ -66,19 +82,8 @@ export default class SubscriptionPlusIndividualsDocStore {
   }
 
   update({ params }) {
-    if (params && this.paramName) {
-      this.ensureSelectedId(params[this.paramName])
-    }
-  }
-
-  ensureSelectedId(selectedId) {
-    const selected = selectedState(selectedId)
-    this.ensureId(selected.id)
-  }
-
-  ensureId(id) {
-    if (id && ! this.individualIds.includes(id)) {
-      runInAction('Add new individual id', () => { this.individualIds.push(id) })
+    if (params && this.selectedParamName) {
+      this.setSelected(params[this.selectedParamName])
     }
   }
 
