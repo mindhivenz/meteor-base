@@ -1856,6 +1856,10 @@ loose-envify@^1.0.0:
   dependencies:
     js-tokens "^3.0.0"
 
+lru-memoize@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/lru-memoize/-/lru-memoize-1.0.1.tgz#25afa87290562ab6addac4f323d16e8724306a9d"
+
 micromatch@^2.1.5:
   version "2.3.11"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-2.3.11.tgz#86677c97d1720b363431d04d0d15293bd38c1565"
