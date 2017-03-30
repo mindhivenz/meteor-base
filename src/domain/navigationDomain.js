@@ -95,6 +95,20 @@ class NavigationDomain {
     })
   }
 
+  // Browser back if we managed navigation to here, otherwise replace with dirs of current URL
+  // So dirs is only used, for example, if a link was shared. By default, in that case, back goes to '/'.
+  // If dirs is >= 0 then the number of directories in the URL to keep
+  //    (recommended to avoid race conditions on quick double clicks)
+  // If dirs is < 0 then the number of directories to remove
+  pop(dirs = 0) {
+    const { browserHistory } = app()
+    if (this.backPathname) {
+      browserHistory.goBack()
+    } else {
+      this.replace(this._keepDirs(dirs))
+    }
+  }
+
   // If browser back button would take us to the same place, then use that, otherwise replace
   popTo(pathname) {
     const { browserHistory } = app()
@@ -102,19 +116,6 @@ class NavigationDomain {
       browserHistory.goBack()
     } else {
       this.replace(pathname)
-    }
-  }
-
-  // Browser back if we managed navigation to here, otherwise replace with dirs of current URL
-  // If dirs is >= 0 then the number of directories in the URL to keep
-  //    (recommended to avoid race conditions on quick double clicks)
-  // If dirs is < 0 then the number of directories to remove
-  popUp(dirs = -1) {
-    const { browserHistory } = app()
-    if (this.backPathname) {
-      browserHistory.goBack()
-    } else {
-      this.replace(this._keepDirs(dirs))
     }
   }
 
