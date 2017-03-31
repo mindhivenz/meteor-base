@@ -2,10 +2,13 @@ import {
   action,
   observable,
   runInAction,
-  isObservable,
+  extendShallowObservable,
 } from 'mobx'
 import { app } from '@mindhive/di'
 import { meteorTracker } from './tracker'
+import difference from 'lodash/difference'
+
+import devError from '../devError'
 
 // Originally based on https://github.com/meteor-space/tracker-mobx-autorun 0.2.0
 
@@ -31,25 +34,6 @@ export const checkFindOptions = ({
   if (Meteor.isDevelopment) {
     if (findOptions && findOptions.sort && ! observableArray) {
       console.warn('sort findOptions does not make sense when not observing an array')  // eslint-disable-line no-console
-    }
-  }
-}
-
-const isShallowReferenceEnhancer = enhancer => ! isObservable(enhancer({}))
-
-export const checkObservableModes = ({
-  observableArray,
-  observableMap,
-}) => {
-  const { Meteor } = app()
-  if (Meteor.isDevelopment) {
-    if (observableArray && ! isShallowReferenceEnhancer(observableArray.$mobx.enhancer)) {
-      console.warn('observableArray does not appear to be shallow, ' +  // eslint-disable-line no-console
-        'declare as: @observable.shallow array = []')
-    }
-    if (observableMap && ! isShallowReferenceEnhancer(observableMap.enhancer)) {
-      console.warn('observableMap does not appear to be shallow, ' +  // eslint-disable-line no-console
-        'declare as: @observable.shallow map = new Map()')
     }
   }
 }
@@ -90,91 +74,110 @@ export class MongoMirror {
     mongoCursor,
     observableArray,  // Should be declared as observable.shallow
     observableMap,  // Should be declared as observable.shallow
+    schema,
     arrayIsOrdered = true,
   }) {
-    checkObservableModes({ observableArray, observableMap })
+    const mapError = (message) => { devError(`${message}\nobservableMap keys: ${Array.from(observableMap.keys())}`) }
+    const arrayError = (message) => { devError(`${message}\nobservableArray keys: ${observableArray.map(d => d._id)}`) }
+    const topLevelSchemaKeys = typeof schema === 'object' ?
+      Object.keys(schema).filter(k => k.indexOf('.') === -1)
+      : []
+    const asShallowObservable = (id, fields) => {
+      const missingKeys = difference(topLevelSchemaKeys, Object.keys(fields))
+      const undefinedFields = {}
+      missingKeys.forEach((k) => { undefinedFields[k] = undefined })
+      return extendShallowObservable({ _id: id }, fields, undefinedFields)
+    }
     meteorTracker.nonreactive(() => {
       runInAction(`${context}: initial fetch`, () => {
         const initialDocs = mongoCursor.fetch()
+          .map(({ _id, ...fields }) => asShallowObservable(_id, fields))
         if (observableArray) {
           observableArray.replace(initialDocs)
         }
         if (observableMap) {
-          observableMap.clear()
-          initialDocs.forEach((doc) => {
-            observableMap.set(doc._id, doc)
-          })
+          observableMap.replace(initialDocs.map(d => [d._id, d]))
         }
       })
     })
-    if (observableArray && arrayIsOrdered) {
-      return mongoCursor.observe({
-        _suppress_initial: true,  // suppresses addedAt for documents initially fetched above
-        addedAt: action(`${context}: document added`, (doc, index) => {
-          observableArray.splice(index, 0, doc)
-          if (observableMap) {
-            observableMap.set(doc._id, doc)
-          }
-        }),
-        changedAt: action(`${context}: document changed`, (doc, oldDoc, index) => {
-          // REVISIT: if existing value isObservable we could be more efficient here and just assign top level fields
-          // Probably using extendObservable but also need to handle fields disappearing
-          // Or use observeChanges instead so we just get fields
-          observableArray[index] = doc
-          if (observableMap) {
-            observableMap.set(doc._id, doc)
-          }
-        }),
-        removedAt: action(`${context}: document removed`, (doc, index) => {
-          observableArray.splice(index, 1)
-          if (observableMap) {
-            observableMap.delete(doc._id)
-          }
-        }),
-        movedTo: action(`${context}: document moved`, (doc, fromIndex, toIndex) => {
-          observableArray.splice(fromIndex, 1)
-          observableArray.splice(toIndex, 0, doc)
-        }),
-      })
-    }
-    // This style of observe has better performance
-    return mongoCursor.observe({
-      _suppress_initial: true,  // suppresses added for documents initially fetched above
-      added: action(`${context}: document added`, (doc) => {
+    const arrayIndexOfId = id => observableArray.findIndex(d => d._id === id)
+    const observer = {
+      _suppress_initial: true,  // suppresses addedAt for documents initially fetched above
+      changed: action(`${context}: document changed`, (id, fields) => {
+        let doc
         if (observableMap) {
-          observableMap.set(doc._id, doc)
+          doc = observableMap.get(id)
+          if (! doc) {
+            mapError(`${id} not found for change in map`)
+          }
+          return // as we've modified the object itself, no need to change in array, finding by map more efficient
+        } else if (observableArray) {
+          doc = observableArray.find(d => d._id === id)
+          if (! doc) {
+            arrayError(`${id} not found for change in array`)
+          }
         }
+        if (doc) {
+          extendShallowObservable(doc, fields)
+        }
+      }),
+      removed: action(`${context}: document removed`, (id) => {
+        if (observableMap) {
+          const removed = observableMap.delete(id)
+          if (! removed) {
+            mapError(`Id ${id} to be removed not found`)
+          }
+        }
+        if (observableArray) {
+          const index = arrayIndexOfId(id)
+          if (index !== -1) {
+            observableArray.splice(index, 1)
+          } else {
+            arrayError(`Id ${id} to be removed not found`)
+          }
+        }
+      }),
+    }
+    if (observableArray && arrayIsOrdered) {
+      observer.addedBefore = action(`${context}: document added`, (id, fields, before) => {
+        const doc = asShallowObservable(id, fields)
+        const index = before != null ? arrayIndexOfId(before) : observableArray.length
+        if (index !== -1) {
+          observableArray.splice(index, 0, doc)
+        } else {
+          devError(`Id ${before} not found when adding ${id}`)
+        }
+        if (observableMap) {
+          observableMap.set(id, doc)
+        }
+      })
+      observer.movedBefore = action(`${context}: document moved`, (id, before) => {
+        const fromIndex = arrayIndexOfId(id)
+        if (fromIndex !== -1) {
+          const doc = observableArray[fromIndex]
+          const toIndex = before != null ? arrayIndexOfId(before) : observableArray.length
+          if (toIndex !== -1) {
+            observableArray.splice(fromIndex, 1)
+            observableArray.splice(toIndex, 0, doc)
+          } else {
+            devError(`Id ${before} not found when moving ${id}`)
+          }
+        } else {
+          devError(`Id ${id} not found trying to move it`)
+        }
+      })
+    } else {
+      observer.added = action(`${context}: document added`, (id, fields) => {
+        const doc = asShallowObservable(id, fields)
         if (observableArray) {
           observableArray.push(doc)
         }
-      }),
-      removed: action(`${context}: document removed`, (oldDoc) => {
         if (observableMap) {
-          observableMap.delete(oldDoc._id)
+          observableMap.set(id, doc)
         }
-        if (observableArray) {
-          // REVISIT: does this first attempt ever find anything?
-          let index = observableArray.indexOf(oldDoc)
-          if (index === -1) {
-            index = observableArray.findIndex(d => d._id === oldDoc._id)
-          }
-          if (index !== -1) {
-            observableArray.splice(index, 1)
-          }
-        }
-      }),
-      changed: action(`${context}: document changed`, (doc) => {
-        if (observableMap) {
-          observableMap.set(doc._id, doc)
-        }
-        if (observableArray) {
-          const index = observableArray.findIndex(d => d._id === doc._id)
-          if (index !== -1) {
-            observableArray[index] = doc
-          }
-        }
-      }),
-    })
+      })
+    }
+    return mongoCursor.observeChanges(observer)
   }
 
   subscriptionToLocal({
@@ -209,6 +212,7 @@ export class MongoMirror {
     observableArray,
     observableMap,
     arrayIsOrdered = typeof findOptions.sort === 'object',
+    schema = collection._c2 && collection._c2._simpleSchema && collection._c2._simpleSchema.mergedSchema(),
     context = `subscription:${publicationName}->${observableName({ observableArray, observableMap })}`,
   }) {
     checkFindOptions({ findOptions, observableArray })
@@ -222,6 +226,7 @@ export class MongoMirror {
         observableArray,
         observableMap,
         arrayIsOrdered,
+        schema,
       }),
     })
   }
@@ -252,6 +257,7 @@ export class MongoMirror {
     groundCollection,
     observableArray,
     observableMap,
+    schema,
     context = `offline:${groundCollectionName(groundCollection)}->${
       observableName({ observableArray, observableMap })}`,
   }) {
@@ -259,6 +265,7 @@ export class MongoMirror {
       context,
       observableArray,
       observableMap,
+      schema,
       mongoCursor: groundCollection.find(),
     })
   }

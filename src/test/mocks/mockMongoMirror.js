@@ -1,6 +1,6 @@
 import { observable } from 'mobx'
 import sinon from 'sinon'
-import { checkFindOptions, checkObservableModes } from '../../client/mongoMirror'
+import { checkFindOptions } from '../../client/mongoMirror'
 
 
 const docId = docOrId =>
@@ -52,7 +52,6 @@ export class MockMongoMirror {
     observableMap,
     mongoCursor,
   }) {
-    checkObservableModes({ observableArray, observableMap })
     const initialFetch = mongoCursor.fetch()
     if (observableArray) {
       observableArray.replace(initialFetch)
