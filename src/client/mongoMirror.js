@@ -72,8 +72,8 @@ export class MongoMirror {
   cursorToObservable({
     context = `cursorToObservable@${generateUniqueId()}`,
     mongoCursor,
-    observableArray,  // Should be declared as observable.shallow
-    observableMap,  // Should be declared as observable.shallow
+    observableArray,
+    observableMap,
     schema,
     arrayIsOrdered = true,
   }) {
