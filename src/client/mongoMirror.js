@@ -50,10 +50,15 @@ class SubscriptionHandle {
   stopped = false
 
   @observable loading = true
+  @observable.ref error = null
 
   _ready(disposer) {
     this.disposer = disposer
     this.loading = false
+  }
+
+  _setError(err) {
+    this.error = err
   }
 
   stop() {
@@ -187,17 +192,26 @@ export class MongoMirror {
     onReady = null,  // Can optionally return a disposer with a stop function
   }) {
     const subscriptionHandle = new SubscriptionHandle(context)
-    Meteor.subscribe(publicationName, subscriptionArgs, () => {
-      if (subscriptionHandle.stopped) {
-        return
-      }
-      let disposer = null
-      if (onReady) {
-        disposer = onReady()
-      }
-      runInAction(`${context}: ready`, () => {
-        subscriptionHandle._ready(disposer)
-      })
+    Meteor.subscribe(publicationName, subscriptionArgs, {
+      onReady() {
+        if (subscriptionHandle.stopped) {
+          return
+        }
+        let disposer = null
+        if (onReady) {
+          disposer = onReady()
+        }
+        runInAction(`${context}: ready`, () => {
+          subscriptionHandle._ready(disposer)
+        })
+      },
+      onStop(err) {
+        if (err) {
+          runInAction(`${context}: error`, () => {
+            subscriptionHandle._setError(err)
+          })
+        }
+      },
     })
     return subscriptionHandle
   }
