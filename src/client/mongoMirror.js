@@ -1,8 +1,10 @@
 import {
   action,
   observable,
+  computed,
   runInAction,
   extendShallowObservable,
+  autorunAsync,
 } from 'mobx'
 import { app } from '@mindhive/di'
 import { meteorTracker } from './tracker'
@@ -48,12 +50,18 @@ const generateUniqueId = () => {
 class SubscriptionHandle {
 
   stopped = false
+  disposers = []
 
   @observable loading = true
   @observable.ref error = null
 
-  _ready(disposer) {
-    this.disposer = disposer
+  _addDisposer(disposer) {
+    if (disposer) {
+      this.disposers.push(disposer)
+    }
+  }
+
+  _setLoaded() {
     this.loading = false
   }
 
@@ -63,14 +71,59 @@ class SubscriptionHandle {
 
   stop() {
     this.stopped = true
-    if (this.disposer) {
-      this.disposer.stop()
-      this.disposer = null
-    }
+    this.disposers.forEach((d) => {
+      d.stop()
+    })
+    this.disposers = []
+  }
+}
+
+class CombinedSubscriptionHandles {
+
+  @observable _handles
+  @observable initialLoading = true
+
+  disposers = []
+
+  constructor(handles = []) {
+    this._handles = handles
+    this.disposers.push(
+      // Async so if client reacts to initial handles completing by adding more, we stay initialLoading for those too
+      autorunAsync('Check initialLoading', () => {
+        if (this.initialLoading && ! this.loading) {
+          runInAction('Initial load complete', () => {
+            this.initialLoading = false
+''          })
+        }
+      })
+    )
+  }
+
+  push(...handles) {
+    this._handles.push(...handles)
+  }
+
+  @computed get loading() {
+    return this._handles.some(h => h.loading)
+  }
+
+  @computed get error() {
+    const errorHandle = this._handles.find(h => h.error)
+    return errorHandle && errorHandle.error
+  }
+
+  stop() {
+    this._handles.forEach((h) => { h.stop() })
+    this.disposers.forEach((d) => { d() })
+    this.disposers = []
   }
 }
 
 export class MongoMirror {
+
+  combineSubscriptionHandles(handles) {
+    return new CombinedSubscriptionHandles(handles)
+  }
 
   // Automatically pump data from a Mongo cursor to a Mobx array or map
   // See subscriptionToObservable for something more high level
@@ -191,28 +244,31 @@ export class MongoMirror {
     context = `subscription:${publicationName}`,
     onReady = null,  // Can optionally return a disposer with a stop function
   }) {
+    const { Meteor } = app()
     const subscriptionHandle = new SubscriptionHandle(context)
-    Meteor.subscribe(publicationName, subscriptionArgs, {
-      onReady() {
-        if (subscriptionHandle.stopped) {
-          return
-        }
-        let disposer = null
-        if (onReady) {
-          disposer = onReady()
-        }
-        runInAction(`${context}: ready`, () => {
-          subscriptionHandle._ready(disposer)
-        })
-      },
-      onStop(err) {
-        if (err) {
-          runInAction(`${context}: error`, () => {
-            subscriptionHandle._setError(err)
+    subscriptionHandle._addDisposer(
+      Meteor.subscribe(publicationName, subscriptionArgs, {
+        onReady() {
+          if (subscriptionHandle.stopped) {
+            return
+          }
+          if (onReady) {
+            const disposer = onReady()
+            subscriptionHandle._addDisposer(disposer)
+          }
+          runInAction(`${context}: ready`, () => {
+            subscriptionHandle._setLoaded()
           })
-        }
-      },
-    })
+        },
+        onStop(err) {
+          if (err) {
+            runInAction(`${context}: error`, () => {
+              subscriptionHandle._setError(err)
+            })
+          }
+        },
+      })
+    )
     return subscriptionHandle
   }
 

@@ -95,8 +95,10 @@ class NavigationDomain {
     })
   }
 
-  // Browser back if we managed navigation to here, otherwise replace with dirs of current URL
-  // So dirs is only used, for example, if a link was shared. By default, in that case, back goes to '/'.
+  // Browser back if we managed navigation to here, otherwise replace based on dirs (optional)
+  // So dirs should only used, for example, if a link was shared. Otherwise there will be browser history that we have
+  // managed.
+  // By default back goes to '/' (when dirs is 0)
   // If dirs is >= 0 then the number of directories in the URL to keep
   //    (recommended to avoid race conditions on quick double clicks)
   // If dirs is < 0 then the number of directories to remove

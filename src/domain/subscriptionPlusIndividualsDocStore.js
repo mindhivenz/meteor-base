@@ -14,10 +14,10 @@ export default class SubscriptionPlusIndividualsDocStore {
   // REVISIT: does it 'flicker' when resolving an issue and it needs to be reloaded individually?
 
   @observable docs = []
-  @observable subscriptions = []
   @observable individualIds = []
-  @observable loading = true
   @observable.ref selected = selectedState(null)
+
+  disposers = []
 
   constructor({
     baseSubscription,
@@ -31,31 +31,38 @@ export default class SubscriptionPlusIndividualsDocStore {
       ...baseSubscription,
       observableArray: this.docs,
     })
-    this._addSubscription(baseSub)
-    autorun('Check loading', () => {
-      if (this.loading && ! baseSub.loading && ! this._anySubscriptionLoading) {
-        runInAction('Initial load complete', () => {
-          this.loading = false
-        })
-      }
-    })
-    autorun('Ensure all individual IDs present', () => {
-      if (! baseSub.loading) {
-        const ids = new Set(this.docs.map(d => d._id))
-        this.individualIds
-          .filter(id => ! ids.has(id))
-          .forEach((id) => {
-            this._addSubscription(mongoMirror.subscriptionToLocal({
-              ...individualSubscription,
-              subscriptionArgs: individualSubscriptionIdToArgs(id),
-            }))
-          })
-      }
-    })
+    this.subscriptions = mongoMirror.combineSubscriptionHandles([baseSub])
+    this.disposers.push(
+      autorun('Ensure all individual IDs present', () => {
+        if (! baseSub.loading) {
+          const ids = new Set(this.docs.map(d => d._id))
+          this.individualIds
+            .filter(id => ! ids.has(id))
+            .forEach((id) => {
+              this.subscriptions.push(
+                mongoMirror.subscriptionToLocal({
+                  ...individualSubscription,
+                  subscriptionArgs: individualSubscriptionIdToArgs(id),
+                })
+              )
+            })
+        }
+      }),
+    )
+  }
+
+  @computed get loading() {
+    return this.subscriptions.initialLoading
   }
 
   @computed get selectedDoc() {
     return this.selected && this.selected.id && this.docs.find(d => d._id === this.selected.id)
+  }
+
+  update({ params }) {
+    if (params && this.selectedParamName) {
+      this.setSelected(params[this.selectedParamName])
+    }
   }
 
   @action setSelected(selectedId) {
@@ -69,25 +76,9 @@ export default class SubscriptionPlusIndividualsDocStore {
     }
   }
 
-  @action _addSubscription(subscription) {
-    this.subscriptions.push(subscription)
-  }
-
-  @computed get _anySubscriptionLoading() {
-    return this.subscriptions.some(s => s.loading)
-  }
-
-  @computed get loadingAdditional() {
-    return ! this.loading && this._anySubscriptionLoading
-  }
-
-  update({ params }) {
-    if (params && this.selectedParamName) {
-      this.setSelected(params[this.selectedParamName])
-    }
-  }
-
   stop() {
-    this.subscriptions.forEach(m => m.stop())
+    this.subscriptions.stop()
+    this.disposers.forEach((d) => { d() })
+    this.disposers = []
   }
 }
