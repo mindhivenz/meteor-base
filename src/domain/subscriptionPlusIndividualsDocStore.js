@@ -13,7 +13,7 @@ export default class SubscriptionPlusIndividualsDocStore {
 
   // REVISIT: does it 'flicker' when resolving an issue and it needs to be reloaded individually?
 
-  @observable.shallow docs = []
+  @observable docs = []
   @observable subscriptions = []
   @observable individualIds = []
   @observable loading = true

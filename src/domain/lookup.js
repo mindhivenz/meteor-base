@@ -60,7 +60,7 @@ class ExtendedLookupDomain {
 
 export class LookupDomain {
 
-  @observable.shallow idMap = new Map()
+  @observable idMap = new Map()
 
   constructor(LookupClass, mirrorSubscriptionOptions) {
     this.LookupClass = LookupClass
