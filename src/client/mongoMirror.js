@@ -90,6 +90,7 @@ export class MongoMirror {
     mongoCursor,
     observableArray,  // Should be declared as observable.shallow
     observableMap,  // Should be declared as observable.shallow
+    arrayIsOrdered = true,
   }) {
     checkObservableModes({ observableArray, observableMap })
     meteorTracker.nonreactive(() => {
@@ -106,7 +107,7 @@ export class MongoMirror {
         }
       })
     })
-    if (observableArray) {
+    if (observableArray && arrayIsOrdered) {
       return mongoCursor.observe({
         _suppress_initial: true,  // suppresses addedAt for documents initially fetched above
         addedAt: action(`${context}: document added`, (doc, index) => {
@@ -135,21 +136,45 @@ export class MongoMirror {
           observableArray.splice(toIndex, 0, doc)
         }),
       })
-    } else if (observableMap) {
-      return mongoCursor.observe({
-        _suppress_initial: true,  // suppresses added for documents initially fetched above
-        added: action(`${context}: document added`, (doc) => {
-          observableMap.set(doc._id, doc)
-        }),
-        removed: action(`${context}: document removed`, (oldDoc) => {
-          observableMap.delete(oldDoc._id)
-        }),
-        changed: action(`${context}: document changed`, (doc) => {
-          observableMap.set(doc._id, doc)
-        }),
-      })
     }
-    throw new Error('Neither observableArray, not observableMap')
+    // This style of observe has better performance
+    return mongoCursor.observe({
+      _suppress_initial: true,  // suppresses added for documents initially fetched above
+      added: action(`${context}: document added`, (doc) => {
+        if (observableMap) {
+          observableMap.set(doc._id, doc)
+        }
+        if (observableArray) {
+          observableArray.push(doc)
+        }
+      }),
+      removed: action(`${context}: document removed`, (oldDoc) => {
+        if (observableMap) {
+          observableMap.delete(oldDoc._id)
+        }
+        if (observableArray) {
+          // REVISIT: does this first attempt ever find anything?
+          let index = observableArray.indexOf(oldDoc)
+          if (index === -1) {
+            index = observableArray.findIndex(d => d._id === oldDoc._id)
+          }
+          if (index !== -1) {
+            observableArray.splice(index, 1)
+          }
+        }
+      }),
+      changed: action(`${context}: document changed`, (doc) => {
+        if (observableMap) {
+          observableMap.set(doc._id, doc)
+        }
+        if (observableArray) {
+          const index = observableArray.findIndex(d => d._id === doc._id)
+          if (index !== -1) {
+            observableArray[index] = doc
+          }
+        }
+      }),
+    })
   }
 
   subscriptionToLocal({
@@ -183,6 +208,7 @@ export class MongoMirror {
     findOptions = {},
     observableArray,
     observableMap,
+    arrayIsOrdered = typeof findOptions.sort === 'object',
     context = `subscription:${publicationName}->${observableName({ observableArray, observableMap })}`,
   }) {
     checkFindOptions({ findOptions, observableArray })
@@ -192,9 +218,10 @@ export class MongoMirror {
       context,
       onReady: () => this.cursorToObservable({
         context,
+        mongoCursor: collection.find(findSelector, findOptions),
         observableArray,
         observableMap,
-        mongoCursor: collection.find(findSelector, findOptions),
+        arrayIsOrdered,
       }),
     })
   }
