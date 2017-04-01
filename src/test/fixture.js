@@ -1,6 +1,6 @@
 import { app } from '@mindhive/di'
 
-import { TestMongo } from './mocks/testMongo'
+import TestMongo from './mocks/TestMongo'
 
 
 export const auditEntries = () =>

@@ -40,7 +40,7 @@ export class MockSubscription extends MockApiContext {
 export class MockHttpContext extends MockApiContext {
 }
 
-export class MockApiRegistry extends ApiRegistry {
+export default class MockApiRegistry extends ApiRegistry {
   methodFuncs = new Map()
   publicationFuncs = new Map()
   httpFuncs = []

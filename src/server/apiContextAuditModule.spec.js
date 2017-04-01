@@ -4,7 +4,7 @@ import { mockAppContext, app } from '@mindhive/di'
 import { sinon } from '../mocha'
 
 import { notAuthorizedError } from '../error'
-import { MockApiRegistry } from '../test/mocks/mockApiRegistry'
+import MockApiRegistry from '../test/mocks/MockApiRegistry'
 
 import apiContextAuditModule, { UnhandledExceptionReporter } from './apiContextAuditModule'
 

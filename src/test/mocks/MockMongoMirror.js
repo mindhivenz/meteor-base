@@ -41,7 +41,7 @@ class AwaitDocs {
   }
 }
 
-export class MockMongoMirror {
+export default class MockMongoMirror {
 
   awaitAdded = new AwaitDocs()
   awaitUpdated = new AwaitDocs()

@@ -7,7 +7,8 @@ export const resetTestGroundCollections = () => {
   testGroundCollections.clear()
 }
 
-export const TestMongo = {}
+const TestMongo = {}
+export default TestMongo
 export const TestGround = {}
 
 const NAME_TO_CAUSE_MINIMONGO = null

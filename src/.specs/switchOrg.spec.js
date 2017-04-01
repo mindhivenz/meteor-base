@@ -1,6 +1,6 @@
 import { initModules, app } from '@mindhive/di'
 import { mockServerContext } from '../test/serverContext'
-import { MockMethodInvocation } from '../test/mocks/mockApiRegistry'
+import { MockMethodInvocation } from '../test/mocks/MockApiRegistry'
 import { notAuthorizedErrorMatch } from '../test/mocks/error'
 import { onlyAuditEntry, auditEntries, resetRolesCollection } from '../test/fixture'
 

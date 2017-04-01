@@ -1,6 +1,6 @@
 import { autorun as mobxAutorun } from 'mobx'
 
 
-export class MockTracker {
+export default class MockTracker {
   autorun = mobxAutorun
 }

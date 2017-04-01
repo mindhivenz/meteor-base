@@ -3,7 +3,7 @@ import { mockAppContext, initModules, app } from '@mindhive/di'
 
 import { sinon, should, forATick } from '../mocha'
 
-import { TestGround } from '../test/mocks/testMongo'
+import { TestGround } from '../test/mocks/TestMongo'
 import mockMeteorCoreModuleFactory from '../test/mocks/mockMeteorCoreModuleFactory'
 import mockClockModule from '@mindhive/time/mockClockModule'
 import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
