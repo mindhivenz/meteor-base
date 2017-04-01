@@ -1,4 +1,4 @@
-giimport { app } from '@mindhive/di'
+import { app } from '@mindhive/di'
 
 
 export default class Api {
