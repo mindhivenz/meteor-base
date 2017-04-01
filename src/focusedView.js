@@ -30,7 +30,7 @@ const VIEW_SPEC_PROPERTIES = [
 const selectorIsById = selector =>
   (selector && selector._id) || typeof selector === 'string'
 
-export class FocusedView {
+export default class FocusedView {
 
   constructor(collection, viewSpec = {}) {
     this.collection = collection

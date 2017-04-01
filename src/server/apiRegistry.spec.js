@@ -2,7 +2,7 @@ import some from '@mindhive/some'
 import { app } from '@mindhive/di'
 
 import { sinon, should } from '../mocha'
-import { ApiRegistry } from './apiRegistry'
+import ApiRegistry from './ApiRegistry'
 
 
 describe('ApiRegistry', () => {

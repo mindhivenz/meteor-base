@@ -1,7 +1,7 @@
 import { app } from '@mindhive/di'
 
 
-export class Api {
+export default class Api {
 
   meteorCall(
     methodName,

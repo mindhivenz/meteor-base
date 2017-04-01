@@ -7,7 +7,7 @@ import {
   autorunAsync,
 } from 'mobx'
 import { app } from '@mindhive/di'
-import { meteorTracker } from './tracker'
+import { meteorTracker } from './Tracker'
 import difference from 'lodash/difference'
 
 import devError from '../devError'
@@ -78,7 +78,7 @@ class SubscriptionHandle {
   }
 }
 
-class CombinedSubscriptionHandles {
+export class CombinedSubscriptionHandles {
 
   @observable _handles
   @observable initialLoading = true
@@ -93,7 +93,7 @@ class CombinedSubscriptionHandles {
         if (this.initialLoading && ! this.loading) {
           runInAction('Initial load complete', () => {
             this.initialLoading = false
-''          })
+          })
         }
       })
     )
@@ -119,11 +119,7 @@ class CombinedSubscriptionHandles {
   }
 }
 
-export class MongoMirror {
-
-  combineSubscriptionHandles(handles) {
-    return new CombinedSubscriptionHandles(handles)
-  }
+export default class MongoMirror {
 
   // Automatically pump data from a Mongo cursor to a Mobx array or map
   // See subscriptionToObservable for something more high level

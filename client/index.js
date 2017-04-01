@@ -1,9 +1,9 @@
-
 var containers = require('../dist/client/containers')
 var compose = require('../dist/client/compose')
 var localContext = require('../dist/client/localContext')
 var latchedProps = require('../dist/client/latchedProps')
 var selectedState = require('../dist/client/selectedState')
+
 
 module.exports = {
   loadingProps: containers.loadingProps,
@@ -16,7 +16,7 @@ module.exports = {
   withApiCallResult: compose.withApiCallResult,
   connectSubscription: compose.connectSubscription,
 
-  LocalContext: localContext.LocalContext,
+  LocalContext: localContext.default,
 
   withLatchedProps: latchedProps.withLatchedProps,
 

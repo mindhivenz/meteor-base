@@ -7,7 +7,7 @@ import {
 
 export const meteorTracker = global.Tracker
 
-export class Tracker {
+export default class Tracker {
 
   autorun(func) {
     let mobxDisposer = null

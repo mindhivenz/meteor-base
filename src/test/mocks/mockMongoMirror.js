@@ -1,6 +1,6 @@
 import { observable } from 'mobx'
 import sinon from 'sinon'
-import { checkFindOptions } from '../../client/mongoMirror'
+import { checkFindOptions } from '../../client/MongoMirror'
 
 
 const docId = docOrId =>

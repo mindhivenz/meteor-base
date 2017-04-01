@@ -1,2 +1,2 @@
 
-module.exports = require('./../dist/domain/subscriptionPlusIndividualsDocStore')
+module.exports = require('./../dist/domain/SubscriptionPlusIndividualsDocStore')

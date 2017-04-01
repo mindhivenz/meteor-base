@@ -8,6 +8,8 @@ import {
 import selectedState from '../client/selectedState'
 import { app } from '@mindhive/di'
 
+import { CombinedSubscriptionHandles } from '../client/MongoMirror'
+
 
 export default class SubscriptionPlusIndividualsDocStore {
 
@@ -31,7 +33,7 @@ export default class SubscriptionPlusIndividualsDocStore {
       ...baseSubscription,
       observableArray: this.docs,
     })
-    this.subscriptions = mongoMirror.combineSubscriptionHandles([baseSub])
+    this.subscriptions = new CombinedSubscriptionHandles([baseSub])
     this.disposers.push(
       autorun('Ensure all individual IDs present', () => {
         if (! baseSub.loading) {

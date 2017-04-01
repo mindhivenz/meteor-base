@@ -2,7 +2,7 @@ import some from '@mindhive/some'
 
 import { sinon, should } from './mocha'
 
-import { Enhancer } from './enhancer'
+import Enhancer from './Enhancer'
 
 
 describe('Enhancer', () => {

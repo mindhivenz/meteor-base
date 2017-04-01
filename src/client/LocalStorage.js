@@ -3,7 +3,7 @@
 
 // For consistency, use same storage as Meteor
 
-export class LocalStorage {
+export default class LocalStorage {
 
   localStorage = global.localStorage
 

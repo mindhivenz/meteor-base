@@ -1,9 +1,9 @@
 import { app } from '@mindhive/di'
 
-import { Enhancer } from '../enhancer'
+import Enhancer from '../Enhancer'
 
 
-export class ClientApiRegistry {
+export default class ClientApiRegistry {
 
   enhancer = new Enhancer()
   errorCallbacks = []

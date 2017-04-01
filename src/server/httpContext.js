@@ -6,7 +6,7 @@ import { HTTP_LOGIN_TOKEN_HEADER, HTTP_LOGIN_TOKEN_QUERY_PARAM } from '../univer
 
 export const parseRequestUrl = request => url.parse(request.originalUrl, true)
 
-export class HttpContext {
+export default class HttpContext {
 
   constructor(req) {
     const { apiRegistry, Random } = app()

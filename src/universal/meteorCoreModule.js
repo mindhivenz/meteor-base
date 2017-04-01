@@ -1,5 +1,5 @@
-import { ApiRegistry } from '../server/apiRegistry'
-import { ClientApiRegistry } from '../client/clientApiRegistry'
+import ApiRegistry from '../server/ApiRegistry'
+import ClientApiRegistry from '../client/ClientApiRegistry'
 
 
 export default () => {

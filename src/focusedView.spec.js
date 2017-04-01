@@ -2,7 +2,7 @@ import some from '@mindhive/some'
 
 import { should, sinon } from './mocha'
 
-import { FocusedView } from './focusedView'
+import FocusedView from './FocusedView'
 
 
 describe('focusedView', () => {

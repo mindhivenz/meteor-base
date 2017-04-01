@@ -2,8 +2,8 @@ import { app } from '@mindhive/di'
 import some from '@mindhive/some'
 import assert from 'assert'
 
-import { ApiRegistry } from '../../server/apiRegistry'
-import { parseRequestUrl } from '../../server/httpContext'
+import ApiRegistry from '../../server/ApiRegistry'
+import { parseRequestUrl } from '../../server/HttpContext'
 
 
 export class MockApiContext {

@@ -1,7 +1,7 @@
 import extendAccessors from 'extend-accessors'
 
 
-export class Enhancer {
+export default class Enhancer {
 
   constructor() {
     this.apiContextEnhanceObj = { enhanced: true }

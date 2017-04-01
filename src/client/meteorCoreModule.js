@@ -1,7 +1,7 @@
-import { Api } from './api'
-import { LocalStorage } from './storage'
-import { Tracker } from './tracker'
-import { MongoMirror } from './mongoMirror'
+import Api from './Api'
+import LocalStorage from './LocalStorage'
+import Tracker from './Tracker'
+import MongoMirror from './MongoMirror'
 
 
 export default () => ({

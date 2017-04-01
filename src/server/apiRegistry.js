@@ -1,10 +1,10 @@
 import { app } from '@mindhive/di'
 
-import { ClientApiRegistry } from '../client/clientApiRegistry'
-import { HttpContext } from './httpContext'
+import ClientApiRegistry from '../client/ClientApiRegistry'
+import HttpContext from './HttpContext'
 
 
-export class ApiRegistry extends ClientApiRegistry {
+export default class ApiRegistry extends ClientApiRegistry {
 
   constructor(Meteor, WebApp) {
     super(Meteor)

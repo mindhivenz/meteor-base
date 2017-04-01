@@ -2,7 +2,7 @@ import some from '@mindhive/some'
 
 import { sinon, should } from '../mocha'
 
-import { LocalStorage } from './storage'
+import LocalStorage from './LocalStorage'
 
 
 describe('LocalStorage', () => {
