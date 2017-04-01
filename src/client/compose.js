@@ -56,7 +56,8 @@ export const withApiCallResult = ({
   propName,
   methodName,
   propsToArgs = () => null,
-  overrideCallProps = () => null,
+  skipCall = () => false,
+  overrideCallProps = () => skipCall() ? {} : null,
   resultToProps = result => ({ [propName]: result }),
 }) =>
   setDisplayName(`apiCall(${methodName})`)(
@@ -86,7 +87,8 @@ export const connectSubscription = ({
   publicationName,
   dataToProps,
   propsToArgs = () => null,
-  overrideCallProps = () => null,
+  skipSubscription = () => false,
+  overrideCallProps = () => skipSubscription() ? {} : null,
 }) =>
   setDisplayName(`connect(${publicationName})`)(
     withMeteorReactive(
