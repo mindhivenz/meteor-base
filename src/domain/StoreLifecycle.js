@@ -9,7 +9,7 @@ export default class StoreLifecycle {
   disposers = []
 
   @computed get loading() {
-    return this._subscriptions && this._subscriptions.loading
+    return this._subscriptions && this._subscriptions.initialLoading
   }
 
   @computed get error() {

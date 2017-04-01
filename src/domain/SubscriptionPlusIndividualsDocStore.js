@@ -7,11 +7,10 @@ import {
 } from 'mobx'
 import selectedState from '../client/selectedState'
 import { app } from '@mindhive/di'
+import StoreLifecycle from './StoreLifecycle'
 
-import { CombinedSubscriptionHandles } from '../client/MongoMirror'
 
-
-export default class SubscriptionPlusIndividualsDocStore {
+export default class SubscriptionPlusIndividualsDocStore extends StoreLifecycle {
 
   // REVISIT: does it 'flicker' when resolving an issue and it needs to be reloaded individually?
 
@@ -19,29 +18,28 @@ export default class SubscriptionPlusIndividualsDocStore {
   @observable individualIds = []
   @observable.ref selected = selectedState(null)
 
-  disposers = []
-
   constructor({
     baseSubscription,
     individualSubscription,
     individualSubscriptionIdToArgs = id => ({ id }),
     selectedParamName = null,
   }) {
+    super()
     const { mongoMirror } = app()
     this.selectedParamName = selectedParamName
     const baseSub = mongoMirror.subscriptionToObservable({
       ...baseSubscription,
       observableArray: this.docs,
     })
-    this.subscriptions = new CombinedSubscriptionHandles([baseSub])
-    this.disposers.push(
+    this.addSubscription(baseSub)
+    this.addDisposer(
       autorun('Ensure all individual IDs present', () => {
         if (! baseSub.loading) {
           const ids = new Set(this.docs.map(d => d._id))
           this.individualIds
             .filter(id => ! ids.has(id))
             .forEach((id) => {
-              this.subscriptions.push(
+              this.addSubscription(
                 mongoMirror.subscriptionToLocal({
                   ...individualSubscription,
                   subscriptionArgs: individualSubscriptionIdToArgs(id),
@@ -51,10 +49,6 @@ export default class SubscriptionPlusIndividualsDocStore {
         }
       }),
     )
-  }
-
-  @computed get loading() {
-    return this.subscriptions.initialLoading
   }
 
   @computed get selectedDoc() {
@@ -76,11 +70,5 @@ export default class SubscriptionPlusIndividualsDocStore {
     if (id && ! this.individualIds.includes(id)) {
       runInAction('Add new individual id', () => { this.individualIds.push(id) })
     }
-  }
-
-  stop() {
-    this.subscriptions.stop()
-    this.disposers.forEach((d) => { d() })
-    this.disposers = []
   }
 }
