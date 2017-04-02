@@ -54,7 +54,7 @@ export const withMeteorReactive = (asyncFunc, shouldResubscribe) =>
 
 export const withApiCallResult = ({
   methodName,
-  propsToArgs = props => null,      // eslint-disable-line no-unused-vars
+  mapPropsToArgs = props => null,      // eslint-disable-line no-unused-vars
   skipCall = props => false,        // eslint-disable-line no-unused-vars
   overrideCallProps = props => skipCall(props) ? {} : null,  // null -> do not override
   propName,
@@ -71,7 +71,7 @@ export const withApiCallResult = ({
         pushProps(loadingProps())
         try {
           pushProps(resultToProps(
-            await app().api.call(methodName, propsToArgs(props), { notifyViewerPending: false })
+            await app().api.call(methodName, mapPropsToArgs(props), { notifyViewerPending: false })
           ))
         } catch (e) {
           pushProps(errorProps(e, props))
@@ -79,14 +79,14 @@ export const withApiCallResult = ({
       },
       (currentProps, nextProps) =>
         ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-        (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
+        (! overrideCallProps(nextProps) && ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)))
     )
   )
 
 export const connectSubscription = ({
   publicationName,
   dataToProps,
-  propsToArgs = props => null,                 // eslint-disable-line no-unused-vars
+  mapPropsToArgs = props => null,                 // eslint-disable-line no-unused-vars
   skipSubscription = props => false,           // eslint-disable-line no-unused-vars
   overrideCallProps = props => skipSubscription(props) ? {} : null,   // null -> do not override
 }) =>
@@ -105,7 +105,7 @@ export const connectSubscription = ({
             }
           },
         }
-        const args = propsToArgs(props)
+        const args = mapPropsToArgs(props)
         if (Meteor.subscribe(publicationName, args, callbacks).ready()) {
           pushProps(dataToProps(app(), args))
         } else {
@@ -114,6 +114,6 @@ export const connectSubscription = ({
       },
       (currentProps, nextProps) =>
         ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-        (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
+        (! overrideCallProps(nextProps) && ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)))
     )
   )
