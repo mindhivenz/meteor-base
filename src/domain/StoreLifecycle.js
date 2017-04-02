@@ -53,9 +53,15 @@ export default class StoreLifecycle {
     pull(this._disposers, disposer)
   }
 
+  update(props) {
+    this._dependents.forEach((d) => {
+      d.update && d.update(props)
+    })
+  }
+
   stop() {
-    this._dependents.forEach((h) => {
-      h.stop && h.stop()
+    this._dependents.forEach((d) => {
+      d.stop && d.stop()
     })
     this._disposers.forEach((d) => {
       d()
