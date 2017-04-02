@@ -10,7 +10,7 @@ import { app } from '@mindhive/di'
 import StoreLifecycle from './StoreLifecycle'
 
 
-export default class SubscriptionPlusIndividualsDocStore extends StoreLifecycle {
+export default class SubscriptionDocStore extends StoreLifecycle {
 
   // REVISIT: does it 'flicker' when resolving an issue and it needs to be reloaded individually?
 

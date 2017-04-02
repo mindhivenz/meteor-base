@@ -18,15 +18,16 @@ export default class StoreLifecycle {
     this._dependents = [...dependents]
     // Async so if subclass calls addDependent in it's constructor or reacts to initial dependents loading
     // by adding more, we stay initialLoading for those too
-    const initialLoadingDisposer = autorunAsync('Check initialLoading', () => {
-      if (this.initialLoading && ! this.loading) {
-        runInAction('Initial load complete', () => {
-          this.initialLoading = false
-          this.disposeEarly(initialLoadingDisposer)
-        })
-      }
-    })
-    this._disposers.push(initialLoadingDisposer)
+    const initialLoadingDisposer = this.addDisposer(
+      autorunAsync('Check initialLoading', () => {
+        if (this.initialLoading && ! this.loading) {
+          runInAction('Initial load complete', () => {
+            this.initialLoading = false
+            this.disposeEarly(initialLoadingDisposer)
+          })
+        }
+      })
+    )
   }
 
   @computed get loading() {
