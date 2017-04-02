@@ -41,11 +41,19 @@ export default class StoreLifecycle {
   // Anything following the 'store protocol' (e.g. stores, SubscriptionHandles)
   addDependent(...dependents) {
     this._dependents.push(...dependents)
+    if (dependents.length === 1) {
+      return dependents[0]
+    }
+    return undefined
   }
 
   // Suitable for mobx disposers
   addDisposer(...disposers) {
     this._disposers.push(...disposers)
+    if (disposers.length === 1) {
+      return disposers[0]
+    }
+    return undefined
   }
 
   disposeEarly(disposer) {
