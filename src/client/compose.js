@@ -53,11 +53,11 @@ export const withMeteorReactive = (asyncFunc, shouldResubscribe) =>
   )
 
 export const withApiCallResult = ({
-  propName,
   methodName,
-  propsToArgs = () => null,
-  skipCall = () => false,
-  overrideCallProps = () => skipCall() ? {} : null,
+  propsToArgs = props => null,      // eslint-disable-line no-unused-vars
+  skipCall = props => false,        // eslint-disable-line no-unused-vars
+  overrideCallProps = props => skipCall(props) ? {} : null,  // null -> do not override
+  propName,
   resultToProps = result => ({ [propName]: result }),
 }) =>
   setDisplayName(`apiCall(${methodName})`)(
@@ -86,9 +86,9 @@ export const withApiCallResult = ({
 export const connectSubscription = ({
   publicationName,
   dataToProps,
-  propsToArgs = () => null,
-  skipSubscription = () => false,
-  overrideCallProps = () => skipSubscription() ? {} : null,
+  propsToArgs = props => null,                 // eslint-disable-line no-unused-vars
+  skipSubscription = props => false,           // eslint-disable-line no-unused-vars
+  overrideCallProps = props => skipSubscription(props) ? {} : null,   // null -> do not override
 }) =>
   setDisplayName(`connect(${publicationName})`)(
     withMeteorReactive(
