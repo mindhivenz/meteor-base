@@ -1,10 +1,8 @@
 import {
   action,
   observable,
-  computed,
   runInAction,
   extendShallowObservable,
-  autorunAsync,
 } from 'mobx'
 import { app } from '@mindhive/di'
 import { meteorTracker } from './Tracker'
@@ -47,6 +45,7 @@ const generateUniqueId = () => {
   return uniqueNameCounter
 }
 
+// Note this follows the 'store protocol': error, loading, stop()
 class SubscriptionHandle {
 
   stopped = false
@@ -74,47 +73,6 @@ class SubscriptionHandle {
     this.disposers.forEach((d) => {
       d.stop()
     })
-    this.disposers = []
-  }
-}
-
-export class CombinedSubscriptionHandles {
-
-  @observable _handles
-  @observable initialLoading = true
-
-  disposers = []
-
-  constructor(handles = []) {
-    this._handles = handles
-    this.disposers.push(
-      // Async so if client reacts to initial handles completing by adding more, we stay initialLoading for those too
-      autorunAsync('Check initialLoading', () => {
-        if (this.initialLoading && ! this.loading) {
-          runInAction('Initial load complete', () => {
-            this.initialLoading = false
-          })
-        }
-      })
-    )
-  }
-
-  push(...handles) {
-    this._handles.push(...handles)
-  }
-
-  @computed get loading() {
-    return this._handles.some(h => h.loading)
-  }
-
-  @computed get error() {
-    const errorHandle = this._handles.find(h => h.error)
-    return errorHandle && errorHandle.error
-  }
-
-  stop() {
-    this._handles.forEach((h) => { h.stop() })
-    this.disposers.forEach((d) => { d() })
     this.disposers = []
   }
 }

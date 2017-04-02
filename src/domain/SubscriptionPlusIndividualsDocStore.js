@@ -31,7 +31,7 @@ export default class SubscriptionPlusIndividualsDocStore extends StoreLifecycle 
       ...baseSubscription,
       observableArray: this.docs,
     })
-    this.addSubscription(baseSub)
+    this.addDependent(baseSub)
     this.addDisposer(
       autorun('Ensure all individual IDs present', () => {
         if (! baseSub.loading) {
@@ -39,7 +39,7 @@ export default class SubscriptionPlusIndividualsDocStore extends StoreLifecycle 
           this.individualIds
             .filter(id => ! ids.has(id))
             .forEach((id) => {
-              this.addSubscription(
+              this.addDependent(
                 mongoMirror.subscriptionToLocal({
                   ...individualSubscription,
                   subscriptionArgs: individualSubscriptionIdToArgs(id),
@@ -49,6 +49,10 @@ export default class SubscriptionPlusIndividualsDocStore extends StoreLifecycle 
         }
       }),
     )
+  }
+
+  @computed get loading() {
+    return this.initialLoading
   }
 
   @computed get selectedDoc() {

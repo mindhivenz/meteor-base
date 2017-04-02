@@ -1,37 +1,66 @@
-import { observable, computed } from 'mobx'
-
-import { CombinedSubscriptionHandles } from '../client/MongoMirror'
+import {
+  observable,
+  computed,
+  autorunAsync,
+  runInAction,
+} from 'mobx'
+import pull from 'lodash/pull'
 
 
 export default class StoreLifecycle {
 
-  @observable.ref _subscriptions
-  disposers = []
+  @observable initialLoading = true
+
+  @observable _dependents
+  _disposers = []
+
+  constructor(dependents = []) {
+    this._dependents = [...dependents]
+    // Async so if subclass calls addDependent in it's constructor or reacts to initial dependents loading
+    // by adding more, we stay initialLoading for those too
+    const initialLoadingDisposer = autorunAsync('Check initialLoading', () => {
+      if (this.initialLoading && ! this.loading) {
+        runInAction('Initial load complete', () => {
+          this.initialLoading = false
+          this.disposeEarly(initialLoadingDisposer)
+        })
+      }
+    })
+    this._disposers.push(initialLoadingDisposer)
+  }
 
   @computed get loading() {
-    return this._subscriptions && this._subscriptions.initialLoading
+    return this._dependents.some(h => h.loading)
   }
 
   @computed get error() {
-    return this._subscriptions && this._subscriptions.error
+    const errorDependent = this._dependents.find(h => h.error)
+    return errorDependent && errorDependent.error
   }
 
-  addSubscription(...handles) {
-    if (this._subscriptions) {
-      this._subscriptions.push(...handles)
-    } else {
-      this._subscriptions = new CombinedSubscriptionHandles(...handles)
-    }
+  // Anything following the 'store protocol' (e.g. stores, SubscriptionHandles)
+  addDependent(...dependents) {
+    this._dependents.push(...dependents)
   }
 
+  // Suitable for mobx disposers
   addDisposer(...disposers) {
-    this.disposers.push(...disposers)
+    this._disposers.push(...disposers)
+  }
+
+  disposeEarly(disposer) {
+    disposer()
+    pull(this._disposers, disposer)
   }
 
   stop() {
-    this._subscriptions && this._subscriptions.stop()
-    this.disposers.forEach((d) => { d() })
-    this.disposers = []
+    this._dependents.forEach((h) => {
+      h.stop && h.stop()
+    })
+    this._disposers.forEach((d) => {
+      d()
+    })
+    this._disposers = []
   }
 
 }
