@@ -12,7 +12,7 @@ import StoreLifecycle from './StoreLifecycle'
 
 export default class SubscriptionDocStore extends StoreLifecycle {
 
-  // REVISIT: does it 'flicker' when resolving an issue and it needs to be reloaded individually?
+  // REVISIT: does it 'flicker' when an individualId is removed from base and has to be re-added?
 
   @observable docs = []
   @observable individualIds = []
@@ -55,8 +55,12 @@ export default class SubscriptionDocStore extends StoreLifecycle {
     return this.initialLoading
   }
 
+  @computed get selectedId() {
+    return this.selected && this.selected.id
+  }
+
   @computed get selectedDoc() {
-    return this.selected && this.selected.id && this.docs.find(d => d._id === this.selected.id)
+    return this.selectedId && this.docs.find(d => d._id === this.selectedId)
   }
 
   update({ params }) {
