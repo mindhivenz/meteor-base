@@ -16,6 +16,7 @@ export const audit = {
     },
     { fromClient = false } = {},
   ) {
+    const { AuditEntries, Meteor } = app()
     const entry = {
       connectionId: connection.id,
       clientAddress: connection.clientAddress,
@@ -34,7 +35,10 @@ export const audit = {
     if (fromClient) {
       entry.fromClient = true
     }
-    app().AuditEntries.insert(entry)
+    if (Meteor.isDevelopment) {
+      console.dir(entry)  // eslint-disable-line no-console
+    }
+    AuditEntries.insert(entry)
   },
 }
 
