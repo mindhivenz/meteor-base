@@ -12,7 +12,7 @@ const VIEWER_STATE_PATH = 'viewerState'
 // Expects viewer data to be auto published (i.e. null publicationName)
 export class ViewerDomain {
   @observable loading = true
-  // Use shallow because we don't update the internals, only the reference,
+  // Use ref because we don't update the internals, only the reference,
   // and makes user pure JS (avoiding issues with Roles package thinking user.roles is not an array)
   @observable.ref user = null
   @observable isAuthenticatedLive = false

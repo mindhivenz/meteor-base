@@ -1,10 +1,9 @@
-import { computed } from 'mobx'
 import { app } from '@mindhive/di'
 
 
 const viewerEnhancer = {
 
-  @computed get userId() {
+  get userId() {
     const { viewerDomain } = app()
     return viewerDomain.user && viewerDomain.user._id
   },
@@ -15,8 +14,9 @@ const viewerEnhancer = {
     return viewerDomain.user
   },
 
-  @computed get isAuthenticated() {
-    return app().viewerDomain.isAuthenticated
+  get isAuthenticated() {
+    const { viewerDomain } = app()
+    return viewerDomain.isAuthenticated
   },
 
   ensureAuthenticated() {

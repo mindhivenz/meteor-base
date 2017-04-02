@@ -51,7 +51,7 @@ export default class SubscriptionDocStore extends StoreLifecycle {
     )
   }
 
-  @computed get loading() {
+  _loading() {
     return this.initialLoading
   }
 

@@ -30,8 +30,13 @@ export default class StoreLifecycle {
     )
   }
 
-  @computed get loading() {
+  _loading() {
     return this._dependents.some(h => h.loading)
+  }
+
+  @computed get loading() {
+    // @computed properties cannot be overwritten, therefore defer to a method that can
+    return this._loading()
   }
 
   @computed get error() {
