@@ -59,8 +59,12 @@ export default class SubscriptionDocStore extends StoreLifecycle {
     return this.selected && this.selected.id
   }
 
+  findById(id) {
+    return id && this.docs.find(d => d._id === id)
+  }
+
   @computed get selectedDoc() {
-    return this.selectedId && this.docs.find(d => d._id === this.selectedId)
+    return this.findById(this.selectedId)
   }
 
   update({ params }) {
