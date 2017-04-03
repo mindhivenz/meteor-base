@@ -1,13 +1,10 @@
 {
   "presets": [
-    "meteor",
-    "react"
+    "env"
   ],
   "plugins": [
-    "transform-es2015-modules-commonjs",
-    ["transform-runtime", {
-      "polyfill": false
-    }],
+    "transform-runtime",
+    "transform-object-rest-spread",
     "transform-decorators-legacy",
     "transform-class-properties"
   ]
