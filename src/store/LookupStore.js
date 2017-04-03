@@ -44,7 +44,7 @@ class ExtendedLookupStore {
 
 export default class LookupStore {
 
-  idMap = observable.map()
+  @observable idMap = new Map()
 
   constructor(DocClass, mirrorSubscriptionOptions) {
     this.DocClass = DocClass

@@ -3,7 +3,9 @@
     "env"
   ],
   "plugins": [
-    "transform-runtime",
+    ["transform-runtime", {
+      "polyfill": false,
+    }],
     "transform-object-rest-spread",
     "transform-decorators-legacy",
     "transform-class-properties"
