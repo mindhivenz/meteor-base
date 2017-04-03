@@ -16,7 +16,7 @@ export const audit = {
     },
     { fromClient = false } = {},
   ) {
-    const { AuditEntries, Meteor } = app()
+    const { AuditEntries } = app()
     const entry = {
       connectionId: connection.id,
       clientAddress: connection.clientAddress,
@@ -35,7 +35,7 @@ export const audit = {
     if (fromClient) {
       entry.fromClient = true
     }
-    if (Meteor.isDevelopment) {
+    if (process.env.NODE_ENV === 'development') {  // specifically avoid 'test' stage
       console.dir(entry)  // eslint-disable-line no-console
     }
     AuditEntries.insert(entry)
