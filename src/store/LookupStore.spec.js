@@ -3,7 +3,8 @@ import { initModules, mockAppContext } from '@mindhive/di'
 
 import { sinon } from '../mocha'
 
-import { LookupStore, LookupDoc } from './lookup'
+import LookupStore from './LookupStore'
+import LookupDoc from './LookupDoc'
 
 
 describe('LookupStore', () => {

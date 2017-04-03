@@ -2,22 +2,6 @@ import { observable, computed } from 'mobx'
 import { app } from '@mindhive/di'
 
 
-export class LookupDoc {
-
-  constructor(store, id) {
-    this._store = store
-    this._id = id
-  }
-
-  @computed get _doc() {  // Dereference the observable as late as possible
-    return this._id && this._store.idMap.get(this._id)
-  }
-
-  @computed get substituteLabel() {
-    return this._store.loading ? '…' : `[${typeof this._id === 'string' ? this._id.substr(-5) : '?'}]`
-  }
-}
-
 class ExtendedLookupStore {
 
   constructor(store, ids) {
@@ -62,8 +46,8 @@ export class LookupStore {
 
   @observable idMap = new Map()
 
-  constructor(LookupClass, mirrorSubscriptionOptions) {
-    this.LookupClass = LookupClass
+  constructor(DocClass, mirrorSubscriptionOptions) {
+    this.DocClass = DocClass
     this.subscription = app().mongoMirror.subscriptionToObservable({
       ...mirrorSubscriptionOptions,
       observableMap: this.idMap,
@@ -76,7 +60,7 @@ export class LookupStore {
 
   get(idOrDoc) {
     const id = (idOrDoc && (typeof idOrDoc === 'string' ? idOrDoc : idOrDoc._id)) || null
-    return new this.LookupClass(this, id)
+    return new this.DocClass(this, id)
   }
 
   get length() {
