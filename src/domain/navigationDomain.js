@@ -25,7 +25,7 @@ class NavigationDomain {
       this.location.state = userState
       this.backPathname = _backPathname
     } else {
-      this.location.state = browserLocation.state
+      this.location.state = {}
       this.backPathname = null
     }
   }
