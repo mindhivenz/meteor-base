@@ -1,6 +1,8 @@
 import { observable, computed } from 'mobx'
 import { app } from '@mindhive/di'
 
+import StoreLifecycle from './StoreLifecycle'
+
 
 class ExtendedLookupStore {
 
@@ -42,20 +44,19 @@ class ExtendedLookupStore {
   }
 }
 
-export default class LookupStore {
+export default class LookupStore extends StoreLifecycle {
 
   @observable idMap = new Map()
 
-  constructor(DocClass, mirrorSubscriptionOptions) {
-    this.DocClass = DocClass
-    this.subscription = app().mongoMirror.subscriptionToObservable({
-      ...mirrorSubscriptionOptions,
+  constructor({ docClass, publicationName, collectionName }) {
+    super()
+    const { Mongo, mongoMirror } = app()
+    this.DocClass = docClass
+    this.addDependent(mongoMirror.subscriptionToObservable({
+      publicationName,
+      collection: new Mongo.Collection(collectionName),
       observableMap: this.idMap,
-    })
-  }
-
-  get loading() {
-    return this.subscription.loading
+    }))
   }
 
   get(idOrDoc) {
@@ -63,7 +64,7 @@ export default class LookupStore {
     return new this.DocClass(this, id)
   }
 
-  get length() {
+  @computed get length() {
     return this.idMap.size
   }
 
@@ -81,10 +82,6 @@ export default class LookupStore {
 
   ensureContains(...ids) {
     return new ExtendedLookupStore(this, ids)
-  }
-
-  stop = () => {
-    this.subscription.stop()
   }
 }
 
