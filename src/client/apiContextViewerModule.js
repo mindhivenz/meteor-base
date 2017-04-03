@@ -4,19 +4,19 @@ import { app } from '@mindhive/di'
 const viewerEnhancer = {
 
   get userId() {
-    const { viewerDomain } = app()
-    return viewerDomain.user && viewerDomain.user._id
+    const { viewerStore } = app()
+    return viewerStore.user && viewerStore.user._id
   },
 
   viewer() {
-    const { viewerDomain } = app()
+    const { viewerStore } = app()
     this.ensureAuthenticated()
-    return viewerDomain.user
+    return viewerStore.user
   },
 
   get isAuthenticated() {
-    const { viewerDomain } = app()
-    return viewerDomain.isAuthenticated
+    const { viewerStore } = app()
+    return viewerStore.isAuthenticated
   },
 
   ensureAuthenticated() {
