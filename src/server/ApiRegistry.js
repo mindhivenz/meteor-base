@@ -2,7 +2,10 @@ import { app } from '@mindhive/di'
 
 import ClientApiRegistry from '../client/ClientApiRegistry'
 import HttpContext from './HttpContext'
+import renamePublicationCollection from './renamePublicationCollection'
 
+
+const isCursor = o => typeof o === 'object' && typeof o.fetch === 'function'
 
 export default class ApiRegistry extends ClientApiRegistry {
 
@@ -35,7 +38,45 @@ export default class ApiRegistry extends ClientApiRegistry {
   }
 
   publication(publicationName, funcOrOptions) {
-    this._publication(this.Meteor.publish, publicationName, funcOrOptions)
+    const options = typeof funcOrOptions === 'function' ?
+      { server: funcOrOptions }
+      : funcOrOptions
+    const {
+      server,
+      collectionName = null,  // Overrides the collection name sent to client
+      publishesThroughSubscriptionMethods = false,
+      ...otherOptions,
+    } = options
+    const func = (appContext, subscription, args) => {
+      const result = server(appContext, subscription, args)
+      if (result) {
+        if (collectionName) {
+          if (! isCursor(result)) {
+            throw new Error(`Cannot rename a publication result from ${publicationName} that is not a cursor`)
+          }
+          return renamePublicationCollection({
+            subscription,
+            collectionName,
+            cursor: result,
+          })
+        } else if (isCursor(result) || Array.isArray(result)) {
+          return result
+        }
+        throw new Error(`Unexpected result from ${publicationName} that is not a cursor`)
+      }
+      if (publishesThroughSubscriptionMethods) {
+        return result
+      }
+      return []  // How to return nothing from a publication
+    }
+    this._publication(
+      this.Meteor.publish,
+      publicationName,
+      {
+        server: func,
+        ...otherOptions,
+      },
+    )
   }
 
   publicationComposite(publicationName, funcOrOptions) {

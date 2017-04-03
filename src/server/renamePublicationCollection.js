@@ -2,18 +2,18 @@
 
 export default ({
   subscription,
-  name,
+  collectionName,
   cursor,
 }) => {
   const handle = cursor.observeChanges({
     added(id, fields) {
-      subscription.added(name, id, fields)
+      subscription.added(collectionName, id, fields)
     },
     changed(id, fields) {
-      subscription.changed(name, id, fields)
+      subscription.changed(collectionName, id, fields)
     },
     removed(id) {
-      subscription.removed(name, id)
+      subscription.removed(collectionName, id)
     },
   })
   subscription.onStop(() => handle.stop())
