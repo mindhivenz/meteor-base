@@ -1,6 +1,6 @@
 {
   "name": "@mindhive/meteor",
-  "version": "19.0.8",
+  "version": "20.0.0",
   "description": "Our standard additions to Meteor",
   "contributors": [
     {
