@@ -42,7 +42,7 @@ class ExtendedLookupStore {
   }
 }
 
-export class LookupStore {
+export default class LookupStore {
 
   @observable idMap = new Map()
 
