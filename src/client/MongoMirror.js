@@ -210,7 +210,7 @@ export default class MongoMirror {
             const disposer = onReady()
             subscriptionHandle._addDisposer(disposer)
           }
-          runInAction(`${context}: ready`, () => {
+          runInAction(`${context}: loaded and ready`, () => {
             subscriptionHandle._setLoaded()
           })
         },
