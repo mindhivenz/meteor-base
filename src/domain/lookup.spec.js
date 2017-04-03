@@ -3,10 +3,10 @@ import { initModules, mockAppContext } from '@mindhive/di'
 
 import { sinon } from '../mocha'
 
-import { LookupDomain, LookupDoc } from './lookup'
+import { LookupStore, LookupDoc } from './lookup'
 
 
-describe('LookupDomain', () => {
+describe('LookupStore', () => {
 
   let mongoMirror
   let subscription
@@ -34,18 +34,18 @@ describe('LookupDomain', () => {
     return doc
   }
 
-  const givenLookupDomain = () => new LookupDomain(LookupDoc, some.object())
+  const givenLookupStore = () => new LookupStore(LookupDoc, some.object())
 
   describe('constructor', () => {
 
     it('should call subscriptionToObservable correctly',
       mockAppContext(modules, async () => {
         const subscriptionOptions = some.object()
-        const domain = new LookupDomain(LookupDoc, subscriptionOptions)
+        const store = new LookupStore(LookupDoc, subscriptionOptions)
         const expectedDoc = givenSubscriptionAdded()
 
         mongoMirror.subscriptionToObservable.firstCall.args[0].should.have.properties(subscriptionOptions)
-        domain.idMap.entries().should.deep.equal([[expectedDoc._id, expectedDoc]])
+        store.idMap.entries().should.deep.equal([[expectedDoc._id, expectedDoc]])
       })
     )
 
@@ -57,9 +57,9 @@ describe('LookupDomain', () => {
       mockAppContext(modules, async () => {
         const expected = some.bool()
         subscription.loading = expected
-        const domain = givenLookupDomain()
+        const store = givenLookupStore()
 
-        domain.loading.should.equal(expected)
+        store.loading.should.equal(expected)
       })
     )
 
@@ -70,9 +70,9 @@ describe('LookupDomain', () => {
     it('should return LookupClass instance by doc',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const doc = givenSubscriptionAdded()
-        const actualLookup = domain.get(doc)
+        const actualLookup = store.get(doc)
 
         actualLookup.should.have.properties({
           _id: doc._id,
@@ -84,9 +84,9 @@ describe('LookupDomain', () => {
     it('should return LookupClass instance by id',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const doc = givenSubscriptionAdded()
-        const actualLookup = domain.get(doc._id)
+        const actualLookup = store.get(doc._id)
 
         actualLookup.should.have.properties({
           _id: doc._id,
@@ -98,9 +98,9 @@ describe('LookupDomain', () => {
     it('should return LookupClass even when id not found in list',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const id = some.string()
-        const actualLookup = domain.get(id)
+        const actualLookup = store.get(id)
 
         actualLookup.should.have.properties({
           _id: id,
@@ -112,8 +112,8 @@ describe('LookupDomain', () => {
     it('should return LookupClass even for missing id',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
-        const actualLookup = domain.get(some.nullOrUndefined())
+        const store = new LookupStore(SomeLookup, some.object())
+        const actualLookup = store.get(some.nullOrUndefined())
 
         actualLookup.should.have.properties({
           _id: null,
@@ -128,10 +128,10 @@ describe('LookupDomain', () => {
 
     it('should return count added',
       mockAppContext(modules, async () => {
-        const domain = givenLookupDomain()
+        const store = givenLookupStore()
         const docs = some.arrayOf(givenSubscriptionAdded)
 
-        domain.length.should.equal(docs.length)
+        store.length.should.equal(docs.length)
       })
     )
 
@@ -142,11 +142,11 @@ describe('LookupDomain', () => {
     it('should return all added as LookupClass instance',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const docs = some.arrayOf(givenSubscriptionAdded)
 
-        domain.all.should.have.properties(docs.map(d => ({ _id: d._id })))
-        domain.all.every(d => d.should.be.an.instanceOf(SomeLookup))
+        store.all.should.have.properties(docs.map(d => ({ _id: d._id })))
+        store.all.every(d => d.should.be.an.instanceOf(SomeLookup))
       })
     )
 
@@ -157,10 +157,10 @@ describe('LookupDomain', () => {
     it('should call mapper func with each LookupClass instance',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const docs = some.arrayOf(givenSubscriptionAdded, 2)
         const mapper = sinon.spy()
-        domain.map(mapper)
+        store.map(mapper)
 
         mapper.should.have.been.calledTwice
         mapper.firstCall.args[0]._id.should.equal(docs[0]._id)
@@ -177,10 +177,10 @@ describe('LookupDomain', () => {
     it('should call predicate func with each LookupClass instance',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const docs = some.arrayOf(givenSubscriptionAdded, 2)
         const predicate = sinon.spy(() => true)
-        const actual = domain.filter(predicate)
+        const actual = store.filter(predicate)
 
         actual.should.have.lengthOf(2)
         predicate.should.have.been.calledTwice
@@ -197,8 +197,8 @@ describe('LookupDomain', () => {
 
     it('should call subscription stop',
       mockAppContext(modules, async () => {
-        const domain = givenLookupDomain()
-        domain.stop()
+        const store = givenLookupStore()
+        store.stop()
 
         subscription.stop.should.have.been.called
       })
@@ -211,9 +211,9 @@ describe('LookupDomain', () => {
     it('should return last 5 chars of ID in brackets',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const id = '1a2b3c4d'
-        const actualLookup = domain.get(id)
+        const actualLookup = store.get(id)
 
         actualLookup.substituteLabel.should.equal('[b3c4d]')
       })
@@ -222,19 +222,19 @@ describe('LookupDomain', () => {
     it('should return [?] for missing id',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
-        const actualLookup = domain.get(some.nullOrUndefined())
+        const store = new LookupStore(SomeLookup, some.object())
+        const actualLookup = store.get(some.nullOrUndefined())
 
         actualLookup.substituteLabel.should.equal('[?]')
       })
     )
 
-    it('should return ellipsis when domain loading',
+    it('should return ellipsis when store loading',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
         subscription.loading = true
-        const domain = new LookupDomain(SomeLookup, some.object())
-        const actualLookup = domain.get(some.string())
+        const store = new LookupStore(SomeLookup, some.object())
+        const actualLookup = store.get(some.string())
 
         actualLookup.substituteLabel.should.equal('…')
       })
@@ -248,13 +248,13 @@ describe('LookupDomain', () => {
       subscription.loading = some.bool()
     })
 
-    it('should duck-type LookupDomain with extra value when not in domain list',
+    it('should duck-type LookupStore with extra value when not in store list',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const existingDoc = givenSubscriptionAdded()
         const expectedId = some.string()
-        const actual = domain.ensureContains(expectedId)
+        const actual = store.ensureContains(expectedId)
 
         actual.loading.should.equal(subscription.loading)
         actual.get(existingDoc).should.have.properties({ _id: existingDoc._id })
@@ -269,12 +269,12 @@ describe('LookupDomain', () => {
       })
     )
 
-    it('should not add to list if id is in domain list',
+    it('should not add to list if id is in store list',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const existingDoc = givenSubscriptionAdded()
-        const actual = domain.ensureContains(existingDoc._id)
+        const actual = store.ensureContains(existingDoc._id)
 
         actual.loading.should.equal(subscription.loading)
         actual.get(existingDoc).should.have.properties({ _id: existingDoc._id })
@@ -289,11 +289,11 @@ describe('LookupDomain', () => {
     it('should handle multiple ids',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const existingDoc = givenSubscriptionAdded()
         const expectedId1 = some.string()
         const expectedId2 = some.string()
-        const actual = domain.ensureContains(expectedId1, expectedId2)
+        const actual = store.ensureContains(expectedId1, expectedId2)
 
         actual.all.should.have.properties([
           { _id: existingDoc._id },
@@ -306,10 +306,10 @@ describe('LookupDomain', () => {
     it('should ignore null/undefined ids',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const domain = new LookupDomain(SomeLookup, some.object())
+        const store = new LookupStore(SomeLookup, some.object())
         const existingDoc = givenSubscriptionAdded()
         const expectedId = some.string()
-        const actual = domain.ensureContains(some.nullOrUndefined(), expectedId)
+        const actual = store.ensureContains(some.nullOrUndefined(), expectedId)
 
         actual.all.should.have.properties([
           { _id: existingDoc._id },
@@ -320,14 +320,14 @@ describe('LookupDomain', () => {
 
     describe('filterKnown', () => {
 
-      it('should call predicate func with each lookup from domain, not missing',
+      it('should call predicate func with each lookup from store, not missing',
         mockAppContext(modules, async () => {
           class SomeLookup extends LookupDoc {}
-          const domain = new LookupDomain(SomeLookup, some.object())
+          const store = new LookupStore(SomeLookup, some.object())
           const existingDoc = givenSubscriptionAdded()
           const missingId = some.string()
           const predicate = sinon.spy(() => true)
-          const actual = domain.ensureContains(missingId).filterKnown(predicate)
+          const actual = store.ensureContains(missingId).filterKnown(predicate)
 
           actual.should.have.lengthOf(2)
           predicate.should.have.been.calledOnce

@@ -4,41 +4,41 @@ import { app } from '@mindhive/di'
 
 export class LookupDoc {
 
-  constructor(domain, id) {
-    this._domain = domain
+  constructor(store, id) {
+    this._store = store
     this._id = id
   }
 
   @computed get _doc() {  // Dereference the observable as late as possible
-    return this._id && this._domain.idMap.get(this._id)
+    return this._id && this._store.idMap.get(this._id)
   }
 
   @computed get substituteLabel() {
-    return this._domain.loading ? '…' : `[${typeof this._id === 'string' ? this._id.substr(-5) : '?'}]`
+    return this._store.loading ? '…' : `[${typeof this._id === 'string' ? this._id.substr(-5) : '?'}]`
   }
 }
 
-class ExtendedLookupDomain {
+class ExtendedLookupStore {
 
-  constructor(domain, ids) {
-    this.domain = domain
+  constructor(store, ids) {
+    this.store = store
     this.ids = ids
   }
 
   get loading() {
-    return this.domain.loading
+    return this.store.loading
   }
 
   get(idOrDoc) {
-    return this.domain.get(idOrDoc)
+    return this.store.get(idOrDoc)
   }
 
   get length() {
-    return this.domain.length + this._missingIds.length
+    return this.store.length + this._missingIds.length
   }
 
   @computed get _missingIds() {
-    return this.ids.filter(id => id && ! this.domain.idMap.has(id))
+    return this.ids.filter(id => id && ! this.store.idMap.has(id))
   }
 
   @computed get _missing() {
@@ -46,7 +46,7 @@ class ExtendedLookupDomain {
   }
 
   @computed get all() {
-    return this.domain.all.concat(this._missing)
+    return this.store.all.concat(this._missing)
   }
 
   map(mapper) {
@@ -54,11 +54,11 @@ class ExtendedLookupDomain {
   }
 
   filterKnown(predicate) {
-    return this.domain.filter(predicate).concat(this._missing)
+    return this.store.filter(predicate).concat(this._missing)
   }
 }
 
-export class LookupDomain {
+export class LookupStore {
 
   @observable idMap = new Map()
 
@@ -96,7 +96,7 @@ export class LookupDomain {
   }
 
   ensureContains(...ids) {
-    return new ExtendedLookupDomain(this, ids)
+    return new ExtendedLookupStore(this, ids)
   }
 
   stop = () => {
