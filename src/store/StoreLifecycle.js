@@ -20,7 +20,7 @@ export default class StoreLifecycle {
     // by adding more, we stay initialLoading for those too
     const initialLoadingDisposer = this.addDisposer(
       autorunAsync('Check initialLoading', () => {
-        if (this.initialLoading && ! this.loading) {
+        if (this.initialLoading && ! this.anyLoading) {
           runInAction('Initial load complete', () => {
             this.initialLoading = false
             this.disposeEarly(initialLoadingDisposer)
@@ -30,8 +30,12 @@ export default class StoreLifecycle {
     )
   }
 
-  _loading() {
+  @computed get anyLoading() {
     return this._dependents.some(h => h.loading)
+  }
+
+  _loading() {
+    return this.anyLoading
   }
 
   @computed get loading() {
