@@ -5,6 +5,8 @@ import {
   runInAction,
   autorun,
 } from 'mobx'
+import difference from 'lodash/difference'
+
 import selectedState from '../client/selectedState'
 import { app } from '@mindhive/di'
 import StoreLifecycle from './StoreLifecycle'
@@ -27,25 +29,24 @@ export default class SubscriptionDocStore extends StoreLifecycle {
     super()
     const { mongoMirror } = app()
     this.selectedParamName = selectedParamName
-    const baseSub = mongoMirror.subscriptionToObservable({
-      ...baseSubscription,
-      observableArray: this.docs,
-    })
-    this.addDependent(baseSub)
+    const baseSub = this.addDependent(
+      mongoMirror.subscriptionToObservable({
+        ...baseSubscription,
+        observableArray: this.docs,
+      })
+    )
     this.addDisposer(
       autorun('Ensure all individual IDs present', () => {
         if (! baseSub.loading) {
-          const ids = new Set(this.docs.map(d => d._id))
-          this.individualIds
-            .filter(id => ! ids.has(id))
-            .forEach((id) => {
-              this.addDependent(
-                mongoMirror.subscriptionToLocal({
-                  ...individualSubscription,
-                  subscriptionArgs: individualSubscriptionIdToArgs(id),
-                })
-              )
-            })
+          const missingIds = difference(this.individualIds, this.docs.map(d => d._id))
+          missingIds.forEach((id) => {
+            this.addDependent(
+              mongoMirror.subscriptionToLocal({
+                ...individualSubscription,
+                subscriptionArgs: individualSubscriptionIdToArgs(id),
+              })
+            )
+          })
         }
       }),
     )
@@ -80,7 +81,9 @@ export default class SubscriptionDocStore extends StoreLifecycle {
 
   ensureId(id) {
     if (id && ! this.individualIds.includes(id)) {
-      runInAction('Add new individual id', () => { this.individualIds.push(id) })
+      runInAction('Add new individual id', () => {
+        this.individualIds.push(id)
+      })
     }
   }
 }
