@@ -9,8 +9,9 @@ import { SUPER_USER } from '../roles'
 
 const VIEWER_STATE_PATH = 'viewerState'
 
-// Expects viewer data to be auto published (i.e. null publicationName)
-export class ViewerDomain {
+// Expects viewer data to be auto published
+export default class ViewerStore {
+
   @observable loading = true
   // Use ref because we don't update the internals, only the reference,
   // and makes user pure JS (avoiding issues with Roles package thinking user.roles is not an array)
@@ -96,24 +97,4 @@ export class ViewerDomain {
   @computed get isSuperUser() {
     return this.hasRole(SUPER_USER)
   }
-}
-
-export class ViewerWithOrgDomain extends ViewerDomain {
-  @observable.ref org = null
-
-  _applyFromServer(user) {
-    super._applyFromServer(user)
-    this.org = user && app().Orgs.findOne(user.orgId)
-  }
-
-  _applyFromOfflineState(state) {
-    super._applyFromOfflineState(state)
-    this.org = state.org
-  }
-
-  _buildOfflineState(state) {
-    super._buildOfflineState(state)
-    state.org = this.org
-  }
-
 }

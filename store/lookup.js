@@ -1,4 +1,4 @@
-var lookup = require('./../dist/domain/lookup')
+var lookup = require('./../dist/store/lookup')
 
 module.exports = {
   LookupDoc: lookup.LookupDoc,
