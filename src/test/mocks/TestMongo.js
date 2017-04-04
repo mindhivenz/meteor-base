@@ -1,5 +1,7 @@
 import { app, initModules } from '@mindhive/di'
 
+import { collectionAttachedSchema } from '../../schemaHelper'
+
 
 const testGroundCollections = new Map()
 
@@ -68,7 +70,7 @@ if (global.Mongo) {
         // MiniMongo will throw an exception
         super._ensureIndex(keys, options)
       }
-      const schemaDoc = this._c2 && this._c2._simpleSchema && this._c2._simpleSchema.mergedSchema()
+      const schemaDoc = collectionAttachedSchema(this)
       if (! schemaDoc) {
         throw new Error("Attach a schema before adding indexes so we can check they're valid")
       }

@@ -7,8 +7,10 @@ import {
 import { app } from '@mindhive/di'
 import { meteorTracker } from './Tracker'
 import difference from 'lodash/difference'
+import fromPairs from 'lodash/fromPairs'
 
 import devError from '../devError'
+import { topLevelFieldsFromSchema, collectionAttachedSchema } from '../schemaHelper'
 
 // Originally based on https://github.com/meteor-space/tracker-mobx-autorun 0.2.0
 
@@ -86,18 +88,15 @@ export default class MongoMirror {
     mongoCursor,
     observableArray,
     observableMap,
-    schema,
+    schema,  // Keys are field paths, works with Mongo find field definitions, SimpleSchema merged schemas
     arrayIsOrdered = true,
   }) {
     const mapError = (message) => { devError(`${message}\nobservableMap keys: ${Array.from(observableMap.keys())}`) }
     const arrayError = (message) => { devError(`${message}\nobservableArray keys: ${observableArray.map(d => d._id)}`) }
-    const topLevelSchemaKeys = typeof schema === 'object' ?
-      Object.keys(schema).filter(k => k.indexOf('.') === -1)
-      : []
+    const topLevelSchemaFields = topLevelFieldsFromSchema(schema) || []
     const asShallowObservable = (id, fields) => {
-      const missingKeys = difference(topLevelSchemaKeys, Object.keys(fields))
-      const undefinedFields = {}
-      missingKeys.forEach((k) => { undefinedFields[k] = undefined })
+      const missingFields = difference(topLevelSchemaFields, Object.keys(fields))
+      const undefinedFields = fromPairs(missingFields.map(f => [f, undefined]))
       return extendShallowObservable({ _id: id }, fields, undefinedFields)
     }
     meteorTracker.nonreactive(() => {
@@ -235,8 +234,8 @@ export default class MongoMirror {
     findOptions = {},
     observableArray,
     observableMap,
-    arrayIsOrdered = typeof findOptions.sort === 'object',
-    schema = collection._c2 && collection._c2._simpleSchema && collection._c2._simpleSchema.mergedSchema(),
+    arrayIsOrdered = findOptions.sort != null,
+    schema = collectionAttachedSchema(collection),
     context = `subscription:${publicationName}->${observableName({ observableArray, observableMap })}`,
   }) {
     checkFindOptions({ findOptions, observableArray })

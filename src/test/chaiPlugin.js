@@ -1,3 +1,4 @@
+import { collectionAttachedSchema } from '../schemaHelper'
 
 
 export const plugin = (chai) => {
@@ -7,7 +8,7 @@ export const plugin = (chai) => {
     const collectionHasName = this._obj._name && this._obj._name.length > 0
     const label = collectionHasName ? `collection named "${this._obj._name}"` : '#{this}'
     this.assert(
-      this._obj && this._obj._c2 && this._obj._c2._simpleSchema,
+      collectionAttachedSchema(this),
       `expected ${label} to have an attached schema`,
       `expected ${label} to not have an attached schema`
     )
