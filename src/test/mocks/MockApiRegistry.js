@@ -60,7 +60,7 @@ export default class MockApiRegistry {
     this.methodFuncs.set(methodName, serverFunc)
   }
 
-  _publication(meteorPublishFunc, publicationName, funcOrOptions) {
+  _publication(publicationName, funcOrOptions) {
     if (this.publicationFuncs.has(publicationName)) {
       throw new Error(`More than one publication with the name "${publicationName}"`)
     }
@@ -68,6 +68,14 @@ export default class MockApiRegistry {
       funcOrOptions
       : funcOrOptions.server
     this.publicationFuncs.set(publicationName, func)
+  }
+
+  publication(publicationName, funcOrOptions) {
+    this._publication(publicationName, funcOrOptions)
+  }
+
+  publicationComposite(publicationName, funcOrOptions) {
+    this._publication(publicationName, funcOrOptions)
   }
 
   http(path, func) {
