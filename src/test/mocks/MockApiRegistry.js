@@ -46,6 +46,10 @@ export default class MockApiRegistry {
   publicationFuncs = new Map()
   httpFuncs = []
 
+  onError() {
+    // REVISIT: should we replicate this functionality?
+  }
+
   method(methodName, funcOrOptions) {
     if (this.methodFuncs.has(methodName)) {
       throw new Error(`More than one method with the name "${methodName}"`)
