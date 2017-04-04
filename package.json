@@ -26,7 +26,7 @@
     "meteor"
   ],
   "dependencies": {
-    "@mindhive/mobx": "^1.0.0",
+    "@mindhive/mobx": "^2.0.0",
     "@mindhive/time": "^1.0.3",
     "babel-runtime": "^6.18.0",
     "date-fns": "^1.9.0",
