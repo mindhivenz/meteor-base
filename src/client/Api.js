@@ -6,17 +6,21 @@ export default class Api {
   meteorCall(
     methodName,
     args,
-    { notifyViewerPending = true, ...meteorOptions } = {},
+    {
+      viewerWaitingOnResult = false,
+      notifyViewerPending = true,
+      ...meteorOptions
+    } = {},
     callback,
   ) {
     const { Meteor, connectionDomain } = app()
-    let connectionCallDisposer
+    let serverCall
     if (connectionDomain && notifyViewerPending) {
-      connectionCallDisposer = connectionDomain.callStarted()
+      serverCall = connectionDomain.callStarted({ viewerWaitingOnResult })
     }
     Meteor.apply(methodName, [args], { returnStubValue: true, ...meteorOptions }, (error, result) => {
-      if (connectionCallDisposer) {
-        connectionCallDisposer()
+      if (serverCall) {
+        connectionDomain.callFinished(serverCall)
       }
       if (callback) {
         callback(error, result)
@@ -27,7 +31,11 @@ export default class Api {
   // Returns a promise resolved or rejected based on the server result
   call(methodName, args, options) {
     return new Promise((resolve, reject) => {
-      this.meteorCall(methodName, args, options, (error, result) => {
+      const callOptions = {
+        viewerWaitingOnResult: true,
+        ...options,
+      }
+      this.meteorCall(methodName, args, callOptions, (error, result) => {
         if (error) {
           reject(error)
         } else {
