@@ -2,7 +2,7 @@ import { app } from '@mindhive/di'
 
 import ClientApiRegistry from '../client/ClientApiRegistry'
 import HttpContext from './HttpContext'
-import renamePublicationCollection from './renamePublicationCollection'
+import adaptCursorToSubscription from './adaptCursorToSubscription'
 
 
 const isCursor = o => typeof o === 'object' && typeof o.fetch === 'function'
@@ -54,11 +54,12 @@ export default class ApiRegistry extends ClientApiRegistry {
           if (! isCursor(result)) {
             throw new Error(`Cannot rename a publication result from ${publicationName} that is not a cursor`)
           }
-          return renamePublicationCollection({
+          adaptCursorToSubscription({
             subscription,
             collectionName,
             cursor: result,
           })
+          return undefined
         } else if (isCursor(result) || Array.isArray(result)) {
           return result
         }
