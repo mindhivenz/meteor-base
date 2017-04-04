@@ -12,9 +12,9 @@ class ServerCall {
   constructor({
     viewerWaitingOnResult,
     runTooLongMs = viewerWaitingOnResult ? 1000 : 2000,
-  }) {
+  } = {}) {
     this.viewerWaitingOnResult = viewerWaitingOnResult
-    this._runningTooLongTimer = setTimeout(this.setRunningTooLong(), runTooLongMs)
+    this._runningTooLongTimer = setTimeout(this.setRunningTooLong, runTooLongMs)
   }
 
   @action.bound setRunningTooLong() {
