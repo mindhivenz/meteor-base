@@ -48,13 +48,19 @@ export default class LookupStore extends StoreLifecycle {
 
   @observable idMap = new Map()
 
-  constructor({ docClass, publicationName, collectionName }) {
+  constructor({
+    docClass,
+    publicationName,
+    publicationFields,
+    collectionName,
+  }) {
     super()
     const { Mongo, mongoMirror } = app()
     this.DocClass = docClass
     this.addDependent(mongoMirror.subscriptionToObservable({
       publicationName,
       collection: new Mongo.Collection(collectionName),
+      schema: publicationFields,
       observableMap: this.idMap,
     }))
   }
