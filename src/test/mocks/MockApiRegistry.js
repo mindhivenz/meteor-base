@@ -2,8 +2,8 @@ import { app } from '@mindhive/di'
 import some from '@mindhive/some'
 import assert from 'assert'
 
-import ApiRegistry from '../../server/ApiRegistry'
 import { parseRequestUrl } from '../../server/HttpContext'
+import Enhancer from '../../Enhancer'
 
 
 export class MockApiContext {
@@ -40,17 +40,11 @@ export class MockSubscription extends MockApiContext {
 export class MockHttpContext extends MockApiContext {
 }
 
-export default class MockApiRegistry extends ApiRegistry {
+export default class MockApiRegistry {
+  enhancer = new Enhancer()
   methodFuncs = new Map()
   publicationFuncs = new Map()
   httpFuncs = []
-
-  constructor() {
-    super(
-      { isServer: true },
-      {},
-    )
-  }
 
   method(methodName, funcOrOptions) {
     if (this.methodFuncs.has(methodName)) {
@@ -74,6 +68,10 @@ export default class MockApiRegistry extends ApiRegistry {
 
   http(path, func) {
     this.httpFuncs.push({ path, func })
+  }
+
+  apiContextEnhancer(objOrFunc) {
+    this.enhancer.registerEnhancement(objOrFunc)
   }
 
   enhanceApiContext(apiContext, includeInApiName = '', callArgs) {
