@@ -50,11 +50,10 @@ export default class Api {
   optimisticCall(methodName, args, options) {
     return this.meteorCall(methodName, args, options, (error) => {
       if (error) {
-        // No need to messageDomain.error here, as should have been done on the server
-        app().messageDomain.show(
-          'Server update failed',
-          'Apologies, but your most recent change was lost. Our team has been notified.',
-        )
+        // No need to systemMessageStore.addMessageAndAuditLog here as audit log should have been done on the server
+        app().systemMessageStore.addMessage({
+          message: 'Terribly sorry, but that change failed',
+        })
       }
     })
   }
