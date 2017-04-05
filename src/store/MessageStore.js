@@ -12,7 +12,7 @@ export default class MessageStore {
   @observable messages = []
 
   @computed get firstMessage() {
-    return this.messages[0]
+    return this.messages.length > 0 ? this.messages[0] : undefined
   }
 
   @mobxAction addMessage({
