@@ -37,7 +37,7 @@ class Message {
   }
 
   @mobxAction stop() {
-    this.store.message.remove(this)
+    this.store.messages.remove(this)
     this.show = false
     if (this.cancelDisposer) {
       this.cancelDisposer()
