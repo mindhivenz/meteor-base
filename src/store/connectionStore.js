@@ -62,7 +62,7 @@ class ConnectionStore {
   }
 
   @action callStarted(options) {
-    const serverCall = new ServerCall(options)
+    const serverCall = new ServerCall(options, this)
     this._callsInProgress.push(serverCall)
     if (this.connectionDown) {
       this._addOfflineMessage()
