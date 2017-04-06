@@ -1,2 +1,2 @@
 
-module.exports = require('./../dist/domain/durableTaskStore')
+module.exports = require('./../dist/store/durableTaskStore')

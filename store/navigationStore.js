@@ -1,2 +1,2 @@
 
-module.exports = require('../dist/domain/navigationStore')
+module.exports = require('../dist/store/navigationStore')

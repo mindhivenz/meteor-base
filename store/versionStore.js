@@ -1,2 +1,2 @@
 
-module.exports = require('./../dist/domain/versionStore')
+module.exports = require('./../dist/store/versionStore')

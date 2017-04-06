@@ -1,2 +1,2 @@
 
-module.exports = require('./../dist/domain/connectionStore')
+module.exports = require('./../dist/store/connectionStore')

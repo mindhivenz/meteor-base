@@ -1,2 +1,2 @@
 
-module.exports = require('../dist/domain/appMarketStore')
+module.exports = require('../dist/store/appMarketStore')
