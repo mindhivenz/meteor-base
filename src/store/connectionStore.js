@@ -1,5 +1,6 @@
 import { observable, action, computed } from 'mobx'
 import { app } from '@mindhive/di'
+import debounce from 'lodash/debounce'
 
 // REVISIT: Expose calls that are taking a long time to complete even if Meteor still saying 'connected'
 // REVISIT: use an interval to get time until next connect attempt and display
@@ -59,8 +60,13 @@ class ConnectionStore {
     serverCall.stop()
   }
 
+  @action('setConnected') _setConnectedBebounced = debounce(
+    (connected) => { this.connected = connected },
+    300,
+  )
+
   @action _setStatus(status) {
-    this.connected = status.connected
+    this._setConnectedBebounced(status.connected)
     if (status.connected || status.status === 'waiting' || status.retryCount) {
       this.statusKnown = true
     }
