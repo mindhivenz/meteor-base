@@ -26,6 +26,7 @@
     "meteor"
   ],
   "dependencies": {
+    "@mindhive/di": "^4.0.0",
     "@mindhive/mobx": "^2.0.0",
     "@mindhive/time": "^1.0.3",
     "babel-runtime": "^6.18.0",
@@ -37,14 +38,12 @@
     "recompose": "^0.22.0"
   },
   "peerDependencies": {
-    "@mindhive/di": "^4.0.0",
     "mobx": "^3.0.0",
     "mobx-react": "^4.0.0",
     "react": "^15.0.0",
     "simpl-schema": "^0.2.2"
   },
   "devDependencies": {
-    "@mindhive/di": "^4.0.0",
     "@mindhive/some": "^3.0.0",
     "@mindhive/wallaby-meteor-config": "^1.1.1",
     "babel-cli": "^6.18.0",
