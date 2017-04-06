@@ -30,7 +30,7 @@ class ServerCall {
   }
 }
 
-class ConnectionDomain {
+class ConnectionStore {
 
   @observable statusKnown = false
   @observable connected = true
@@ -72,11 +72,11 @@ class ConnectionDomain {
 }
 
 export default ({ Meteor, Tracker }) => {
-  const connectionDomain = new ConnectionDomain()
+  const connectionStore = new ConnectionStore()
   Tracker.autorun(() => {
-    connectionDomain._setStatus(Meteor.status())
+    connectionStore._setStatus(Meteor.status())
   })
   return {
-    connectionDomain,
+    connectionStore,
   }
 }

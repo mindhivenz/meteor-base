@@ -10,7 +10,7 @@ import { app } from '@mindhive/di'
 const NEEDS_UPDATE_ERROR_MESSAGE = 'Skipping downloading new version because the Cordova platform version' +
   ' or plugin versions have changed and are potentially incompatible'
 
-class AppStoreDomain {
+class AppMarketStore {
 
   packageName
   @observable needsUpdate = false
@@ -56,5 +56,5 @@ class AppStoreDomain {
 }
 
 export default () => ({
-  appStoreDomain: new AppStoreDomain(),
+  appMarketStore: new AppMarketStore(),
 })

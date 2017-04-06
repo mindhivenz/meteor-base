@@ -13,14 +13,14 @@ export default class Api {
     } = {},
     callback,
   ) {
-    const { Meteor, connectionDomain } = app()
+    const { Meteor, connectionStore } = app()
     let serverCall
-    if (connectionDomain && notifyViewerPending) {
-      serverCall = connectionDomain.callStarted({ viewerWaitingOnResult })
+    if (connectionStore && notifyViewerPending) {
+      serverCall = connectionStore.callStarted({ viewerWaitingOnResult })
     }
     Meteor.apply(methodName, [args], { returnStubValue: true, ...meteorOptions }, (error, result) => {
       if (serverCall) {
-        connectionDomain.callFinished(serverCall)
+        connectionStore.callFinished(serverCall)
       }
       if (callback) {
         callback(error, result)

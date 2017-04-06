@@ -7,10 +7,10 @@ import { TestGround } from '../test/mocks/TestMongo'
 import mockMeteorCoreModuleFactory from '../test/mocks/mockMeteorCoreModuleFactory'
 import mockClockModule from '@mindhive/time/mockClockModule'
 import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
-import durableTaskDomainModule from '../domain/durableTaskDomain'
+import durableTaskStoreModule from '../store/durableTaskStore'
 
 
-describe('durableTaskDomain', () => {
+describe('durableTaskStore', () => {
 
   let taskFunc
   let expectedArgs
@@ -33,21 +33,21 @@ describe('durableTaskDomain', () => {
   ])
 
   const givenDomainModuleInited = () => {
-    if (! app().durableTaskDomain) {
-      initModules([durableTaskDomainModule])
+    if (! app().durableTaskStore) {
+      initModules([durableTaskStoreModule])
     }
   }
 
   const givenSomeTask = () => {
     givenDomainModuleInited()
-    app().durableTaskDomain.registerExecutor({
+    app().durableTaskStore.registerExecutor({
       taskRef: 'someTask',
       executor: taskFunc,
     })
   }
 
   const whenAddTask = (args = expectedArgs) => {
-    return app().durableTaskDomain.addTask({
+    return app().durableTaskStore.addTask({
       taskRef: 'someTask',
       args,
     })
@@ -74,7 +74,7 @@ describe('durableTaskDomain', () => {
     mockAppContext(modules, async () => {
       givenDomainModuleInited()
       should.throw(() => {
-        app().durableTaskDomain.registerExecutor({
+        app().durableTaskStore.registerExecutor({
           taskRef: 'someTask',
           executor: null,
         })

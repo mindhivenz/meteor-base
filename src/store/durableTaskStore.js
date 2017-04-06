@@ -1,7 +1,7 @@
 import { app } from '@mindhive/di'
 
 
-class DurableTaskDomain {
+class DurableTaskStore {
 
   refMap = new Map()
 
@@ -57,9 +57,9 @@ class DurableTaskDomain {
 
 export default ({ Ground }) => {
   const DurableTasks = new Ground.Collection('durableTasks')
-  const durableTaskDomain = new DurableTaskDomain()
+  const durableTaskStore = new DurableTaskStore()
   return {
     DurableTasks,
-    durableTaskDomain,
+    durableTaskStore,
   }
 }

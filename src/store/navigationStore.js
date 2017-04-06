@@ -2,7 +2,7 @@ import { observable, action, when } from 'mobx'
 import { app } from '@mindhive/di'
 
 
-class NavigationDomain {
+class NavigationStore {
 
   @observable.shallow location = {
     pathname: null,
@@ -131,5 +131,5 @@ class NavigationDomain {
 }
 
 export default () => ({
-  navigationDomain: new NavigationDomain(),
+  navigationStore: new NavigationStore(),
 })
