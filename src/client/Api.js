@@ -20,7 +20,7 @@ export default class Api {
     }
     Meteor.apply(methodName, [args], { returnStubValue: true, ...meteorOptions }, (error, result) => {
       if (serverCall) {
-        connectionStore.callFinished(serverCall)
+        serverCall.stop()
       }
       if (callback) {
         callback(error, result)

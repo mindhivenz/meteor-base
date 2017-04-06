@@ -44,7 +44,7 @@ class DurableTaskStore {
         const result = await executor(args)
         backoff.reset()
         DurableTasks.remove(taskId)
-        connectionStore.callFinished(serverCall)
+        serverCall.stop()
         return result
       } catch (e) {
         console.warn(`Task ${taskRef} failed (will retry)`, e)  // eslint-disable-line no-console

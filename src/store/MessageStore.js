@@ -2,10 +2,48 @@ import {
   observable,
   action as mobxAction,
   computed,
+  when,
 } from 'mobx'
 import { app } from '@mindhive/di'
 
 /* eslint-disable no-console */
+
+class Message {
+  message
+  actionLabel
+  onAction
+  @observable show = true
+
+  constructor(
+    {
+      message,
+      actionLabel = null,
+      onAction = null,
+      cancelWhen = null,
+    },
+    store,
+  ) {
+    this.message = message
+    this.actionLabel = actionLabel
+    this.onAction = onAction
+    this.store = store
+    if (cancelWhen) {
+      this.cancelDisposer = when(
+        'Cancel message',
+        cancelWhen,
+        () => { this.stop() },
+      )
+    }
+  }
+
+  @mobxAction stop() {
+    this.store.message.remove(this)
+    this.show = false
+    if (this.cancelDisposer) {
+      this.cancelDisposer()
+    }
+  }
+}
 
 export default class MessageStore {
 
@@ -15,14 +53,10 @@ export default class MessageStore {
     return this.messages.length > 0 ? this.messages[0] : undefined
   }
 
-  @mobxAction addMessage({
-    message,
-    actionLabel = null,
-    onAction = () => {},
-  }) {
-    const messageRecord = { message, actionLabel, onAction }
-    this.messages.push(messageRecord)
-    return messageRecord
+  @mobxAction addMessage(options) {
+    const message = new Message(options, this)
+    this.messages.push(message)
+    return message
   }
 
   addMessageAndAuditLog({
@@ -59,9 +93,5 @@ export default class MessageStore {
       { notifyViewerPending: false },
     )
     return this.addMessage({ message, actionLabel, onAction })
-  }
-
-  @mobxAction dismissMessage(message) {
-    this.messages.remove(message)
   }
 }
