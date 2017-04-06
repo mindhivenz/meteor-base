@@ -54,7 +54,7 @@ class ConnectionStore {
   }
 
   @computed get backgroundComms() {
-    return this._callsInProgress.some(c => ! this.connected || c.notifyViewer)
+    return this._callsInProgress.some(c => ! c.viewerWaitingOnResult && (! this.connected || c.notifyViewer))
   }
 
   @computed get callInProgress() {
