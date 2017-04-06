@@ -8,25 +8,25 @@ import debounce from 'lodash/debounce'
 class ServerCall {
 
   viewerWaitingOnResult
-  @observable runningTooLong = false
+  @observable notifyViewer = false
 
   constructor({
-    viewerWaitingOnResult,
-    runTooLongMs = viewerWaitingOnResult ? 1000 : 2000,
+    viewerWaitingOnResult = false,
+    notifyViewerAfterRunningMs = viewerWaitingOnResult ? 1000 : 2000,
   } = {}) {
     this.viewerWaitingOnResult = viewerWaitingOnResult
-    this._runningTooLongTimer = setTimeout(this.setRunningTooLong, runTooLongMs)
+    this._notifyViewerTimer = setTimeout(this.setNotifyViewer, notifyViewerAfterRunningMs)
   }
 
-  @action.bound setRunningTooLong() {
-    this.runningTooLong = true
-    this._runningTooLongTimer = null
+  @action.bound setNotifyViewer() {
+    this.notifyViewer = true
+    this._notifyViewerTimer = null
   }
 
   stop() {
-    if (this._runningTooLongTimer) {
-      clearTimeout(this._runningTooLongTimer)
-      this._runningTooLongTimer = null
+    if (this._notifyViewerTimer) {
+      clearTimeout(this._notifyViewerTimer)
+      this._notifyViewerTimer = null
     }
   }
 }
@@ -41,12 +41,12 @@ class ConnectionStore {
     return ! this.connected && this.statusKnown
   }
 
-  @computed get callRunningTooLong() {
-    return this._callsInProgress.some(c => ! this.connected || c.runningTooLong)
+  @computed get backgroundComms() {
+    return this._callsInProgress.some(c => ! this.connected || c.notifyViewer)
   }
 
-  @computed get viewerWaitingTooLong() {
-    return this._callsInProgress.some(c => c.viewerWaitingOnResult && (! this.connected || c.runningTooLong))
+  @computed get callInProgress() {
+    return this._callsInProgress.some(c => c.viewerWaitingOnResult && (! this.connected || c.notifyViewer))
   }
 
   @action callStarted(options) {

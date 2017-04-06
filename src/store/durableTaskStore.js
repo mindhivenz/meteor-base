@@ -20,32 +20,31 @@ class DurableTaskStore {
     // TODO: if multiple tabs then this should only be done in one of them! https://trello.com/c/RPK1iOX0
     DurableTasks.once('loaded', () => {
       DurableTasks.find().forEach((t) => {
-        this._runTask(t, t._id)
+        this._runTask(t._id, t)
       })
     })
   }
 
-  addTask = ({ taskRef, args }) => {
+  addTask = (taskDef) => {
     const { DurableTasks } = app()
-    const taskId = DurableTasks.insert({
-      taskRef,
-      args,
-    })
-    return this._runTask({ taskRef, args }, taskId)
+    const taskId = DurableTasks.insert(taskDef)
+    return this._runTask(taskId, taskDef)
   }
 
-  _runTask = async ({ taskRef, args }, taskId) => {
-    const { DurableTasks } = app()
+  _runTask = async (taskId, { taskRef, args, ...serverCallOptions }) => {
+    const { DurableTasks, connectionStore } = app()
     const task = this.refMap.get(taskRef)
     if (! task) {
-      throw new Error(`Attempt to call unknown taskRef '${taskRef}'`)
+      throw new Error(`Attempt to call unregistered taskRef '${taskRef}'`)
     }
     const { executor, backoff } = task
+    const serverCall = connectionStore.callStarted(serverCallOptions)
     for (;;) {
       try {
         const result = await executor(args)
         backoff.reset()
         DurableTasks.remove(taskId)
+        connectionStore.callFinished(serverCall)
         return result
       } catch (e) {
         console.warn(`Task ${taskRef} failed (will retry)`, e)  // eslint-disable-line no-console
