@@ -79,7 +79,7 @@ if (global.Mongo) {
           throw new Error(`Attempt to add an index key '${k}' which is not in the schema`)
         }
       })
-      this.indexes.push(options ? { keys, options } : keys)
+      this.indexes.push({ keys, options })
     }
   }
 
