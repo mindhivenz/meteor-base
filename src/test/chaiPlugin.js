@@ -13,7 +13,7 @@ export const plugin = (chai) => {
     const collection = this._obj
     const label = collectionLabel(collection)
     this.assert(
-      collectionAttachedSchema(this),
+      collectionAttachedSchema(collection),
       `expected ${label} to have an attached schema`,
       `expected ${label} to not have an attached schema`,
     )
