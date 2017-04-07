@@ -24,7 +24,7 @@ export const plugin = (chai) => {
     const label = collectionLabel(collection)
     const matchingIndex = collection.indexes.find((idx) => {
       const keys = Object.entries(idx.keys)
-      return fields.every((f, i) => typeof f === 'string' ? f === keys[i][0] : isEqual(Object.entries(f), keys[i]))
+      return fields.every((f, i) => typeof f === 'string' ? f === keys[i][0] : isEqual(Object.entries(f)[0], keys[i]))
     })
     this.assert(
       matchingIndex,
