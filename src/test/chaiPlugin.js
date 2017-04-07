@@ -4,7 +4,7 @@ import { collectionAttachedSchema } from '../schemaHelper'
 
 
 const collectionLabel = collection =>
-  collection._name ? `collection named "${this._name}"` : '#{this}'
+  collection._name ? `collection named "${collection._name}"` : '#{this}'
 
 export const plugin = (chai) => {
   const Assertion = chai.Assertion
