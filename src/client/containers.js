@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import compose from 'recompose/compose'
 import setDisplayName from 'recompose/setDisplayName'
 import getContext from 'recompose/getContext'
@@ -21,7 +22,7 @@ export const errorProps = (error, props) => {
 export class AsyncContainerComponentsProvider extends React.Component {
 
   static childContextTypes = {
-    asyncContainerComponents: React.PropTypes.object.isRequired,
+    asyncContainerComponents: PropTypes.object.isRequired,
   }
 
   getChildContext = () => ({
@@ -36,7 +37,7 @@ export class AsyncContainerComponentsProvider extends React.Component {
 }
 
 const withAsyncContainerComponents = getContext({
-  asyncContainerComponents: React.PropTypes.object.isRequired,
+  asyncContainerComponents: PropTypes.object.isRequired,
 })
 
 export const errorContainer = Component =>
