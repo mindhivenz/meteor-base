@@ -23,12 +23,13 @@ class ServerCall {
   ) {
     this.viewerWaitingOnResult = viewerWaitingOnResult
     this.store = store
-    this._notifyViewerTimer = setTimeout(this.setNotifyViewer, notifyViewerAfterRunningMs)
-  }
-
-  @action.bound setNotifyViewer() {
-    this.notifyViewer = true
-    this._notifyViewerTimer = null
+    this._notifyViewerTimer = setTimeout(
+      action('Set notifyViewer', () => {
+        this.notifyViewer = true
+        this._notifyViewerTimer = null
+      }),
+      notifyViewerAfterRunningMs,
+    )
   }
 
   @action stop() {
@@ -43,14 +44,24 @@ class ServerCall {
 
 class ConnectionStore {
 
+  @observable initialized = false
   @observable statusKnown = false
   @observable connected = true
   @observable _callsInProgress = []
 
   _offlineMessage = null
 
+  constructor() {
+    setTimeout(
+      action('initialised', () => {
+        this.initialized = true
+      }),
+      5000,
+    )
+  }
+
   @computed get connectionDown() {
-    return ! this.connected && this.statusKnown
+    return this.initialized && ! this.connected && this.statusKnown
   }
 
   @computed get backgroundComms() {
