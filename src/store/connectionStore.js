@@ -77,7 +77,7 @@ class ConnectionStore {
         this._addOfflineMessage()
       }
     }),
-    300,
+    700,
   )
 
   _addOfflineMessage() {
