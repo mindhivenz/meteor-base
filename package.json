@@ -62,6 +62,7 @@
     "mobx": "^3.0.0",
     "mobx-react": "^4.0.0",
     "mocha": "^3.1.2",
+    "simpl-schema": "^0.2.2",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
     "sinon-stub-promise": "^3.0.1"
