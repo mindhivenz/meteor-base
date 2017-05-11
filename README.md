@@ -9,12 +9,15 @@
 ### Meteor package peer dependencies (optional)
 
 1. `FocusedView`: `meteor add ejson`
-1. `backdoorModule`: `meteor add xolvio:backdoor`
-1. `SimpleSchema`: `meteor add aldeed:collection2`
-2. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
-3. client `timeModule`: `meteor add mizzao:timesync`
-4. `hasRole`: `meteor add alanning:roles`
-5. offline: `meteor add ground:db@2.0.0-rc.6` 
+2. `backdoorModule`: `meteor add xolvio:backdoor`
+3. `SimpleSchema`: `meteor add aldeed:collection2-core`
+4. `apiRegistry.publishComposite`: `meteor add reywood:publish-composite`
+5. client `timeModule`: `meteor add mizzao:timesync` (optional, will default to local machine time otherwise)
+6. `hasRole`: `meteor add alanning:roles`
+7. `offlineModule`: `meteor add ground:db@2.0.0-rc.7`
+8. `appMarketStore`: `meteor add cordova:cordova-plugin-device`,  
+ 	`meteor add cordova:cordova-plugin-appinfo` and
+ 	`meteor add cordova:cordova-plugin-market`
 
 ## How to use this
  
@@ -28,8 +31,9 @@ This package also makes Meteor core services available in the appContext:
  
 - `Meteor`
 - `Mongo`: Meteor's Mongo, or in testing it is our own `TestMongo` (see below)
-- `Random`
 - `Accounts`: with appropriate internal data reset each test
+- `Random`
+- `EJSON`
 - `Users`: Meteor's 'users' Mongo collection (`TestMongo` in testing)
 - `apiRegistry`: see below
 
@@ -57,7 +61,7 @@ Uses in memory MiniMongo instead of real Mongo collections to increase test spee
 An [example domain test](https://github.com/mindhivenz/todos-basis-webapp/blob/master/tests/specs/domain/tasks.spec.js).
 
 - Use `mockServerContext` of `@mindhvie/meteor/test` to initialise modules in test
-	- Most likely you'll want to import and pass `@mindhvie/meteor/test/mockMeteorCoreModule`
+	- Most likely you'll want to import and pass `@mindhvie/meteor/test/mockMeteorCoreModuleFactory`
 	  as the first module into `mockServerContext`
 	- This also sets up a fiber so Meteor code can be run in your tests  
 - From the returned context get the mock `apiRegistry` which can `call` and `subscribe` to methods and publications

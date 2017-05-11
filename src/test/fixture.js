@@ -1,6 +1,6 @@
 import { app } from '@mindhive/di'
 
-import { TestMongo } from './mocks/testMongo'
+import TestMongo from './mocks/TestMongo'
 
 
 export const auditEntries = () =>
@@ -15,7 +15,7 @@ export const lastAuditEntry = () => {
 
 export const onlyAuditEntry = () => {
   const entries = auditEntries()
-  entries.should.have.length(1)
+  entries.should.have.lengthOf(1)
   return entries[0]
 }
 

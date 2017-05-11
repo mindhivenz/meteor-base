@@ -30,14 +30,14 @@ const VIEW_SPEC_PROPERTIES = [
 const selectorIsById = selector =>
   (selector && selector._id) || typeof selector === 'string'
 
-export class FocusedView {
+export default class FocusedView {
 
   constructor(collection, viewSpec = {}) {
     this.collection = collection
     this._name = collection._name
     Object.keys(viewSpec)
       .filter(k => ! VIEW_SPEC_PROPERTIES.includes(k))
-      .forEach(k => { throw new Error(`Invalid viewSpec property ${k}`) })
+      .forEach((k) => { throw new Error(`Invalid viewSpec property ${k}`) })
     this.viewSpec = viewSpec
   }
 
@@ -45,7 +45,13 @@ export class FocusedView {
     if (! operation.startsWith('find') && ! operation.startsWith('load') && this.viewSpec.updateSelector) {
       return this.viewSpec.updateSelector(apiContext.viewer())
     }
-    return this.viewSpec.findSelector && this.viewSpec.findSelector(apiContext.viewer())
+    if (this.viewSpec.findSelector) {
+      if (operation === 'find' && ! apiContext.isAuthenticated) {
+        return { _id: null }
+      }
+      return this.viewSpec.findSelector(apiContext.viewer())
+    }
+    return null
   }
 
   selector(apiContext, selector, operation = 'find') {
@@ -65,49 +71,57 @@ export class FocusedView {
     }
   }
 
-  _reportAccessDeniedForNotFound(apiContext, selector, operation, selectorOperation = operation) {
+  _reportAccessDeniedForNotOne(count, apiContext, selector, operation, selectorOperation = operation) {
 
     const selectorAsFieldsOptions = (s) => {
       const result = {}
-      Object.keys(s).forEach(k => {
+      Object.keys(s).forEach((k) => {
         result[k] = 1
       })
       return { fields: result }
     }
 
-    const selectorId = typeof selector._id === 'string' ? selector._id : undefined
-    const focusSelector = this._focusSelector(apiContext, selectorOperation)
-    const withoutFocusDoc = focusSelector && this.collection.findOne(selector, selectorAsFieldsOptions(focusSelector))
-    if (withoutFocusDoc) {
-      apiContext.accessDenied(`${operation} doc is out of focus`, {
-        collection: this.collection,
-        id: withoutFocusDoc._id,
-        data: {
-          viewFocus: focusSelector,
-          foundDoc: withoutFocusDoc,
-        },
-      })
-    } else if (selectorId) {
-      const byIdDoc = this.collection.findOne(selectorId, selectorAsFieldsOptions(selector))
-      if (byIdDoc) {
-        apiContext.accessDenied(`${operation} by id restricted by additional passed selectors`, {
+    if (count === 0) {
+      const selectorId = typeof selector._id === 'string' ? selector._id : undefined
+      const focusSelector = this._focusSelector(apiContext, selectorOperation)
+      const withoutFocusDoc = focusSelector && this.collection.findOne(selector, selectorAsFieldsOptions(focusSelector))
+      if (withoutFocusDoc) {
+        apiContext.accessDenied(`${operation} doc is out of focus`, {
           collection: this.collection,
-          id: selectorId,
+          id: withoutFocusDoc._id,
           data: {
-            foundDoc: byIdDoc,
+            foundDoc: withoutFocusDoc,
           },
         })
+      } else if (selectorId) {
+        const byIdDoc = this.collection.findOne(selectorId, selectorAsFieldsOptions(selector))
+        if (byIdDoc) {
+          apiContext.accessDenied(`${operation} by id restricted by additional passed selectors`, {
+            collection: this.collection,
+            id: selectorId,
+            data: {
+              foundDoc: byIdDoc,
+            },
+          })
+        } else {
+          apiContext.accessDenied(`${operation} non-existent id`, {
+            collection: this.collection,
+            id: selectorId,
+          })
+        }
       } else {
-        apiContext.accessDenied(`${operation} non-existent id`, {
+        apiContext.accessDenied(`${operation} found nothing`, {
           collection: this.collection,
-          id: selectorId,
+          data: {
+            selector,
+          },
         })
       }
-    } else {
-      apiContext.accessDenied(`${operation} found nothing`, {
+    } else if (count > 1) {
+      apiContext.accessDenied(`${operation} found more than one`, {
         collection: this.collection,
         data: {
-          selector,
+          selector: this.selector(apiContext, selector, selectorOperation),
         },
       })
     }
@@ -136,22 +150,22 @@ export class FocusedView {
     return this.collection.find(this.selector(apiContext, selector, 'update'), options)
   }
 
+  _loadOne(apiContext, selector, options, operation, selectorOperation = operation) {
+    const docs = this.collection
+      .find(this.selector(apiContext, selector, selectorOperation), { ...options, limit: 2 })
+      .fetch()
+    this._reportAccessDeniedForNotOne(docs.length, apiContext, selector, operation, selectorOperation)
+    return docs[0]
+  }
+
   loadOne(apiContext, selector, options) {
     this._firewall(apiContext)
-    const doc = this.collection.findOne(this.selector(apiContext, selector, 'loadOne'), options)
-    if (! doc) {
-      this._reportAccessDeniedForNotFound(apiContext, selector, 'loadOne')
-    }
-    return doc
+    return this._loadOne(apiContext, selector, options, 'loadOne')
   }
 
   loadOneForUpdate(apiContext, selector, options) {
     this._updateFirewall(apiContext)
-    const doc = this.collection.findOne(this.selector(apiContext, selector, 'update'), options)
-    if (! doc) {
-      this._reportAccessDeniedForNotFound(apiContext, selector, 'loadOneForUpdate', 'update')
-    }
-    return doc
+    return this._loadOne(apiContext, selector, options, 'loadOneForUpdate', 'update')
   }
 
   insert(apiContext, doc) {
@@ -164,9 +178,7 @@ export class FocusedView {
   updateOne(apiContext, selector, modifier) {
     this._updateFirewall(apiContext)
     const updateCount = this.collection.update(this.selector(apiContext, selector, 'updateOne'), modifier)
-    if (! updateCount) {
-      this._reportAccessDeniedForNotFound(apiContext, selector, 'updateOne')
-    }
+    this._reportAccessDeniedForNotOne(updateCount, apiContext, selector, 'updateOne')
     return updateCount
   }
 
@@ -182,9 +194,7 @@ export class FocusedView {
       throw new Error('Can only perform removeOne by id')
     }
     const removeCount = this.collection.remove(fullSelector)
-    if (! removeCount) {
-      this._reportAccessDeniedForNotFound(apiContext, selector, 'removeOne')
-    }
+    this._reportAccessDeniedForNotOne(removeCount, apiContext, selector, 'removeOne')
     return removeCount
   }
 

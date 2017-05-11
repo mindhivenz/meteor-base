@@ -8,15 +8,22 @@ export class UnhandledExceptionReporter {
   handledFilters = []
 
   onError = (apiContext, e) => {
-    if (! this.handledFilters.some(f => f(e))) {
+    const { Meteor } = app()
+    const errorHandled = this.handledFilters.some(f => f(e))
+    if (Meteor.isDevelopment) {
+      if (errorHandled) {
+        console.log('handled:', apiContext.apiName, e)  // eslint-disable-line no-console
+      } else {
+        console.error('UNHANDLED:', apiContext.apiName, e)  // eslint-disable-line no-console
+      }
+    }
+    if (! errorHandled) {
       const entry = {
         action: 'Unhandled exception',
         data: {
-          exception: String(e),
+          callArgs: apiContext.callArgs,
+          exception: e.stack || String(e),
         },
-      }
-      if (e.stack) {
-        entry.data.stack = e.stack
       }
       apiContext.auditLog(entry)
     }
@@ -34,7 +41,7 @@ const registerApi = (apiRegistry) => {
       app().audit.log(
         this.connection,
         this.apiName,
-        (this.isAuthenticated && this.isAuthenticated()) ? this.viewer() : null,
+        this.isAuthenticated ? this.viewer() : null,
         entry,
       )
     },

@@ -2,7 +2,10 @@
   <dictionary name="damon">
     <words>
       <w>autorun</w>
+      <w>bebounced</w>
+      <w>debounced</w>
       <w>denodeify</w>
+      <w>ejson</w>
       <w>falsy</w>
     </words>
   </dictionary>

@@ -4,54 +4,69 @@ import { mockAppContext, app } from '@mindhive/di'
 import { sinon } from '../mocha'
 
 import { notAuthorizedError } from '../error'
-import { MockApiRegistry } from '../test/mocks/mockApiRegistry'
+import MockApiRegistry from '../test/mocks/MockApiRegistry'
 
 import apiContextAuditModule, { UnhandledExceptionReporter } from './apiContextAuditModule'
 
 
+const modules = () => ({
+  Meteor: {
+    isDevelopment: false,
+  },
+  audit: {
+    log: sinon.spy(),
+  },
+  apiRegistry: new MockApiRegistry(),
+})
+
+let error
+
 describe('UnhandledExceptionReporter', () => {
 
   let apiContext
-  let error
   let unhandledExceptionReporter
 
   beforeEach(() => {
     apiContext = {
+      callArgs: some.object(),
       auditLog: sinon.spy(),
     }
     error = new Error(some.string())
     unhandledExceptionReporter = new UnhandledExceptionReporter()
   })
 
-  it('should call apiContext.auditLog correctly', () => {
-    unhandledExceptionReporter.onError(apiContext, error)
-    apiContext.auditLog.should.have.been.calledWith({
-      action: 'Unhandled exception',
-      data: {
-        exception: String(error),
-        stack: error.stack,
-      },
+  it('should call apiContext.auditLog correctly',
+    mockAppContext(modules, () => {
+      unhandledExceptionReporter.onError(apiContext, error)
+      apiContext.auditLog.should.have.been.calledWith({
+        action: 'Unhandled exception',
+        data: {
+          exception: error.stack,
+          callArgs: apiContext.callArgs,
+        },
+      })
     })
-  })
+  )
 
-  it('should not call apiContext.auditLog when filtered', () => {
-    unhandledExceptionReporter.registerHandledErrorFilter(e => e === error)
-    unhandledExceptionReporter.onError(apiContext, error)
-    apiContext.auditLog.should.not.have.been.called
-  })
+  it('should use string form of error if not stack trace',
+    mockAppContext(modules, () => {
+      error = some.string()
+      unhandledExceptionReporter.onError(apiContext, error)
+      apiContext.auditLog.firstCall.args[0].data.exception.should.equal(error)
+    })
+  )
+
+  it('should not call apiContext.auditLog when filtered',
+    mockAppContext(modules, () => {
+      unhandledExceptionReporter.registerHandledErrorFilter(e => e === error)
+      unhandledExceptionReporter.onError(apiContext, error)
+      apiContext.auditLog.should.not.have.been.called
+    })
+  )
 
 })
 
 describe('apiContextAuditModule', () => {
-
-  const modules = () => ({
-    audit: {
-      log: sinon.spy(),
-    },
-    apiRegistry: new MockApiRegistry(),
-  })
-
-  let error
 
   beforeEach(() => {
     error = new Error(some.string())
@@ -59,15 +74,15 @@ describe('apiContextAuditModule', () => {
 
   const givenApiContext = (viewer) => {
     const result = {
-      isAuthenticated: () => !! viewer,
+      get isAuthenticated() { return !! viewer },
       viewer: () => viewer,
       connection: some.object(),
     }
-    app().apiRegistry.mockEnhance(result)
+    app().apiRegistry.enhanceApiContext(result, some.string(), some.object())
     return result
   }
 
-  const whenError = (apiContext) =>
+  const whenError = apiContext =>
     app().apiRegistry._errorEvent(apiContext, error)
 
   it('should call audit.log on error',
@@ -83,8 +98,8 @@ describe('apiContextAuditModule', () => {
         {
           action: 'Unhandled exception',
           data: {
-            exception: String(error),
-            stack: error.stack,
+            exception: error.stack,
+            callArgs: apiContext.callArgs,
           },
         }
       )

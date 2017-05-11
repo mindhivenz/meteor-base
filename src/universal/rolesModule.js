@@ -1,6 +1,6 @@
 
 
-export const rolesEnhancer = (Roles) => ({
+export const rolesEnhancer = Roles => ({
 
   viewerHasRole(roles, group) {
     return Roles.userIsInRole(this.viewer(), roles, group)

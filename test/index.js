@@ -1,21 +1,20 @@
-var mockMeteorCoreModule = require('../dist/test/mocks/meteorCoreModule')
 var serverContext = require('../dist/test/serverContext')
-var testMongo = require('../dist/test/mocks/testMongo')
-var mockApiRegistry = require('../dist/test/mocks/apiRegistry')
+var TestMongo = require('../dist/test/mocks/TestMongo')
+var MockApiRegistry = require('../dist/test/mocks/MockApiRegistry')
 var chaiPlugin = require('../dist/test/chaiPlugin')
 var error = require('../dist/test/mocks/error')
 var fixture = require('../dist/test/fixture')
 
 module.exports = {
   mockServerContext: serverContext.mockServerContext,
-  mockMeteorCoreModule: mockMeteorCoreModule.default,
-  TestMongo: testMongo.TestMongo,
-  TestGround: testMongo.TestGround,
-  withRealMongoCollection: testMongo.withRealMongoCollection,
-  MockMethodInvocation: mockApiRegistry.MockMethodInvocation,
-  MockSubscription: mockApiRegistry.MockSubscription,
-  MockApiContext: mockApiRegistry.MockApiContext,
-  MockApiRegistry: mockApiRegistry.MockApiRegistry,
+  TestMongo: TestMongo.default,
+  TestGround: TestMongo.TestGround,
+  withRealMongoCollection: TestMongo.withRealMongoCollection,
+  MockMethodInvocation: MockApiRegistry.MockMethodInvocation,
+  MockSubscription: MockApiRegistry.MockSubscription,
+  MockHttpContext: MockApiRegistry.MockHttpContext,
+  MockApiContext: MockApiRegistry.MockApiContext,
+  MockApiRegistry: MockApiRegistry.default,
   MockMeteorError: error.MockMeteorError,
   notAuthorizedErrorMatch: error.notAuthorizedErrorMatch,
   validationErrorMatch: error.validationErrorMatch,

@@ -1,4 +1,5 @@
 import { app } from '@mindhive/di'
+import SimpleSchema from 'simpl-schema'
 
 
 export const audit = {
@@ -15,6 +16,7 @@ export const audit = {
     },
     { fromClient = false } = {},
   ) {
+    const { AuditEntries } = app()
     const entry = {
       connectionId: connection.id,
       clientAddress: connection.clientAddress,
@@ -33,7 +35,10 @@ export const audit = {
     if (fromClient) {
       entry.fromClient = true
     }
-    app().AuditEntries.insert(entry)
+    if (process.env.NODE_ENV === 'development') {  // specifically avoid 'test' stage
+      console.dir(entry)  // eslint-disable-line no-console
+    }
+    AuditEntries.insert(entry)
   },
 }
 
@@ -62,8 +67,8 @@ const registerApi = (apiRegistry) => {
 export default ({ Mongo, apiRegistry }) => {
   const AuditEntries = new Mongo.Collection('auditEntries')
 
-  if (global.SimpleSchema) {
-    const AuditEntrySchema = new global.SimpleSchema({
+  if (AuditEntries.attachSchema) {
+    const AuditEntrySchema = new SimpleSchema({
       timestamp: {
         type: Date,
         autoValue() {
@@ -73,19 +78,19 @@ export default ({ Mongo, apiRegistry }) => {
           return new Date()
         },
       },
-      connectionId: { type: String },
-      clientAddress: { type: String },
-      context: { type: String },
+      connectionId: String,
+      clientAddress: String,
+      context: String,
       viewerId: { type: String, optional: true },
       orgId: { type: String, optional: true },
-      action: { type: String },
+      action: String,
       collection: { type: String, optional: true },
       id: {
         type: String,
         optional: true,
         custom() {
           if (this.value && ! this.field('collection').value) {
-            return 'required'
+            return SimpleSchema.ErrorTypes.REQUIRED
           }
           return null
         },

@@ -14,3 +14,8 @@ chai.use(chaiProperties)
 chai.use(chaiAsPromised)
 
 export { sinon, should }
+
+export const forATick = () =>
+  new Promise((resolve) => {
+    setTimeout(resolve, 0)
+  })

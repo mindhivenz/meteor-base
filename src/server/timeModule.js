@@ -1,12 +1,11 @@
-import { extendClock, ProgressiveBackoff } from '../universal/time'
+import { initModules } from '@mindhive/di'
+import clockModule from '@mindhive/time/clockModule'
+import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
 
 
-const clock = () =>
-  new Date()
-
-extendClock(clock)
-
-export default () => ({
-  clock,
-  ProgressiveBackoff,
-})
+export default () => {
+  initModules([clockModule])
+  return {
+    ProgressiveBackoff,
+  }
+}

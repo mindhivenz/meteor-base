@@ -1,31 +1,39 @@
 import React from 'react'
+import compose from 'recompose/compose'
+import setDisplayName from 'recompose/setDisplayName'
 
 
 // If values of mapPropsToProps null/undefined, then previous values are used
 export const withLatchedProps = mapPropsToProps =>
-  Component =>
-    class Latched extends React.Component {
+  compose(
+    setDisplayName('withLatchedProps'),
+    Component =>
+      class Latched extends React.Component {
 
-      componentWillMount() {
-        this.setStateFromProps(this.props)
-      }
+        componentWillMount() {
+          this.setStateFromProps(this.props)
+        }
 
-      componentWillReceiveProps(nextProps) {
-        this.setStateFromProps(nextProps)
-      }
+        componentWillReceiveProps(nextProps) {
+          this.setStateFromProps(nextProps)
+        }
 
-      setStateFromProps(props) {
-        const applyState = {}
-        const mappedProps = mapPropsToProps(props)
-        Object.entries(mappedProps).forEach(([k, v]) => {
-          if (v != null) {
-            applyState[k] = v
+        setStateFromProps(props) {
+          const applyState = {}
+          const mappedProps = mapPropsToProps(props)
+          if (mappedProps != null) {
+            Object.entries(mappedProps).forEach(([k, v]) => {
+              // So old state that was applied with a non-null value will be left intact
+              if (v != null) {
+                applyState[k] = v
+              }
+            })
+            this.setState(applyState)
           }
-        })
-        this.setState(applyState)
-      }
+        }
 
-      render() {
-        return React.createElement(Component, { ...this.props, ...this.state })
-      }
-    }
+        render() {
+          return React.createElement(Component, { ...this.props, ...this.state })
+        }
+      },
+  )

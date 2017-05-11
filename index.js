@@ -1,6 +1,6 @@
 var init = require('./dist/init')
 var error = require('./dist/error')
-var focusedView = require('./dist/focusedView')
+var FocusedView = require('./dist/FocusedView')
 var roles = require('./dist/roles')
 var check = require('./dist/check')
 
@@ -11,8 +11,8 @@ module.exports = {
   notAuthorizedError: error.notAuthorizedError,
   VALIDATION_ERROR: error.VALIDATION_ERROR,
   validationError: error.validationError,
-  FocusedView: focusedView.FocusedView,
-  prefixKeys: focusedView.prefixKeys,
+  FocusedView: FocusedView.default,
+  prefixKeys: FocusedView.prefixKeys,
   SUPER_USER: roles.SUPER_USER,
 
   /*
@@ -24,5 +24,4 @@ module.exports = {
    */
   check: check.check,
   Match: check.Match,
-  SimpleSchema: check.SimpleSchema,
 }

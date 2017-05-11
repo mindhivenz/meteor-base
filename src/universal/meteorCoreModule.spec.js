@@ -3,6 +3,8 @@ import '../mocha'
 import meteorCoreModule from './meteorCoreModule'
 
 
+const originalMeteor = global.Meteor
+
 describe('meteorCoreModule', () => {
 
   beforeEach(() => {
@@ -10,7 +12,7 @@ describe('meteorCoreModule', () => {
   })
 
   afterEach(() => {
-    delete global.Meteor
+    global.Meteor = originalMeteor
   })
 
   it('should add core Meteor services and packages', () => {
@@ -22,6 +24,7 @@ describe('meteorCoreModule', () => {
       'Accounts',
       'apiRegistry',
       'Random',
+      'EJSON',
     ])
   })
 })

@@ -1,11 +1,9 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import compose from 'recompose/compose'
+import setDisplayName from 'recompose/setDisplayName'
+import getContext from 'recompose/getContext'
 
-
-export const withDisplayName = (name, ContainerComponent, ChildComponent) => {
-  const childName = ChildComponent && (ChildComponent.displayName || ChildComponent.name)
-  ContainerComponent.displayName = childName ? `${name}(${childName})` : name
-  return ContainerComponent
-}
 
 export const loadingProps = () => ({
   loading: true,
@@ -24,7 +22,7 @@ export const errorProps = (error, props) => {
 export class AsyncContainerComponentsProvider extends React.Component {
 
   static childContextTypes = {
-    asyncContainerComponents: React.PropTypes.object.isRequired,
+    asyncContainerComponents: PropTypes.object.isRequired,
   }
 
   getChildContext = () => ({
@@ -38,37 +36,35 @@ export class AsyncContainerComponentsProvider extends React.Component {
     this.props.children
 }
 
-const withAsyncContainerComponentsContext = (Component) => {
-  Component.contextTypes = {
-    asyncContainerComponents: React.PropTypes.object.isRequired,
-  }
-  return Component
-}
+const withAsyncContainerComponents = getContext({
+  asyncContainerComponents: PropTypes.object.isRequired,
+})
 
-export const errorContainer = (Component) =>
-  withDisplayName(
-    'errorContainer',
-    withAsyncContainerComponentsContext(
-      (
-        { errors, ...props },
-        { asyncContainerComponents: { Error } },
-      ) =>
-        errors ? React.createElement(Error, { errors })
+export const errorContainer = Component =>
+  compose(
+    setDisplayName('errorContainer'),
+    withAsyncContainerComponents,
+  )(
+    ({
+      errors,
+      asyncContainerComponents: { Error },
+      ...props
+    }) =>
+      errors ? React.createElement(Error, { errors })
         : React.createElement(Component, props)
-    ),
-    Component,
   )
 
-export const asyncContainer = (Component) =>
-  withDisplayName(
-    'asyncContainer',
-    withAsyncContainerComponentsContext(
-      (
-        { errors, loading, ...props },
-        { asyncContainerComponents: { Error, Loading } },
-      ) =>
-        errors ? React.createElement(Error, { errors })
+export const asyncContainer = Component =>
+  compose(
+    setDisplayName('asyncContainer'),
+    withAsyncContainerComponents,
+  )(
+    ({
+        errors,
+        loading,
+        asyncContainerComponents: { Error, Loading },
+        ...props,
+      }) =>
+      errors ? React.createElement(Error, { errors })
         : (loading ? React.createElement(Loading) : React.createElement(Component, props))
-    ),
-    Component,
   )

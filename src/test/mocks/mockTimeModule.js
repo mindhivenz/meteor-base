@@ -1,29 +1,11 @@
-import addMilliseconds from 'date-fns/add_milliseconds'
-
-import { extendClock, ProgressiveBackoff } from '../../universal/time'
+import { initModules } from '@mindhive/di'
+import mockClockModule from '@mindhive/time/mockClockModule'
+import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
 
 
 export default () => {
-  const initialTime = new Date()
-  let testTime = initialTime
-
-  const clock = () => testTime
-
-  clock.adjust = (func) => {
-    testTime = func(testTime)
-    return testTime
-  }
-  clock.sleep = (milliseconds) => {
-    clock.adjust(time => addMilliseconds(time, milliseconds))
-    return Promise.resolve()
-  }
-  clock.totalAdjustedMs = () =>
-    testTime - initialTime
-
-  extendClock(clock)
-
+  initModules([mockClockModule])
   return {
-    clock,
     ProgressiveBackoff,
   }
 }

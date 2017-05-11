@@ -1,36 +1,40 @@
 import { compose, composeWithTracker } from 'react-komposer'
-import shallowEqual from 'shallowequal'
+import shallowEqual from 'recompose/shallowEqual'
+import setDisplayName from 'recompose/setDisplayName'
 import { app } from '@mindhive/di'
 
-import { withDisplayName, loadingProps, errorProps } from './containers'
+import { loadingProps, errorProps } from './containers'
 
 
-const PushPropsNotCalled = () => {
-  console.error("You didn't call pushProps")  // eslint-disable-line no-console
-}
-
-const composeFunc = (asyncFunc) =>
+const composeFunc = asyncFunc =>
   (ownProps, onData) => {
-    const pushProps = (props = {}) =>
+    let pushPropsCalled = false
+    const pushProps = (props = {}) => {
+      pushPropsCalled = true
       onData(null, props)
+    }
     asyncFunc(app(), pushProps, ownProps)
+    if (! pushPropsCalled) {
+      pushProps()
+    }
   }
 
 /*
  asyncFunc: (app, pushProps, ownProps)
 
  Call pushProps with the props to push to the child component.
- You must call pushProps when asyncFunc is first called.
 
  Note: we don't use the loading and error component of react-komposer.
  Push that data through props to handle it nicely.
  */
 export const withAsync = (asyncFunc, shouldResubscribe) =>
-  compose(
-    composeFunc(asyncFunc),
-    PushPropsNotCalled,
-    null,
-    { shouldResubscribe },
+  setDisplayName('withAsync')(
+    compose(
+      composeFunc(asyncFunc),
+      null,
+      null,
+      { shouldResubscribe },
+    )
   )
 
 /*
@@ -39,21 +43,24 @@ export const withAsync = (asyncFunc, shouldResubscribe) =>
  This rerun is not blocked by shouldResubscribe.
  */
 export const withMeteorReactive = (asyncFunc, shouldResubscribe) =>
-  composeWithTracker(
-    composeFunc(asyncFunc),
-    PushPropsNotCalled,
-    null,
-    { shouldResubscribe },
+  setDisplayName('withMeteorReactive')(
+    composeWithTracker(
+      composeFunc(asyncFunc),
+      null,
+      null,
+      { shouldResubscribe },
+    )
   )
 
 export const withApiCallResult = ({
-  propName,
   methodName,
-  propsToArgs = () => null,
-  overrideCallProps = () => null,
-  resultToProps = (result) => ({ [propName]: result }),
+  mapPropsToArgs = props => null,      // eslint-disable-line no-unused-vars
+  skipCall = props => false,        // eslint-disable-line no-unused-vars
+  overrideCallProps = props => skipCall(props) ? {} : null,  // null -> do not override
+  propName,
+  resultToProps = result => ({ [propName]: result }),
 }) =>
-  withDisplayName(`withApiCallResult(${methodName})`,
+  setDisplayName(`apiCall(${methodName})`)(
     withAsync(
       async (appContext, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
@@ -64,25 +71,26 @@ export const withApiCallResult = ({
         pushProps(loadingProps())
         try {
           pushProps(resultToProps(
-            await app().api.call(methodName, propsToArgs(props), { notifyViewerPending: false })
+            await app().api.call(methodName, mapPropsToArgs(props), { notifyViewerPending: false })
           ))
         } catch (e) {
           pushProps(errorProps(e, props))
         }
       },
       (currentProps, nextProps) =>
-      ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-      (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
+        ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
+        (! overrideCallProps(nextProps) && ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)))
     )
   )
 
 export const connectSubscription = ({
   publicationName,
   dataToProps,
-  propsToArgs = () => null,
-  overrideCallProps = () => null,
+  mapPropsToArgs = props => null,                 // eslint-disable-line no-unused-vars
+  skipSubscription = props => false,           // eslint-disable-line no-unused-vars
+  overrideCallProps = props => skipSubscription(props) ? {} : null,   // null -> do not override
 }) =>
-  withDisplayName(`connect(${publicationName})`,
+  setDisplayName(`connect(${publicationName})`)(
     withMeteorReactive(
       ({ Meteor }, pushProps, props) => {
         const overrideProps = overrideCallProps(props)
@@ -97,14 +105,15 @@ export const connectSubscription = ({
             }
           },
         }
-        if (Meteor.subscribe(publicationName, propsToArgs(props), callbacks).ready()) {
-          pushProps(dataToProps(app(), props))
+        const args = mapPropsToArgs(props)
+        if (Meteor.subscribe(publicationName, args, callbacks).ready()) {
+          pushProps(dataToProps(app(), args))
         } else {
           pushProps(loadingProps())
         }
       },
       (currentProps, nextProps) =>
-      ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
-      (! overrideCallProps(nextProps) && ! shallowEqual(propsToArgs(currentProps), propsToArgs(nextProps)))
+        ! shallowEqual(overrideCallProps(currentProps), overrideCallProps(nextProps)) ||
+        (! overrideCallProps(nextProps) && ! shallowEqual(mapPropsToArgs(currentProps), mapPropsToArgs(nextProps)))
     )
   )
