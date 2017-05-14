@@ -6,10 +6,10 @@ import {
   autorun,
 } from 'mobx'
 import difference from 'lodash/difference'
+import StoreLifecycle from '@mindhive/mobx/StoreLifecycle'
 
 import selectedState from '../client/selectedState'
 import { app } from '@mindhive/di'
-import StoreLifecycle from './StoreLifecycle'
 
 
 export default class SubscriptionDocStore extends StoreLifecycle {

@@ -1,7 +1,6 @@
 import { observable, computed } from 'mobx'
 import { app } from '@mindhive/di'
-
-import StoreLifecycle from './StoreLifecycle'
+import StoreLifecycle from '@mindhive/mobx/StoreLifecycle'
 
 
 class ExtendedLookupStore {
