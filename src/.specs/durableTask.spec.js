@@ -1,7 +1,7 @@
 import some from '@mindhive/some'
 import { mockAppContext, initModules, app } from '@mindhive/di'
 
-import { sinon, should, forATick } from '../mocha'
+import { sinon, should, tick } from '../mocha'
 
 import { TestGround } from '../test/mocks/TestMongo'
 import mockMeteorCoreModuleFactory from '../test/mocks/mockMeteorCoreModuleFactory'
@@ -171,7 +171,7 @@ describe('durableTaskStore', () => {
       givenDomainModuleInited()
       givenSomeTask()
 
-      await forATick()
+      await tick()
       taskFunc.should.have.been.calledOnce
       taskFunc.should.have.been.calledWith(expectedArgs)
     })
@@ -186,7 +186,7 @@ describe('durableTaskStore', () => {
       })
       givenDomainModuleInited()
 
-      await forATick()
+      await tick()
       taskFunc.should.not.have.been.called
     })
   )
