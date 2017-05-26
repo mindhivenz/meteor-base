@@ -8,7 +8,7 @@ const collectionLabel = collection =>
 
 const assetTestMongo = (collection, chai) => {
   chai.assert(
-    collection.constructor && collection.constructor.name === 'TestMongo',
+    Array.isArray(collection.indexes),
     'expected an instance of TestMongo',
     'expected not an instance of TestMongo',
   )
