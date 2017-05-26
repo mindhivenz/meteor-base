@@ -13,5 +13,5 @@ const inFiberAsPromise = func =>
       })
     })
 
-export const mockServerContext = (testModules, testFunc) =>
+export default (testModules, testFunc) =>
   inFiberAsPromise(mockAppContext(testModules, testFunc))

@@ -5,6 +5,7 @@ import { sinon } from '../mocha'
 
 import LookupStore from './LookupStore'
 import LookupDoc from './LookupDoc'
+import TestMongo from '../test/mocks/TestMongo'
 
 
 describe('LookupStore', () => {
@@ -25,6 +26,7 @@ describe('LookupStore', () => {
   const modules = () => {
     initModules([
       () => ({
+        Mongo: TestMongo,
         mongoMirror,
       }),
     ])

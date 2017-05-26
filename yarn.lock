@@ -9,10 +9,10 @@
     slash "^1.0.0"
 
 "@mindhive/di@^4.0.0", "@mindhive/di@^4.1.1":
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/@mindhive/di/-/di-4.1.1.tgz#ee7030a0b299b726ea9ac6c45d92f0bb431674bc"
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@mindhive/di/-/di-4.2.1.tgz#bf379789b72dac4d535e09a8143cc1a51e368464"
   dependencies:
-    babel-runtime "^6.18.0"
+    babel-runtime "^6.23.0"
 
 "@mindhive/mobx@^2.0.4":
   version "2.1.1"
@@ -37,11 +37,12 @@
     date-fns "^1.28.0"
 
 "@mindhive/wallaby-meteor-config@^1.1.1":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@mindhive/wallaby-meteor-config/-/wallaby-meteor-config-1.2.6.tgz#8b111d6a6dcc5b27d9d13cf60762a761f54fd65b"
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@mindhive/wallaby-meteor-config/-/wallaby-meteor-config-1.2.7.tgz#95818437f751b5ee7c0a7db103c5ded3d4a75e18"
   dependencies:
     "@mindhive/babel-plugin-root-import" "^5.0.0"
     babel-core "^6.18.2"
+    babel-plugin-transform-es2015-modules-commonjs "^6.24.1"
     babel-polyfill "^6.16.0"
     babel-preset-meteor "^6.14.0"
     babel-preset-react "^6.16.0"
@@ -799,7 +800,7 @@ babel-register@^6.24.1:
     mkdirp "^0.5.1"
     source-map-support "^0.4.2"
 
-babel-runtime@6.x.x, babel-runtime@^6.18.0, babel-runtime@^6.2.0, babel-runtime@^6.22.0:
+babel-runtime@6.x.x, babel-runtime@^6.18.0, babel-runtime@^6.2.0, babel-runtime@^6.22.0, babel-runtime@^6.23.0:
   version "6.23.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.23.0.tgz#0a9489f144de70efb3ce4300accdb329e2fc543b"
   dependencies:
@@ -929,8 +930,8 @@ camelcase@^1.0.2:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-1.2.1.tgz#9bb5304d2e0b56698b2c758b08a3eaa9daa58a39"
 
 caniuse-lite@^1.0.30000670:
-  version "1.0.30000670"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000670.tgz#c94f7dbf0b68eaadc46d3d203f46e82e7801135e"
+  version "1.0.30000672"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000672.tgz#3f89b9907db78653f88bc4d056ed626e8ec74357"
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -1106,17 +1107,11 @@ debug@2.2.0:
   dependencies:
     ms "0.7.1"
 
-debug@2.6.0:
+debug@2.6.0, debug@^2.1.1, debug@^2.2.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.0.tgz#bc596bcabe7617f11d9fa15361eded5608b8499b"
   dependencies:
     ms "0.7.2"
-
-debug@^2.1.1, debug@^2.2.0:
-  version "2.6.8"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.8.tgz#e731531ca2ede27d188222427da17821d68ff4fc"
-  dependencies:
-    ms "2.0.0"
 
 decamelize@^1.0.0:
   version "1.2.0"
@@ -2212,10 +2207,6 @@ ms@0.7.1:
 ms@0.7.2:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.2.tgz#ae25cf2512b3885a1d95d7f037868d8431124765"
-
-ms@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
 mute-stream@0.0.5:
   version "0.0.5"
