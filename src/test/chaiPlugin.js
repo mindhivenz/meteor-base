@@ -6,10 +6,20 @@ import { collectionAttachedSchema } from '../schemaHelper'
 const collectionLabel = collection =>
   collection._name ? `collection named "${collection._name}"` : '#{this}'
 
+function assetTestMongo() {
+  const collection = this._obj
+  this.assert(
+    collection.constructor && collection.constructor.name === 'TestMongo',
+    'expected an instance of TestMongo',
+    'expected not an instance of TestMongo',
+  )
+}
+
 export const plugin = (chai) => {
   const Assertion = chai.Assertion
 
   Assertion.addProperty('schema', function schemaProperty() {
+    assetTestMongo()
     const collection = this._obj
     const label = collectionLabel(collection)
     this.assert(
@@ -20,6 +30,7 @@ export const plugin = (chai) => {
   })
 
   Assertion.addMethod('index', function indexMethod(fields) {
+    assetTestMongo()
     const collection = this._obj
     const label = collectionLabel(collection)
     const matchingIndex = collection.indexes.find((idx) => {
