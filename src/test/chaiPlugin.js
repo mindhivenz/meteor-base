@@ -19,7 +19,7 @@ export const plugin = (chai) => {
     )
   })
 
-  Assertion.addMethod('index', function indexProperty(fields) {
+  Assertion.addMethod('index', function indexMethod(fields) {
     const collection = this._obj
     const label = collectionLabel(collection)
     const matchingIndex = collection.indexes.find((idx) => {
