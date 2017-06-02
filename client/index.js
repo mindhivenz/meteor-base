@@ -1,25 +1,23 @@
-var containers = require('../dist/client/containers')
-var compose = require('../dist/client/compose')
-var localContext = require('../dist/client/localContext')
-var latchedProps = require('../dist/client/latchedProps')
-var selectedState = require('../dist/client/selectedState')
+const containers = require('../dist/client/containers')
+const compose = require('../dist/client/compose')
+const localContext = require('../dist/client/localContext')
+const latchedProps = require('../dist/client/latchedProps')
+const selectedState = require('../dist/client/selectedState')
 
 
-module.exports = {
-  loadingProps: containers.loadingProps,
-  errorProps: containers.errorProps,
-  errorContainer: containers.errorContainer,
-  asyncContainer: containers.asyncContainer,
+module.exports.loadingProps = containers.loadingProps
+module.exports.errorProps = containers.errorProps
+module.exports.errorContainer = containers.errorContainer
+module.exports.asyncContainer = containers.asyncContainer
 
-  withAsync: compose.withAsync,
-  withMeteorReactive: compose.withMeteorReactive,
-  withApiCallResult: compose.withApiCallResult,
-  connectSubscription: compose.connectSubscription,
+module.exports.withAsync = compose.withAsync
+module.exports.withMeteorReactive = compose.withMeteorReactive
+module.exports.withApiCallResult = compose.withApiCallResult
+module.exports.connectSubscription = compose.connectSubscription
 
-  LocalContext: localContext.default,
+module.exports.LocalContext = localContext.default
 
-  withLatchedProps: latchedProps.withLatchedProps,
+module.exports.withLatchedProps = latchedProps.withLatchedProps
 
-  selectedState: selectedState.default,
-  SELECT_NEW_ID: selectedState.SELECT_NEW_ID,
-}
+module.exports.selectedState = selectedState.default
+module.exports.SELECT_NEW_ID = selectedState.SELECT_NEW_ID

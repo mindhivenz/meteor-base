@@ -1,27 +1,26 @@
-var mockServerContext = require('../dist/test/mockServerContext')
-var TestMongo = require('../dist/test/mocks/TestMongo')
-var MockApiRegistry = require('../dist/test/mocks/MockApiRegistry')
-var chaiPlugin = require('../dist/test/chaiPlugin')
-var error = require('../dist/test/mocks/error')
-var fixture = require('../dist/test/fixture')
+const mockServerContext = require('../dist/test/mockServerContext')
+const TestMongo = require('../dist/test/mocks/TestMongo')
+const MockApiRegistry = require('../dist/test/mocks/MockApiRegistry')
+const chaiPlugin = require('../dist/test/chaiPlugin')
+const error = require('../dist/test/mocks/error')
+const fixture = require('../dist/test/fixture')
 
-module.exports = {
-  mockServerContext: mockServerContext.default,
-  TestMongo: TestMongo.default,
-  TestGround: TestMongo.TestGround,
-  withRealMongoCollection: TestMongo.withRealMongoCollection,
-  MockMethodInvocation: MockApiRegistry.MockMethodInvocation,
-  MockSubscription: MockApiRegistry.MockSubscription,
-  MockHttpContext: MockApiRegistry.MockHttpContext,
-  MockApiContext: MockApiRegistry.MockApiContext,
-  MockApiRegistry: MockApiRegistry.default,
-  MockMeteorError: error.MockMeteorError,
-  notAuthorizedErrorMatch: error.notAuthorizedErrorMatch,
-  validationErrorMatch: error.validationErrorMatch,
-  chaiPlugin: chaiPlugin.plugin,
-  auditEntries: fixture.auditEntries,
-  lastAuditEntry: fixture.lastAuditEntry,
-  onlyAuditEntry: fixture.onlyAuditEntry,
-  userHasPassword: fixture.userHasPassword,
-  resetRolesCollection: fixture.resetRolesCollection,
-}
+
+module.exports.mockServerContext = mockServerContext.default
+module.exports.TestMongo = TestMongo.default
+module.exports.TestGround = TestMongo.TestGround
+module.exports.withRealMongoCollection = TestMongo.withRealMongoCollection
+module.exports.MockMethodInvocation = MockApiRegistry.MockMethodInvocation
+module.exports.MockSubscription = MockApiRegistry.MockSubscription
+module.exports.MockHttpContext = MockApiRegistry.MockHttpContext
+module.exports.MockApiContext = MockApiRegistry.MockApiContext
+module.exports.MockApiRegistry = MockApiRegistry.default
+module.exports.MockMeteorError = error.MockMeteorError
+module.exports.notAuthorizedErrorMatch = error.notAuthorizedErrorMatch
+module.exports.validationErrorMatch = error.validationErrorMatch
+module.exports.chaiPlugin = chaiPlugin.plugin
+module.exports.auditEntries = fixture.auditEntries
+module.exports.lastAuditEntry = fixture.lastAuditEntry
+module.exports.onlyAuditEntry = fixture.onlyAuditEntry
+module.exports.userHasPassword = fixture.userHasPassword
+module.exports.resetRolesCollection = fixture.resetRolesCollection
