@@ -12,6 +12,10 @@ export default class LookupDoc {
     return this._id && this._store.idMap.get(this._id)
   }
 
+  @computed get exists() {
+    return Boolean(this._doc)
+  }
+
   @computed get substituteLabel() {
     return this._store.loading ? '…' : `[${typeof this._id === 'string' ? this._id.substr(-5) : '?'}]`
   }
