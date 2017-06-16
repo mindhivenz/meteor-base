@@ -38,6 +38,10 @@ class ExtendedLookupStore {
     return this.all.map(mapper)
   }
 
+  filter(predicate) {
+    return this.all.filter(predicate)
+  }
+
   filterKnown(predicate) {
     return this.store.filter(predicate).concat(this._missing)
   }
@@ -65,6 +69,7 @@ export default class LookupStore extends StoreLifecycle {
   }
 
   get(idOrDoc) {
+    // TODO: can we ensure the same objects are returned if called multiple times, but with weak references?
     const id = (idOrDoc && (typeof idOrDoc === 'string' ? idOrDoc : idOrDoc._id)) || null
     return new this.DocClass(this, id)
   }
