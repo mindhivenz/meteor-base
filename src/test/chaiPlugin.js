@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+import util from 'util'
 
 import { collectionAttachedSchema } from '../schemaHelper'
 
@@ -14,7 +15,7 @@ const assetTestMongo = (collection, chai) => {
   )
 }
 
-export const plugin = (chai) => {
+export default (chai) => {
   const Assertion = chai.Assertion
 
   Assertion.addProperty('schema', function schemaProperty() {
@@ -28,20 +29,24 @@ export const plugin = (chai) => {
     )
   })
 
-  Assertion.addMethod('index', function indexMethod(fields) {
+  Assertion.addMethod('index', function indexMethod(fields, options) {
     const collection = this._obj
     assetTestMongo(collection, this)
     const label = collectionLabel(collection)
     const matchingIndex = collection.indexes.find((idx) => {
       const keys = Object.entries(idx.keys)
-      return fields.every((f, i) => typeof f === 'string' ? f === keys[i][0] : isEqual(Object.entries(f)[0], keys[i]))
+      const fieldsMatch = fields.every((f, i) =>
+        typeof f === 'string' ? f === keys[i][0] : isEqual(Object.entries(f)[0], keys[i])
+      )
+      const optionsMatch = options ? isEqual(options, idx.options) : true
+      return fieldsMatch && optionsMatch
     })
     this.assert(
       matchingIndex,
       `expected ${label} to have an index #{exp} from #{act}`,
       `expected ${label} to not have an index #{exp}`,
-      fields,
-      collection.indexes.map(idx => idx.keys),
+      options ? util.inspect({ fields, options }) : util.inspect(fields),
+      util.inspect(collection.indexes),
     )
   })
 

@@ -3,4 +3,4 @@ npm-debug.log
 /dist/
 /.idea/workspace.xml
 /.idea/libraries/
-.meteor-portable
+.meteor-portable*
