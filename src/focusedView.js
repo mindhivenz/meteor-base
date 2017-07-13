@@ -30,6 +30,9 @@ const VIEW_SPEC_PROPERTIES = [
 const selectorIsById = selector =>
   (selector && selector._id) || typeof selector === 'string'
 
+export const selectorAsObject = selector =>
+  typeof selector === 'string' ? { _id: selector } : selector
+
 export default class FocusedView {
 
   constructor(collection, viewSpec = {}) {
@@ -47,6 +50,7 @@ export default class FocusedView {
     }
     if (this.viewSpec.findSelector) {
       if (operation === 'find' && ! apiContext.isAuthenticated) {
+        // Short circuit force not finding it
         return { _id: null }
       }
       return this.viewSpec.findSelector(apiContext.viewer())
@@ -64,9 +68,8 @@ export default class FocusedView {
     if (! viewSelector) {
       return selector
     }
-    const selectorObj = typeof selector === 'string' ? { _id: selector } : selector
     return {
-      ...selectorObj,
+      ...selectorAsObject(selector),
       ...viewSelector,
     }
   }
@@ -74,6 +77,9 @@ export default class FocusedView {
   _reportAccessDeniedForNotOne(count, apiContext, selector, operation, selectorOperation = operation) {
 
     const selectorAsFieldsOptions = (s) => {
+      if (typeof s === 'string') {
+        return {}
+      }
       const result = {}
       Object.keys(s).forEach((k) => {
         result[k] = 1
@@ -127,26 +133,26 @@ export default class FocusedView {
     }
   }
 
-  _firewall(apiContext) {
+  _firewall(apiContext, selector) {
     if (this.viewSpec.firewall) {
-      this.viewSpec.firewall(apiContext)
+      this.viewSpec.firewall(apiContext, selectorAsObject(selector))
     }
   }
 
-  _updateFirewall(apiContext) {
+  _updateFirewall(apiContext, selector) {
     if (this.viewSpec.updateFirewall) {
-      this.viewSpec.updateFirewall(apiContext)
+      this.viewSpec.updateFirewall(apiContext, selectorAsObject(selector))
     }
-    this._firewall(apiContext)
+    this._firewall(apiContext, selector)
   }
 
   find(apiContext, selector, options) {
-    this._firewall(apiContext)
+    this._firewall(apiContext, selector)
     return this.collection.find(this.selector(apiContext, selector, 'find'), options)
   }
 
   findForUpdate(apiContext, selector, options) {
-    this._updateFirewall(apiContext)
+    this._updateFirewall(apiContext, selector)
     return this.collection.find(this.selector(apiContext, selector, 'update'), options)
   }
 
@@ -159,36 +165,36 @@ export default class FocusedView {
   }
 
   loadOne(apiContext, selector, options) {
-    this._firewall(apiContext)
+    this._firewall(apiContext, selector)
     return this._loadOne(apiContext, selector, options, 'loadOne')
   }
 
   loadOneForUpdate(apiContext, selector, options) {
-    this._updateFirewall(apiContext)
+    this._updateFirewall(apiContext, selector)
     return this._loadOne(apiContext, selector, options, 'loadOneForUpdate', 'update')
   }
 
   insert(apiContext, doc) {
-    this._updateFirewall(apiContext)
+    this._updateFirewall(apiContext, doc)
     const insertDoc = this.viewSpec.insertDocMerge ? this.viewSpec.insertDocMerge(apiContext.viewer(), doc) : clone(doc)
     insertDoc._id = this.collection.insert(insertDoc)
     return insertDoc
   }
 
   updateOne(apiContext, selector, modifier) {
-    this._updateFirewall(apiContext)
+    this._updateFirewall(apiContext, selector)
     const updateCount = this.collection.update(this.selector(apiContext, selector, 'updateOne'), modifier)
     this._reportAccessDeniedForNotOne(updateCount, apiContext, selector, 'updateOne')
     return updateCount
   }
 
   updateMaybe(apiContext, selector, modifier) {
-    this._updateFirewall(apiContext)
+    this._updateFirewall(apiContext, selector)
     return this.collection.update(this.selector(apiContext, selector, 'updateMany'), modifier)
   }
 
   removeOne(apiContext, selector) {
-    this._updateFirewall(apiContext)
+    this._updateFirewall(apiContext, selector)
     const fullSelector = this.selector(apiContext, selector, 'removeOne')
     if (! selectorIsById(fullSelector)) {
       throw new Error('Can only perform removeOne by id')

@@ -1,8 +1,9 @@
 import some from '@mindhive/some'
+import fromPairs from 'lodash/fromPairs'
 
 import { should, sinon } from './mocha'
 
-import FocusedView from './FocusedView'
+import FocusedView, { selectorAsObject } from './FocusedView'
 
 
 describe('focusedView', () => {
@@ -184,12 +185,14 @@ describe('focusedView', () => {
 
     it('should throw if firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        firewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.find(apiContext, selector, options)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
   })
@@ -231,12 +234,14 @@ describe('focusedView', () => {
 
     it('should throw if update firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        updateFirewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.findForUpdate(apiContext, selector, options)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
   })
@@ -270,12 +275,14 @@ describe('focusedView', () => {
 
     it('should throw if firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        firewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.loadOne(apiContext, selector, options)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should accessDenied if no matching doc', () => {
@@ -314,7 +321,10 @@ describe('focusedView', () => {
           },
         }
       )
-      Collection.findOne.withArgs(selector).should.have.been.calledWith(selector, { fields: { a: 1, b: 1 } })
+      if (typeof viewSelector !== 'string') {
+        Collection.findOne.withArgs(selector)
+          .should.have.been.calledWith(selector, { fields: fromPairs(Object.keys(viewSelector).map(f => [f, 1])) })
+      }
     })
 
     it('should accessDenied when _id passed and other passed selectors were reason for not finding doc', () => {
@@ -409,22 +419,26 @@ describe('focusedView', () => {
 
     it('should throw if update firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        updateFirewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.loadOneForUpdate(apiContext, selector, options)
       }, reason)
+      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        firewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.loadOneForUpdate(apiContext, selector, options)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should accessDenied if no matching doc', () => {
@@ -518,22 +532,28 @@ describe('focusedView', () => {
 
     it('should throw if updateFirewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        updateFirewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
+      const doc = some.object()
       should.throw(() => {
-        focusedViewer.insert(apiContext, some.object())
+        focusedViewer.insert(apiContext, doc)
       }, reason)
+      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, doc)
     })
 
     it('should throw if firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        firewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
+      const doc = some.object()
       should.throw(() => {
-        focusedViewer.insert(apiContext, some.object())
+        focusedViewer.insert(apiContext, doc)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, doc)
     })
 
   })
@@ -576,22 +596,26 @@ describe('focusedView', () => {
 
     it('should throw if updateFirewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        updateFirewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.updateOne(apiContext, selector, modifier)
       }, reason)
+      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        firewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.updateOne(apiContext, selector, modifier)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
   })
@@ -624,22 +648,26 @@ describe('focusedView', () => {
 
     it('should throw if updateFirewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        updateFirewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.updateMaybe(apiContext, selector, modifier)
       }, reason)
+      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        firewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.updateMaybe(apiContext, selector, modifier)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
   })
@@ -707,22 +735,26 @@ describe('focusedView', () => {
 
     it('should throw if updateFirewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        updateFirewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.removeOne(apiContext, selector)
       }, reason)
+      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {
       const reason = some.string()
-      givenFocusedViewer({
-        firewall(ac) { ac.accessDenied(reason) },
-      })
+      const viewSpec = {
+        firewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+      }
+      givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.removeOne(apiContext, selector)
       }, reason)
+      viewSpec.firewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
   })
