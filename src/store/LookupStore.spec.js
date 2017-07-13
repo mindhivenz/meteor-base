@@ -37,17 +37,35 @@ describe('LookupStore', () => {
     return doc
   }
 
-  const givenLookupStore = () => new LookupStore(LookupDoc, some.object())
+  const givenStore = ({
+    docClass = LookupDoc,
+    publicationName = some.string(),
+    publicationFields = some.arrayOf(some.string),
+    collectionName = some.string(),
+  } = {}) =>
+    new LookupStore({
+      docClass,
+      publicationName,
+      publicationFields,
+      collectionName,
+    })
 
   describe('constructor', () => {
 
     it('should call subscriptionToObservable correctly',
       mockAppContext(modules, async () => {
-        const subscriptionOptions = some.object()
-        const store = new LookupStore(LookupDoc, subscriptionOptions)
+        const publicationName = some.string()
+        const publicationFields = some.arrayOf(some.string)
+        const collectionName = some.string()
+        const store = givenStore({ publicationName, publicationFields, collectionName })
         const expectedDoc = givenSubscriptionAdded()
 
-        mongoMirror.subscriptionToObservable.firstCall.args[0].should.have.properties(subscriptionOptions)
+        const subscriptionToObservableOptions = mongoMirror.subscriptionToObservable.firstCall.args[0]
+        subscriptionToObservableOptions.should.have.properties({
+          publicationName,
+          schema: publicationFields,
+        })
+        subscriptionToObservableOptions.collection._name.should.equal(collectionName)
         store.idMap.entries().should.deep.equal([[expectedDoc._id, expectedDoc]])
       })
     )
@@ -60,7 +78,7 @@ describe('LookupStore', () => {
       mockAppContext(modules, async () => {
         const expected = some.bool()
         subscription.loading = expected
-        const store = givenLookupStore()
+        const store = givenStore()
 
         store.loading.should.equal(expected)
       })
@@ -73,7 +91,7 @@ describe('LookupStore', () => {
     it('should return LookupClass instance by doc',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const doc = givenSubscriptionAdded()
         const actualLookup = store.get(doc)
 
@@ -87,7 +105,7 @@ describe('LookupStore', () => {
     it('should return LookupClass instance by id',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const doc = givenSubscriptionAdded()
         const actualLookup = store.get(doc._id)
 
@@ -101,7 +119,7 @@ describe('LookupStore', () => {
     it('should return LookupClass even when id not found in list',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const id = some.string()
         const actualLookup = store.get(id)
 
@@ -115,7 +133,7 @@ describe('LookupStore', () => {
     it('should return LookupClass even for missing id',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const actualLookup = store.get(some.nullOrUndefined())
 
         actualLookup.should.have.properties({
@@ -131,7 +149,7 @@ describe('LookupStore', () => {
 
     it('should return count added',
       mockAppContext(modules, async () => {
-        const store = givenLookupStore()
+        const store = givenStore()
         const docs = some.arrayOf(givenSubscriptionAdded)
 
         store.length.should.equal(docs.length)
@@ -145,7 +163,7 @@ describe('LookupStore', () => {
     it('should return all added as LookupClass instance',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const docs = some.arrayOf(givenSubscriptionAdded)
 
         store.all.should.have.properties(docs.map(d => ({ _id: d._id })))
@@ -160,7 +178,7 @@ describe('LookupStore', () => {
     it('should call mapper func with each LookupClass instance',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const docs = some.arrayOf(givenSubscriptionAdded, 2)
         const mapper = sinon.spy()
         store.map(mapper)
@@ -180,7 +198,7 @@ describe('LookupStore', () => {
     it('should call predicate func with each LookupClass instance',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const docs = some.arrayOf(givenSubscriptionAdded, 2)
         const predicate = sinon.spy(() => true)
         const actual = store.filter(predicate)
@@ -200,7 +218,7 @@ describe('LookupStore', () => {
 
     it('should call subscription stop',
       mockAppContext(modules, async () => {
-        const store = givenLookupStore()
+        const store = givenStore()
         store.stop()
 
         subscription.stop.should.have.been.called
@@ -213,8 +231,7 @@ describe('LookupStore', () => {
 
     it('should return last 5 chars of ID in brackets',
       mockAppContext(modules, async () => {
-        class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore()
         const id = '1a2b3c4d'
         const actualLookup = store.get(id)
 
@@ -224,8 +241,7 @@ describe('LookupStore', () => {
 
     it('should return [?] for missing id',
       mockAppContext(modules, async () => {
-        class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore()
         const actualLookup = store.get(some.nullOrUndefined())
 
         actualLookup.substituteLabel.should.equal('[?]')
@@ -234,9 +250,8 @@ describe('LookupStore', () => {
 
     it('should return ellipsis when store loading',
       mockAppContext(modules, async () => {
-        class SomeLookup extends LookupDoc {}
         subscription.loading = true
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore()
         const actualLookup = store.get(some.string())
 
         actualLookup.substituteLabel.should.equal('…')
@@ -254,7 +269,7 @@ describe('LookupStore', () => {
     it('should duck-type LookupStore with extra value when not in store list',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const existingDoc = givenSubscriptionAdded()
         const expectedId = some.string()
         const actual = store.ensureContains(expectedId)
@@ -275,7 +290,7 @@ describe('LookupStore', () => {
     it('should not add to list if id is in store list',
       mockAppContext(modules, async () => {
         class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore({ docClass: SomeLookup })
         const existingDoc = givenSubscriptionAdded()
         const actual = store.ensureContains(existingDoc._id)
 
@@ -291,8 +306,7 @@ describe('LookupStore', () => {
 
     it('should handle multiple ids',
       mockAppContext(modules, async () => {
-        class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore()
         const existingDoc = givenSubscriptionAdded()
         const expectedId1 = some.string()
         const expectedId2 = some.string()
@@ -308,8 +322,7 @@ describe('LookupStore', () => {
 
     it('should ignore null/undefined ids',
       mockAppContext(modules, async () => {
-        class SomeLookup extends LookupDoc {}
-        const store = new LookupStore(SomeLookup, some.object())
+        const store = givenStore()
         const existingDoc = givenSubscriptionAdded()
         const expectedId = some.string()
         const actual = store.ensureContains(some.nullOrUndefined(), expectedId)
@@ -326,7 +339,7 @@ describe('LookupStore', () => {
       it('should call predicate func with each lookup from store, not missing',
         mockAppContext(modules, async () => {
           class SomeLookup extends LookupDoc {}
-          const store = new LookupStore(SomeLookup, some.object())
+          const store = givenStore({ docClass: SomeLookup })
           const existingDoc = givenSubscriptionAdded()
           const missingId = some.string()
           const predicate = sinon.spy(() => true)
