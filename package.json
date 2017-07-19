@@ -31,6 +31,7 @@
     "@mindhive/time": "^1.0.3",
     "babel-runtime": "^6.18.0",
     "date-fns": "^1.9.0",
+    "enumify": "^1.0.4",
     "extend-accessors": "^1.0.1",
     "lodash": "^4.17.4",
     "lru-memoize": "^1.0.1",

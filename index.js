@@ -3,6 +3,7 @@ const error = require('./dist/error')
 const FocusedView = require('./dist/FocusedView')
 const roles = require('./dist/roles')
 const check = require('./dist/check')
+const LogLevel = require('./dist/LogLevel')
 
 
 module.exports.initMeteorModules = init.initMeteorModules
@@ -14,6 +15,7 @@ module.exports.validationError = error.validationError
 module.exports.FocusedView = FocusedView.default
 module.exports.prefixKeys = FocusedView.prefixKeys
 module.exports.SUPER_USER = roles.SUPER_USER
+module.exports.LogLevel = LogLevel.default
 
 /*
  Import Meteor standard packages that we would want to use directly / declarative, rather than injecting

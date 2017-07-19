@@ -1,6 +1,8 @@
 import { app } from '@mindhive/di'
 import SimpleSchema from 'simpl-schema'
+import LogLevel from '../LogLevel'
 
+/* eslint-disable no-console */
 
 const AuditEntrySchema = new SimpleSchema({
   timestamp: {
@@ -40,6 +42,7 @@ export const audit = {
     context,
     viewer,
     {
+      level = LogLevel.INFO,
       action,
       collection,
       id,
@@ -51,6 +54,7 @@ export const audit = {
     const entry = {
       connectionId: connection.id,
       clientAddress: connection.clientAddress,
+      level: level.name,
       context,
       action,
       collection: collection && collection._name,
@@ -66,8 +70,17 @@ export const audit = {
     if (fromClient) {
       entry.fromClient = true
     }
-    if (process.env.NODE_ENV === 'development') {  // specifically avoid 'test' stage
-      console.dir(entry)  // eslint-disable-line no-console
+    if (process.env.NODE_ENV !== 'test') {
+      if (level === LogLevel.ERROR) {
+        console.error(action)
+      } else if (level === LogLevel.WARN) {
+        console.warn(action)
+      } else if (process.env.NODE_ENV === 'development') {
+        console.info(action)
+      }
+      if (level.ordinal >= LogLevel.WARN || process.env.NODE_ENV === 'development') {
+        console.dir(entry, { colors: process.env.NODE_ENV === 'development' })
+      }
     }
     AuditEntries.insert(entry)
   },
