@@ -4,7 +4,8 @@ import { mockAppContext, app } from '@mindhive/di'
 import { sinon } from '../mocha'
 
 import { notAuthorizedError } from '../error'
-import MockApiRegistry from '../test/mocks/MockApiRegistry'
+import LogLevel from '../LogLevel'
+import ApiRegistry from '../server/ApiRegistry'
 
 import apiContextAuditModule, { UnhandledExceptionReporter } from './apiContextAuditModule'
 
@@ -16,7 +17,7 @@ const modules = () => ({
   audit: {
     log: sinon.spy(),
   },
-  apiRegistry: new MockApiRegistry(),
+  apiRegistry: new ApiRegistry(),
 })
 
 let error
@@ -39,6 +40,7 @@ describe('UnhandledExceptionReporter', () => {
     mockAppContext(modules, () => {
       unhandledExceptionReporter.onError(apiContext, error)
       apiContext.auditLog.should.have.been.calledWith({
+        level: LogLevel.ERROR,
         action: 'Unhandled exception',
         data: {
           exception: error.stack,
@@ -96,6 +98,7 @@ describe('apiContextAuditModule', () => {
         apiContext.apiName,
         viewer,
         {
+          level: LogLevel.ERROR,
           action: 'Unhandled exception',
           data: {
             exception: error.stack,

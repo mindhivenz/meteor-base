@@ -1,5 +1,6 @@
 import { app } from '@mindhive/di'
 
+import LogLevel from '../LogLevel'
 import { NOT_AUTHORIZED, VALIDATION_ERROR } from '../error'
 
 
@@ -8,24 +9,20 @@ export class UnhandledExceptionReporter {
   handledFilters = []
 
   onError = (apiContext, e) => {
-    const { Meteor } = app()
     const errorHandled = this.handledFilters.some(f => f(e))
-    if (Meteor.isDevelopment) {
-      if (errorHandled) {
+    if (errorHandled) {
+      if (process.env.NODE_ENV === 'development') {
         console.log('handled:', apiContext.apiName, e)  // eslint-disable-line no-console
-      } else {
-        console.error('UNHANDLED:', apiContext.apiName, e)  // eslint-disable-line no-console
       }
-    }
-    if (! errorHandled) {
-      const entry = {
+    } else {
+      apiContext.auditLog({
+        level: LogLevel.ERROR,
         action: 'Unhandled exception',
         data: {
           callArgs: apiContext.callArgs,
           exception: e.stack || String(e),
         },
-      }
-      apiContext.auditLog(entry)
+      })
     }
   }
 

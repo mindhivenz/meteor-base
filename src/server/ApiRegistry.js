@@ -1,5 +1,6 @@
 import { app } from '@mindhive/di'
 
+import LogLevel from '../LogLevel'
 import ClientApiRegistry from '../client/ClientApiRegistry'
 import HttpContext from './HttpContext'
 import adaptCursorToSubscription from './adaptCursorToSubscription'
@@ -98,9 +99,13 @@ export default class ApiRegistry extends ClientApiRegistry {
         this._errorEvent(context, e)
         if (res.headersSent) {
           console.warn('Failed to send HTTP error as headers already written')  // eslint-disable-line no-console
-          context.auditLog({ action: 'Failed to send HTTP error as headers already written' })
+          context.auditLog({
+            level: LogLevel.WARN,
+            action: 'Failed to send HTTP error as headers already written',
+          })
+        } else {
+          res.statusCode = Number.isInteger(e.error) ? e.error : 500
         }
-        res.statusCode = Number.isInteger(e.error) ? e.error : 500
         res.end()
       }
     })

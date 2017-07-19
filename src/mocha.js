@@ -4,11 +4,14 @@ import sinonChai from 'sinon-chai'
 import chaiProperties from 'chai-properties'
 import chaiAsPromised from 'chai-as-promised'
 
+import chaiPlugin from './test/chaiPlugin'
+
 const should = chai.should()
 
 chai.use(sinonChai)
 chai.use(chaiProperties)
 chai.use(chaiAsPromised)
+chai.use(chaiPlugin)
 
 export { sinon, should }
 

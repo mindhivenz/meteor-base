@@ -6,6 +6,8 @@ import {
 } from 'mobx'
 import { app } from '@mindhive/di'
 
+import LogLevel from '../LogLevel'
+
 /* eslint-disable no-console */
 
 class Message {
@@ -65,6 +67,7 @@ export default class MessageStore {
     onAction = () => {},
     exception = null,
     audit: {
+      level = LogLevel.INFO,  // Don't use ERROR when exception, only use ERROR when ops should be notified
       action,
       context,
       data = {},
@@ -86,6 +89,7 @@ export default class MessageStore {
       {
         context,
         entry: {
+          level: level.name,
           action,
           data,
         },

@@ -19,6 +19,7 @@ const AuditEntrySchema = new SimpleSchema({
   context: String,
   viewerId: { type: String, optional: true },
   orgId: { type: String, optional: true },
+  level: { type: String, allowedValues: LogLevel.enumValues.map(s => s.name) },
   action: String,
   collection: { type: String, optional: true },
   id: {
@@ -54,7 +55,7 @@ export const audit = {
     const entry = {
       connectionId: connection.id,
       clientAddress: connection.clientAddress,
-      level: level.name,
+      level: level.name || String(level),
       context,
       action,
       collection: collection && collection._name,
