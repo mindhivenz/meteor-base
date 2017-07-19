@@ -88,11 +88,9 @@ export default class MessageStore {
       'audit.log',
       {
         context,
-        entry: {
-          level: level.name,
-          action,
-          data,
-        },
+        level: level.name,
+        action,
+        data,
       },
       { notifyViewerPending: false },
     )

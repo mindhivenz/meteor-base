@@ -9,7 +9,7 @@ export const auditEnhancer = () => ({
         'audit.log',
         {
           context: this.apiName,
-          entry,
+          ...entry,
         },
         { notifyViewerPending: false },
       )

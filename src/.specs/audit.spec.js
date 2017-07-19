@@ -42,27 +42,24 @@ describe('Audit API', () => {
 
   describe('audit.log method', () => {
 
-    let context
     let viewer
 
-    beforeEach(() => {
-      context = some.string()
-    })
-
-    const whenCalled = entry =>
+    const whenCalled = args =>
       app().apiRegistry.call(
         'audit.log',
         new MockMethodInvocation({ viewer }),
-        { context, entry },
+        args,
       )
 
     it("should log an auditEntry and specify it's from the client",
       mockServerContext(modules, async () => {
         viewer = Factory.create('user')
+        const context = some.string()
         const action = some.string()
         const data = some.object()
-        const level = some.enum(LogLevel)
+        const level = some.enum(LogLevel).name
         whenCalled({
+          context,
           level,
           action,
           data,
@@ -70,7 +67,7 @@ describe('Audit API', () => {
         onlyAuditEntry().should.have.properties({
           context,
           viewerId: viewer._id,
-          level: level.name,
+          level,
           action,
           data,
           fromClient: true,
@@ -83,8 +80,8 @@ describe('Audit API', () => {
       mockServerContext(modules, async () => {
         viewer = Factory.create('user')
         whenCalled({
+          context: some.string(),
           action: some.string(),
-          data: some.object(),
         })
         onlyAuditEntry().should.have.properties({
           level: 'INFO',

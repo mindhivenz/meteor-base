@@ -2,6 +2,8 @@ import { app } from '@mindhive/di'
 import SimpleSchema from 'simpl-schema'
 import LogLevel from '../LogLevel'
 
+import { check } from '../check'
+
 /* eslint-disable no-console */
 
 const AuditEntrySchema = new SimpleSchema({
@@ -95,14 +97,23 @@ const registerApi = (apiRegistry) => {
         methodInvocation,
         {
           context,
-          entry,
+          level = LogLevel.INFO.name,
+          action,
+          data,
         },
       ) => {
+        check(context, String)
+        check(level, String)
+        check(action, String)
         audit.log(
           methodInvocation.connection,
           context,
           methodInvocation.viewer(),
-          entry,
+          {
+            level,
+            action,
+            data,
+          },
           { fromClient: true },
         )
       },
