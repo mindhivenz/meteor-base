@@ -18,9 +18,9 @@ export class UnhandledExceptionReporter {
       apiContext.auditLog({
         level: LogLevel.ERROR,
         action: 'Unhandled exception',
+        error: e,
         data: {
           callArgs: apiContext.callArgs,
-          exception: e.stack || String(e),
         },
       })
     }

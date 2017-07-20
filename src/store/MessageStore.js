@@ -78,11 +78,8 @@ export default class MessageStore {
     if (exception) {
       console.error(exception, exception.stack)
     }
-    if (exception) {
-      data.exceptionMessage = String(exception)
-      if (exception.stack) {
-        data.stack = exception.stack
-      }
+    if (exception && exception.stack) {
+      data.stack = exception.stack
     }
     api.optimisticCall(
       'audit.log',
@@ -90,6 +87,7 @@ export default class MessageStore {
         context,
         level: level.name,
         action,
+        error: exception && String(exception),
         data,
       },
       { notifyViewerPending: false },

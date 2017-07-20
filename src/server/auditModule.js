@@ -2,7 +2,7 @@ import { app } from '@mindhive/di'
 import SimpleSchema from 'simpl-schema'
 import LogLevel from '../LogLevel'
 
-import { check } from '../check'
+import { check, Match } from '../check'
 
 /* eslint-disable no-console */
 
@@ -34,6 +34,7 @@ const AuditEntrySchema = new SimpleSchema({
       return null
     },
   },
+  error: { type: String, optional: true },
   data: { type: Object, optional: true, blackbox: true },
   fromClient: { type: Boolean, optional: true },
 })
@@ -47,6 +48,7 @@ export const audit = {
     {
       level = LogLevel.INFO,
       action,
+      error,
       collection,
       id,
       data,
@@ -57,12 +59,16 @@ export const audit = {
     const entry = {
       connectionId: connection.id,
       clientAddress: connection.clientAddress,
-      level: level.name || String(level),
       context,
+      level: level.name || String(level),
       action,
+      error: error && String(error),
       collection: collection && collection._name,
       id,
-      data,
+      data: {
+        ...(error && error.stack ? { stack: error.stack } : {}),
+        ...data,
+      },
     }
     if (viewer) {
       entry.viewerId = viewer._id
@@ -99,12 +105,14 @@ const registerApi = (apiRegistry) => {
           context,
           level = LogLevel.INFO.name,
           action,
+          error,
           data,
         },
       ) => {
         check(context, String)
         check(level, String)
         check(action, String)
+        check(error, Match.Maybe(String))
         audit.log(
           methodInvocation.connection,
           context,
@@ -112,6 +120,7 @@ const registerApi = (apiRegistry) => {
           {
             level,
             action,
+            error,
             data,
           },
           { fromClient: true },

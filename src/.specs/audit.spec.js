@@ -90,6 +90,22 @@ describe('Audit API', () => {
       })
     )
 
+    it('should take error',
+      mockServerContext(modules, async () => {
+        viewer = Factory.create('user')
+        const error = some.string()
+        whenCalled({
+          context: some.string(),
+          action: some.string(),
+          error,
+        })
+        onlyAuditEntry().should.have.properties({
+          error,
+        })
+
+      })
+    )
+
   })
 
 })

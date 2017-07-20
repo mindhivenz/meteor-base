@@ -42,19 +42,11 @@ describe('UnhandledExceptionReporter', () => {
       apiContext.auditLog.should.have.been.calledWith({
         level: LogLevel.ERROR,
         action: 'Unhandled exception',
+        error,
         data: {
-          exception: error.stack,
           callArgs: apiContext.callArgs,
         },
       })
-    })
-  )
-
-  it('should use string form of error if not stack trace',
-    mockAppContext(modules, () => {
-      error = some.string()
-      unhandledExceptionReporter.onError(apiContext, error)
-      apiContext.auditLog.firstCall.args[0].data.exception.should.equal(error)
     })
   )
 
@@ -100,8 +92,8 @@ describe('apiContextAuditModule', () => {
         {
           level: LogLevel.ERROR,
           action: 'Unhandled exception',
+          error,
           data: {
-            exception: error.stack,
             callArgs: apiContext.callArgs,
           },
         }
