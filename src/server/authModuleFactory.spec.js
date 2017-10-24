@@ -3,10 +3,10 @@ import some from '@mindhive/some'
 
 import { sinon } from '../mocha'
 
-import authModule from './authModule'
+import authModuleFactory from './authModuleFactory'
 
 
-describe('authModule', () => {
+describe('authModuleFactory', () => {
 
   let connection
   let user
@@ -27,7 +27,7 @@ describe('authModule', () => {
           log: sinon.spy(),
         },
       }),
-      authModule,
+      authModuleFactory(),
     ])
 
   describe('validateAndAuditLogins', () => {
