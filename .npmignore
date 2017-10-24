@@ -3,6 +3,6 @@
 /wallaby.js
 /src/
 .babelrc
-.meteor-portable
+.meteor-portable*
 /harness.meteor/
-/src/.specs/
+!/test
