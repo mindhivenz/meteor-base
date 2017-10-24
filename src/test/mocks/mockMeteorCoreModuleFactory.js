@@ -16,30 +16,37 @@ class MockMeteor {
     const wasInFiber = require('fibers').current  // eslint-disable-line global-require
     let resolve = null
     let reject = null
+    const onlyCompletePromiseOnce = () => {
+      resolve = () => {}
+      reject = () => {}
+    }
     this._timerPromises.push(new Promise((res, rej) => {
       resolve = res
       reject = rej
     }))
     return timer(
       () => {
-        try {
-          if (wasInFiber) {
-            func.future()().resolve((err) => {
-              if (err) {
-                throw err
-              }
-            })
-          } else {
-            func()
+        if (wasInFiber) {
+          func.future()().resolve((err, res) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(res)
+            }
+            onlyCompletePromiseOnce()
+            if (err) {
+              throw err
+            }
+          })
+        } else {
+          try {
+            resolve(func())
+          } catch (e) {
+            reject(e)
+            throw e
+          } finally {
+            onlyCompletePromiseOnce()
           }
-          resolve()
-        } catch (e) {
-          reject(e)
-          throw e
-        } finally {
-          // So setInterval can call this func multiple times without us calling resolve/reject more than once
-          resolve = () => {}
-          reject = () => {}
         }
       },
       timeout,
