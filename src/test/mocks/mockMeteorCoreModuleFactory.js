@@ -4,24 +4,64 @@ import MockTracker from './MockTracker'
 import MockMongoMirror from './MockMongoMirror'
 
 
-const possiblyRunTimerFuncInFiber = timer =>
-  (func, timeout = 0) => {
+class MockMeteor {
+
+  constructor(props) {
+    Object.assign(this, props)
+  }
+
+  _timerPromises = []
+
+  _possiblyRunTimerFuncInFiber(timer, func, timeout = 0) {
     const wasInFiber = require('fibers').current  // eslint-disable-line global-require
+    let resolve = null
+    let reject = null
+    this._timerPromises.push(new Promise((res, rej) => {
+      resolve = res
+      reject = rej
+    }))
     return timer(
       () => {
-        if (wasInFiber) {
-          func.future()().resolve((err) => {
-            if (err) {
-              throw err
-            }
-          })
-        } else {
-          func()
+        try {
+          if (wasInFiber) {
+            func.future()().resolve((err) => {
+              if (err) {
+                throw err
+              }
+            })
+          } else {
+            func()
+          }
+          resolve()
+        } catch (e) {
+          reject(e)
+          throw e
+        } finally {
+          // So setInterval can call this func multiple times without us calling resolve/reject more than once
+          resolve = () => {}
+          reject = () => {}
         }
       },
       timeout,
     )
   }
+
+  _derferredPromises() {
+    return Promise.all(this._timerPromises)
+  }
+
+  isDevelopment = true
+  isProduction = false
+
+  wrapAsync = Meteor.wrapAsync
+  defer(...args) { return this._possiblyRunTimerFuncInFiber(setTimeout, ...args) }
+  startup(...args) { return this._possiblyRunTimerFuncInFiber(setTimeout, ...args) }
+  setTimeout(...args) { return this._possiblyRunTimerFuncInFiber(setTimeout, ...args) }
+  clearTimeout = clearTimeout
+  setInterval(...args) { return this._possiblyRunTimerFuncInFiber(setInterval, ...args) }
+  clearInterval = clearInterval
+}
+
 
 export default (
   {
@@ -47,20 +87,7 @@ export default (
       delete Accounts._onCreateUserHook
     }
     const result = {
-      Meteor: {
-        isClient,
-        isServer,
-        isCordova,
-        isDevelopment: true,
-        isProduction: false,
-        wrapAsync: Meteor.wrapAsync,
-        defer: possiblyRunTimerFuncInFiber(setTimeout),
-        startup: possiblyRunTimerFuncInFiber(setTimeout),
-        setTimeout: possiblyRunTimerFuncInFiber(setTimeout),
-        clearTimeout,
-        setInterval: possiblyRunTimerFuncInFiber(setInterval),
-        clearInterval,
-      },
+      Meteor: new MockMeteor({ isClient, isServer, isCordova }),
       Mongo: TestMongo,
       Users: Accounts.users,
       apiRegistry: new MockApiRegistry(),
