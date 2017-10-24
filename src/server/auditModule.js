@@ -23,17 +23,17 @@ const AuditEntrySchema = new SimpleSchema({
   orgId: { type: String, optional: true },
   level: { type: String, allowedValues: LogLevel.enumValues.map(s => s.name) },
   action: String,
-  collection: { type: String, optional: true },
-  id: {
+  collection: {
     type: String,
     optional: true,
     custom() {
-      if (this.value && ! this.field('collection').value) {
+      if (! this.value && this.field('id').value) {
         return SimpleSchema.ErrorTypes.REQUIRED
       }
       return null
     },
   },
+  id: { type: String, optional: true },
   error: { type: String, optional: true },
   data: { type: Object, optional: true, blackbox: true },
   fromClient: { type: Boolean, optional: true },
