@@ -2,7 +2,7 @@ import { app } from '@mindhive/di'
 
 
 export const defaultValidateLoginDeniedReason = user =>
-  user.disabled && 'user disabled'
+  user && user.disabled && 'user disabled'
 
 export default (validateLoginDeniedReason = defaultValidateLoginDeniedReason) =>
   ({ Accounts }) => {
