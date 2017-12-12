@@ -12,12 +12,6 @@ export default () => {
     WebApp,
   } = global  // Import like this so it can be used in Wallaby
   const Users = Meteor.users
-  if (Meteor.isServer) {
-    // REVISIT: Until Meteor on Node 6.6, we need to do this ourselves
-    process.on('unhandledRejection', (reason) => {
-      console.error('Unhandled promise rejection', reason.stack || reason)  // eslint-disable-line no-console
-    })
-  }
   const result = {
     Meteor,
     Users,
