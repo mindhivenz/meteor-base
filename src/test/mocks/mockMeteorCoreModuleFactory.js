@@ -4,6 +4,13 @@ import MockTracker from './MockTracker'
 import MockMongoMirror from './MockMongoMirror'
 
 
+let fibers
+try {
+  fibers = require('fibers')  // eslint-disable-line global-require
+} catch (ignore) {
+  fibers = null
+}
+
 class MockMeteor {
 
   constructor(props) {
@@ -13,7 +20,7 @@ class MockMeteor {
   _timerPromises = []
 
   _possiblyRunTimerFuncInFiber(timer, func, timeout = 0) {
-    const wasInFiber = require('fibers').current  // eslint-disable-line global-require
+    const wasInFiber = fibers && fibers.current
     let resolve = null
     let reject = null
     const onlyCompletePromiseOnce = () => {
