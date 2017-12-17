@@ -41,9 +41,7 @@ class DurableTaskStore {
     const serverCall = connectionStore.callStarted(serverCallOptions)
     for (;;) {
       try {
-        console.log('await executor')
         const result = await executor(args)
-        console.log('done')
         backoff.reset()
         DurableTasks.remove(taskId)
         serverCall.stop()

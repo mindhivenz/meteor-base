@@ -103,8 +103,7 @@ describe('durableTaskStore', () => {
   it('should call task again when it throws',
     mockAppContext(modules, async ({ clock, connectionStore }) => {
       givenSomeTask()
-      taskFunc.onFirstCall().throws(new some.Exception())
-      taskFunc.onSecondCall().returns(undefined)
+      taskFunc.onFirstCall().throws()
       await whenAddTask()
 
       taskFunc.should.have.been.calledTwice
@@ -182,8 +181,7 @@ describe('durableTaskStore', () => {
       })
       givenDomainModuleInited()
       givenSomeTask()
-      await tick()
-      await tick()
+      await new Promise((resolve) => {DurableTasks.once('loaded', resolve)})
 
       taskFunc.should.have.been.calledOnce
       taskFunc.should.have.been.calledWith(expectedArgs)
