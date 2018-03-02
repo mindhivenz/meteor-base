@@ -22,7 +22,7 @@ export const prefixKeys = (prefix, fields) => {
 const VIEW_SPEC_PROPERTIES = [
   'firewall',
   'findSelector',
-  'updateFirewall',
+  'writeFirewall',
   'updateSelector',
   'insertDocMerge',
 ]
@@ -139,9 +139,9 @@ export default class FocusedView {
     }
   }
 
-  _updateFirewall(apiContext, selector) {
-    if (this.viewSpec.updateFirewall) {
-      this.viewSpec.updateFirewall(apiContext, selectorAsObject(selector))
+  _writeFirewall(apiContext, selector) {
+    if (this.viewSpec.writeFirewall) {
+      this.viewSpec.writeFirewall(apiContext, selectorAsObject(selector))
     }
     this._firewall(apiContext, selector)
   }
@@ -152,7 +152,7 @@ export default class FocusedView {
   }
 
   findForUpdate(apiContext, selector, options) {
-    this._updateFirewall(apiContext, selector)
+    this._writeFirewall(apiContext, selector)
     return this.collection.find(this.selector(apiContext, selector, 'update'), options)
   }
 
@@ -170,31 +170,31 @@ export default class FocusedView {
   }
 
   loadOneForUpdate(apiContext, selector, options) {
-    this._updateFirewall(apiContext, selector)
+    this._writeFirewall(apiContext, selector)
     return this._loadOne(apiContext, selector, options, 'loadOneForUpdate', 'update')
   }
 
   insert(apiContext, doc) {
-    this._updateFirewall(apiContext, doc)
+    this._writeFirewall(apiContext, doc)
     const insertDoc = this.viewSpec.insertDocMerge ? this.viewSpec.insertDocMerge(apiContext.viewer(), doc) : clone(doc)
     insertDoc._id = this.collection.insert(insertDoc)
     return insertDoc
   }
 
   updateOne(apiContext, selector, modifier) {
-    this._updateFirewall(apiContext, selector)
+    this._writeFirewall(apiContext, selector)
     const updateCount = this.collection.update(this.selector(apiContext, selector, 'updateOne'), modifier)
     this._reportAccessDeniedForNotOne(updateCount, apiContext, selector, 'updateOne')
     return updateCount
   }
 
   updateMaybe(apiContext, selector, modifier) {
-    this._updateFirewall(apiContext, selector)
+    this._writeFirewall(apiContext, selector)
     return this.collection.update(this.selector(apiContext, selector, 'updateMany'), modifier)
   }
 
   removeOne(apiContext, selector) {
-    this._updateFirewall(apiContext, selector)
+    this._writeFirewall(apiContext, selector)
     const fullSelector = this.selector(apiContext, selector, 'removeOne')
     if (! selectorIsById(fullSelector)) {
       throw new Error('Can only perform removeOne by id')

@@ -420,13 +420,13 @@ describe('focusedView', () => {
     it('should throw if update firewall does', () => {
       const reason = some.string()
       const viewSpec = {
-        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+        writeFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
       }
       givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.loadOneForUpdate(apiContext, selector, options)
       }, reason)
-      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
+      viewSpec.writeFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {
@@ -530,17 +530,17 @@ describe('focusedView', () => {
       focusedViewer.insert(apiContext, originalDoc)
     })
 
-    it('should throw if updateFirewall does', () => {
+    it('should throw if writeFirewall does', () => {
       const reason = some.string()
       const viewSpec = {
-        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+        writeFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
       }
       givenFocusedViewer(viewSpec)
       const doc = some.object()
       should.throw(() => {
         focusedViewer.insert(apiContext, doc)
       }, reason)
-      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, doc)
+      viewSpec.writeFirewall.should.have.been.calledWith(apiContext, doc)
     })
 
     it('should throw if firewall does', () => {
@@ -594,16 +594,16 @@ describe('focusedView', () => {
       Collection.update.should.have.been.calledWith(builtSelector('updateOne'), modifier)
     })
 
-    it('should throw if updateFirewall does', () => {
+    it('should throw if writeFirewall does', () => {
       const reason = some.string()
       const viewSpec = {
-        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+        writeFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
       }
       givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.updateOne(apiContext, selector, modifier)
       }, reason)
-      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
+      viewSpec.writeFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {
@@ -646,16 +646,16 @@ describe('focusedView', () => {
       Collection.update.should.have.been.calledWith(builtSelector('updateMaybe'), modifier)
     })
 
-    it('should throw if updateFirewall does', () => {
+    it('should throw if writeFirewall does', () => {
       const reason = some.string()
       const viewSpec = {
-        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+        writeFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
       }
       givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.updateMaybe(apiContext, selector, modifier)
       }, reason)
-      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
+      viewSpec.writeFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {
@@ -733,16 +733,16 @@ describe('focusedView', () => {
       )
     })
 
-    it('should throw if updateFirewall does', () => {
+    it('should throw if writeFirewall does', () => {
       const reason = some.string()
       const viewSpec = {
-        updateFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
+        writeFirewall: sinon.spy((ac) => { ac.accessDenied(reason) }),
       }
       givenFocusedViewer(viewSpec)
       should.throw(() => {
         focusedViewer.removeOne(apiContext, selector)
       }, reason)
-      viewSpec.updateFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
+      viewSpec.writeFirewall.should.have.been.calledWith(apiContext, selectorAsObject(selector))
     })
 
     it('should throw if firewall does', () => {

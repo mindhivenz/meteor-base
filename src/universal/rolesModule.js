@@ -14,7 +14,7 @@ export const rolesEnhancer = Roles => ({
 })
 
 export default ({ apiRegistry }) => {
-  const Roles = global.Roles
+  const { Roles } = global
   apiRegistry.apiContextEnhancer(rolesEnhancer(Roles))
   return {
     Roles,
