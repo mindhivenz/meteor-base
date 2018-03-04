@@ -51,6 +51,8 @@ export default class Api {
     return this.meteorCall(methodName, args, options, (error) => {
       if (error) {
         // No need to systemMessageStore.addMessageAndAuditLog here as audit log should have been done on the server
+        // eslint-disable-next-line no-console
+        console.error(`Unexpectedly failed calling ${methodName}`, error)
         app().systemMessageStore.addMessage({
           message: 'Terribly sorry, but that change failed',
         })
