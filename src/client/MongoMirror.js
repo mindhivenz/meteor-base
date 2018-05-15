@@ -97,7 +97,7 @@ export default class MongoMirror {
     const asShallowObservable = (id, fields) => {
       const missingFields = difference(topLevelSchemaFields, Object.keys(fields))
       const undefinedFields = fromPairs(missingFields.map(f => [f, undefined]))
-      return extendShallowObservable({ _id: id }, fields, undefinedFields)
+      return extendShallowObservable({ _id: id }, { ...fields, ...undefinedFields })
     }
     meteorTracker.nonreactive(() => {
       runInAction(`${context}: initial fetch`, () => {
@@ -302,6 +302,7 @@ export default class MongoMirror {
     groundCollection,
     observableArray,
     observableMap,
+    schema,
   }) {
     // REVISIT: this will have 3 copies in memory (groundCollection._collection, subscription collection, observable(s))
     checkFindOptions({ findOptions, observableArray })
@@ -309,6 +310,7 @@ export default class MongoMirror {
       groundCollection,
       observableArray,
       observableMap,
+      schema,
     })
     return this.subscriptionToOffline({
       publicationName,
