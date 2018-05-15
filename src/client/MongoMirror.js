@@ -10,6 +10,7 @@ import difference from 'lodash/difference'
 import fromPairs from 'lodash/fromPairs'
 
 import devError from '../devError'
+import devWarn from '../devWarn'
 import { topLevelFieldsFromSchema, collectionAttachedSchema } from '../schemaHelper'
 
 // Originally based on https://github.com/meteor-space/tracker-mobx-autorun 0.2.0
@@ -94,6 +95,10 @@ export default class MongoMirror {
     const mapError = (message) => { devError(`${message}\nobservableMap keys: ${Array.from(observableMap.keys())}`) }
     const arrayError = (message) => { devError(`${message}\nobservableArray keys: ${observableArray.map(d => d._id)}`) }
     const topLevelSchemaFields = topLevelFieldsFromSchema(schema) || []
+    if (! topLevelSchemaFields.length) {
+      devWarn(`Mongo documents for ${context} being made observable without a schema, ` +
+        'this can result in unobserved fields if they are initially undefined')
+    }
     const asShallowObservable = (id, fields) => {
       const missingFields = difference(topLevelSchemaFields, Object.keys(fields))
       const undefinedFields = fromPairs(missingFields.map(f => [f, undefined]))
