@@ -1,6 +1,6 @@
 import { initModules } from '@mindhive/di'
 import clockModule from '@mindhive/time/clockModule'
-import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
+import { ProgressiveBackoff } from '../universal/ProgressiveBackoff'
 
 
 export default () => {
