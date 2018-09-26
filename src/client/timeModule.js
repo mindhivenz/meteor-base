@@ -1,8 +1,7 @@
 import extendClock from '@mindhive/time/extendClock'
 import ProgressiveBackoff from '@mindhive/time/ProgressiveBackoff'
 
-
-const TimeSync = global.TimeSync
+const { TimeSync } = global
 
 const localClock = () => new Date()
 
@@ -20,7 +19,20 @@ const serverSyncClock = () => {
   return new Date(serverTime)
 }
 
-export default () => ({
-  clock: extendClock(TimeSync ? serverSyncClock : localClock),
-  ProgressiveBackoff,
-})
+export default () => {
+  const clock = extendClock(TimeSync ? serverSyncClock : localClock)
+
+  class LocalClockProgressiveBackoff extends ProgressiveBackoff {
+    constructor(options) {
+      super({
+        clock,
+        ...options
+      })
+    }
+  }
+
+  return ({
+    clock,
+    ProgressiveBackoff: LocalClockProgressiveBackoff,
+  })
+}
