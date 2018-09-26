@@ -19,7 +19,20 @@ const serverSyncClock = () => {
   return new Date(serverTime)
 }
 
-export default () => ({
-  clock: extendClock(TimeSync ? serverSyncClock : localClock),
-  ProgressiveBackoff,
-})
+export default () => {
+  const clock = extendClock(TimeSync ? serverSyncClock : localClock)
+
+  class LocalClockProgressiveBackoff extends ProgressiveBackoff {
+    constructor(options) {
+      super({
+        clock,
+        ...options
+      })
+    }
+  }
+
+  return ({
+    clock,
+    ProgressiveBackoff: LocalClockProgressiveBackoff,
+  })
+}
